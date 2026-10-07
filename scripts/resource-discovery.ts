@@ -1,5 +1,5 @@
 import { readdir } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { join, relative, sep } from "node:path";
 
 export const RESOURCE_SECTIONS = [
   "agents",
@@ -98,7 +98,7 @@ export async function discoverResourceFiles(
     resources[section] = files.map((sourcePath) => ({
       section,
       sourcePath,
-      pluginPath: `./${relative(root, sourcePath)}`,
+      pluginPath: `./${relative(root, sourcePath).split(sep).join("/")}`,
     }));
   }
 

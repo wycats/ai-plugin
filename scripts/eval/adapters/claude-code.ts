@@ -2,12 +2,16 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { basename, dirname, join } from "node:path";
+import { join } from "node:path";
+import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
 import { findClaudeCommand, type ClaudeCommand } from "../../claude-executable.ts";
 import type { EvaluationResource, EvaluationSuite } from "../core.ts";
 import { canonicalResourceDescriptor } from "../resource.ts";
 import { discoverResourceFiles } from "../../resource-discovery.ts";
+import { loadCanonicalComposition, formatCompositionDiagnostics } from "../../resource-composition.ts";
+import { createProjectionPlan, parseProjectionResourceMap, resolveProjectedResource, type ProjectionResourceMap } from "../../projection-plan.ts";
+import { CLAUDE_CODE_TARGET, outputPathForTarget } from "../../target-output.ts";
 import type {
   AdapterMetadata,
   AdapterObservation,
@@ -53,15 +57,9 @@ export function parseClaudeCodeConfig(value: unknown): { models: Record<string, 
 
 export async function validateClaudeCodeProjection(root: string): Promise<void> {
   const resources = await discoverResourceFiles(root);
-  const names = new Map<string, string>();
-  for (const resource of [...resources.skills, ...resources.stances]) {
-    const name = basename(dirname(resource.sourcePath));
-    const previous = names.get(name);
-    if (previous) {
-      throw new Error(`Claude Code skill '${name}' collides between ${previous} and ${resource.pluginPath}.`);
-    }
-    names.set(name, resource.pluginPath);
-  }
+  const result = await loadCanonicalComposition(root, resources);
+  if (!result.composition) throw new Error(formatCompositionDiagnostics(result.diagnostics));
+  await createProjectionPlan(result.composition, CLAUDE_CODE_TARGET, outputPathForTarget(root, CLAUDE_CODE_TARGET));
 }
 
 function messageContent(event: Record<string, unknown>): unknown[] {
@@ -207,10 +205,11 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
   #command: ClaudeCommand | undefined;
   #launcherModel = "";
   #pluginName = "";
+  #resourceMap: ProjectionResourceMap | undefined;
 
   constructor(root: string) {
     this.#root = root;
-    this.#projection = join(root, "out", "claude-code");
+    this.#projection = outputPathForTarget(root, CLAUDE_CODE_TARGET);
     this.#configPath = join(root, "config.claude-code.example.json");
     const pluginManifest = JSON.parse(
       readFileSync(join(root, "plugin.json"), "utf-8"),
@@ -253,6 +252,9 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
     if (pluginManifest.name !== this.#pluginName) {
       throw new Error("The Claude Code projection must preserve the canonical plugin name.");
     }
+    const mapPath = join(this.#projection, "projection-resources.json");
+    const mapSource = await readFile(mapPath, "utf8");
+    this.#resourceMap = parseProjectionResourceMap(JSON.parse(mapSource) as unknown, this.target);
     return {
       id: this.id,
       target: this.target,
@@ -267,6 +269,7 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
         { encoding: "utf-8" },
       ).trim(),
       projection: this.#projection,
+      projectionResourceMap: { path: mapPath, digest: createHash("sha256").update(mapSource).digest("hex") },
       launcherModel: {
         role: "balanced",
         target: this.#launcherModel,
@@ -276,11 +279,11 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
   }
 
   projectedResourcePath(resource: EvaluationResource): string {
-    const descriptor = canonicalResourceDescriptor(resource.path);
-    if (descriptor.kind === "stance") {
-      return join(this.#projection, "skills", descriptor.name, "SKILL.md");
-    }
-    return join(this.#projection, resource.path);
+    this.#resourceMap ??= parseProjectionResourceMap(
+      JSON.parse(readFileSync(join(this.#projection, "projection-resources.json"), "utf8")) as unknown,
+      this.target,
+    );
+    return resolveProjectedResource(this.#projection, this.#resourceMap, resource.path);
   }
 
   projectPrompt(suite: EvaluationSuite, canonicalPrompt: string): string {

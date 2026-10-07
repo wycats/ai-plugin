@@ -11,6 +11,7 @@
 
 import { readFile, stat } from "node:fs/promises";
 import { basename, dirname, isAbsolute, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   RESOURCE_SECTIONS,
   discoverResourceFiles,
@@ -20,7 +21,7 @@ import { loadCanonicalComposition } from "./resource-composition.ts";
 
 const HOOK_TYPES = new Set(["policy", "observer", "side-effect"]);
 
-const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 
 let errors = 0;
 
@@ -30,7 +31,7 @@ function error(msg: string) {
 }
 
 function extractFrontmatter(content: string): Record<string, string> | null {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
 
   const fields: Record<string, string> = {};

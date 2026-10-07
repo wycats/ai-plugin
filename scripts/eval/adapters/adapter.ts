@@ -33,6 +33,7 @@ export interface AdapterMetadata {
   argumentPrefix: string[];
   runtimeVersion: string;
   projection: string;
+  projectionResourceMap: { path: string; digest: string };
   launcherModel: {
     role: string;
     target: string;

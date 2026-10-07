@@ -15,7 +15,7 @@ import {
   outputPathForTarget,
 } from "./target-output.ts";
 
-const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const CODEX_OUT = outputPathForTarget(ROOT, CODEX_TARGET);
 const CODEX_OUT_REL = displayOutputDirectoryForTarget(CODEX_TARGET);
 const CODEX_CONFIG = "config.codex.example.json";

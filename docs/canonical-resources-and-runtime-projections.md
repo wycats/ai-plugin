@@ -111,6 +111,32 @@ without asserting that generated frontmatter retained the same line number.
 The index supports inspection and discovery; canonical prose remains the
 authority for what each relationship means.
 
+## Projection plans and artifact addresses
+
+`scripts/projection-plan.ts` selects materialized resources and records their
+target destinations, intended public or private surface, and reference-only
+status. The same plan supplies support-directory copying, manifest paths,
+composition addresses, and the Pi capability catalog. Public and private
+describe the intended discovery surface; they do not prove runtime activation.
+
+The bounded Pi profile lives in `scripts/pi-profile.ts`. Its delegated catalog
+contains the public Recon workflow and four constituent stances. The package
+also carries the larger private stance collection for navigation. Packaging
+availability and the delegated catalog remain separate decisions.
+
+Every target emits `projection-resources.json` with `schemaVersion: 1`, the
+target, and resource records containing `canonicalSource`, `generatedSource`,
+canonical `identity`, and `exposure`. Canonical and generated addresses use
+forward slashes; filesystem paths remain native. Evaluation consumes this
+artifact map instead of independently reconstructing a runtime's layout.
+
+Claude Code, Codex, and Pi publication prepare their distinct package layouts
+through `scripts/publish-generated.ts`. Each publication stages a fresh orphan
+snapshot and updates only its generated branch, with a lease against the head
+observed before staging. Validation or concurrent updates prevent publication;
+the temporary checkout is cleaned up. VS Code continues publishing its tracked
+distribution through the separate main-branch contract.
+
 ## Reinforcement, variants, and loss
 
 Intentional restatement is useful when it deepens the same well. A compact

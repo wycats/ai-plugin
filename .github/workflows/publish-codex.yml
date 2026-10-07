@@ -37,9 +37,6 @@ jobs:
       - name: Typecheck and lint scripts
         run: pnpm check
 
-      - name: Build Codex plugin
-        run: pnpm build:codex
-
       - name: Publish Codex marketplace branch
         run: |
           git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"

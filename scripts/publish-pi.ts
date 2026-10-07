@@ -5,12 +5,10 @@ import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
+import { gitOutput, publishGeneratedOutput } from "./publish-generated.ts";
+
 export const PI_PUBLICATION_BRANCH = "pi-plugin";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-
-function git(cwd: string, args: string[]): string {
-  return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
-}
 
 /** Accepts a built package; tests publish exclusively to disposable local remotes. */
 export async function publishPiOutput(output: string, remote: string): Promise<string> {
@@ -28,26 +26,18 @@ export async function publishPiOutput(output: string, remote: string): Promise<s
     await access(join(output, path));
   }
 
-  const stage = await mkdtemp(join(tmpdir(), "wycats-pi-publish-"));
-  try {
-    await cp(output, stage, { recursive: true });
-    await writeFile(join(stage, "README.md"), `# Wycats AI Plugin — Pi projection\n\nGenerated from the canonical resources in [wycats/vscode-ai-plugin](https://github.com/wycats/vscode-ai-plugin).\n\nRequires Node 24+, Pi, and pi-subagents for the delegated agent. This first projection exposes Recon and private constituent stances. See projection-capabilities.json for scope and runtime assumptions.\n\nInstall:\n\n\`\`\`sh\npi install git:github.com/wycats/vscode-ai-plugin@pi-plugin\n\`\`\`\n\nUpdate on Pi 0.85.1:\n\n\`\`\`sh\npi update git:github.com/wycats/vscode-ai-plugin@pi-plugin\n\`\`\`\n\nThen use /reload or restart pi. This branch is generated; edit canonical resources on main.\n`);
-    git(stage, ["init", "--quiet"]);
-    git(stage, ["config", "user.name", "github-actions[bot]"]);
-    git(stage, ["config", "user.email", "github-actions[bot]@users.noreply.github.com"]);
-    git(stage, ["remote", "add", "origin", remote]);
-    const ref = `refs/heads/${PI_PUBLICATION_BRANCH}`;
-    const previous = git(stage, ["ls-remote", "--heads", "origin", ref]).split(/\s+/)[0] ?? "";
-    git(stage, ["add", "--all"]);
-    // An orphan snapshot matches the existing generated publication branches.
-    git(stage, ["commit", "--quiet", "-m", `Update Pi plugin (${manifest.version})`]);
-    const head = git(stage, ["rev-parse", "HEAD"]);
-    // Refuse to overwrite a publication that changed after the observed head.
-    git(stage, ["push", `--force-with-lease=${ref}:${previous}`, "origin", `HEAD:${ref}`]);
-    return head;
-  } finally {
-    await rm(stage, { recursive: true, force: true });
-  }
+  return publishGeneratedOutput({
+    remote, branch: PI_PUBLICATION_BRANCH, message: `Update Pi plugin (${manifest.version})`,
+    prepare: async (stage) => {
+      await cp(output, stage, { recursive: true });
+      await writeFile(join(stage, "README.md"), `# Wycats AI Plugin — Pi projection\n\nGenerated from the canonical resources in [wycats/vscode-ai-plugin](https://github.com/wycats/vscode-ai-plugin).\n\nRequires Node 24+, Pi, and pi-subagents for the delegated agent. This first projection exposes Recon and private constituent stances. See projection-capabilities.json for scope and runtime assumptions.\n\nInstall:\n\n\`\`\`sh\npi install git:github.com/wycats/vscode-ai-plugin@pi-plugin\n\`\`\`\n\nUpdate on Pi 0.85.1:\n\n\`\`\`sh\npi update git:github.com/wycats/vscode-ai-plugin@pi-plugin\n\`\`\`\n\nThen use /reload or restart pi. This branch is generated; edit canonical resources on main.\n`);
+      for (const path of ["skills/recon/SKILL.md", "agents/wycats-recon.agent.md", "stances", "composition-index.json", "projection-capabilities.json", "projection-resources.json"]) {
+        await access(join(stage, path));
+      }
+      const stagedManifest = JSON.parse(await readFile(join(stage, "package.json"), "utf8")) as { name?: string; version?: string };
+      if (stagedManifest.name !== manifest.name || stagedManifest.version !== manifest.version) throw new Error("Pi package changed while staging");
+    },
+  });
 }
 
 async function main(): Promise<void> {
@@ -56,7 +46,7 @@ async function main(): Promise<void> {
   try {
     const output = join(stage, "package");
     execFileSync(process.execPath, ["scripts/build.ts", "--config", "config.pi.example.json", "--output", output], { cwd: ROOT, stdio: "inherit" });
-    const remote = git(ROOT, ["remote", "get-url", "origin"]);
+    const remote = gitOutput(ROOT, ["remote", "get-url", "origin"]);
     const head = await publishPiOutput(output, remote);
     console.log(`Published Pi package to ${PI_PUBLICATION_BRANCH}: ${head}`);
   } finally {

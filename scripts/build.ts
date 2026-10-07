@@ -10,8 +10,8 @@
  * (vscode → out/wycats/, claude-code → out/claude-code/, codex → out/codex/).
  */
 
-import { readFile, writeFile, mkdir, cp } from "node:fs/promises";
-import { join, relative, dirname, basename, resolve } from "node:path";
+import { readFile, writeFile, mkdir, cp, stat } from "node:fs/promises";
+import { join, relative, dirname, resolve, posix } from "node:path";
 import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 import { ModuleKind, ScriptTarget, transpileModule } from "typescript";
@@ -33,6 +33,8 @@ import {
   type CanonicalComposition,
 } from "./resource-composition.ts";
 import { assertSafeOutputOverride, prepareProjectionOutput } from "./projection-output.ts";
+import { PI_PROFILE, piAgentContext } from "./pi-profile.ts";
+import { createProjectionPlan, projectionResourceMap, type ProjectionPlan } from "./projection-plan.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DEFAULT_CONFIG_PATH = join(ROOT, "config.json");
@@ -277,6 +279,7 @@ async function buildAgent(
   config: Config,
   composition: CanonicalComposition,
   outputBySourcePath: ReadonlyMap<string, string>,
+  profileSkillNames: string[],
 ): Promise<string> {
   const raw = projectCompositionLinks(
     await readFile(srcPath, "utf-8"),
@@ -292,7 +295,7 @@ async function buildAgent(
 
   // Claude Code and pi-subagents require a name field — insert at the front.
   if ((isClaudeCode || isPi) && !data.name) {
-    const name = isPi ? "wycats-recon" : deriveAgentName(filename);
+    const name = isPi ? PI_PROFILE.name : deriveAgentName(filename);
     const original = { ...data };
     for (const k of Object.keys(data)) {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -328,22 +331,7 @@ async function buildAgent(
   }
 
   if (isPi) {
-    Object.assign(data, {
-      advertise: true,
-      systemPromptMode: "replace",
-      inheritProjectContext: true,
-      inheritGlobalContext: false,
-      inheritSkills: false,
-      skills: [
-        "recon",
-        "diagnostic-questioning",
-        "interpretive-synthesis",
-        "observational-grounding",
-        "relational-continuity",
-      ],
-      skillPath: ["../skills", "../stances"],
-      allowNestedSubagents: false,
-    });
+    Object.assign(data, piAgentContext(profileSkillNames));
   }
 
   const frontmatter = serializeFrontmatter(data, isPi ? "block" : "flow");
@@ -507,57 +495,6 @@ function buildCCHooks(
   ).then(() => ["./hooks/hooks.json"]);
 }
 
-async function copyDir(srcName: string, outDir: string): Promise<void> {
-  const srcDir = join(ROOT, srcName);
-  const destDir = join(outDir, srcName);
-  try {
-    await cp(srcDir, destDir, { recursive: true });
-  } catch {
-    return;
-  }
-}
-
-function projectedResourcePath(
-  outDir: string,
-  target: string,
-  resource: DiscoveredResource,
-): string {
-  if (resource.section === "agents" && target === PI_TARGET) {
-    return join(outDir, "agents", "wycats-recon.agent.md");
-  }
-  if (
-    resource.section === "stances" &&
-    (target === "claude-code" || target === CODEX_TARGET)
-  ) {
-    return join(outDir, "skills", basename(dirname(resource.sourcePath)), "SKILL.md");
-  }
-  return join(outDir, resource.pluginPath.replace(/^\.\//, ""));
-}
-
-function resourcesProjectedForTarget(
-  target: string,
-  resources: Awaited<ReturnType<typeof discoverResourceFiles>>,
-): DiscoveredResource[] {
-  if (target !== PI_TARGET) {
-    return [
-      ...resources.agents,
-      ...resources.skills,
-      ...resources.stances,
-      ...(target === VSCODE_TARGET ? resources.instructions : []),
-    ];
-  }
-
-  return [
-    ...resources.agents.filter(
-      (resource) => basename(resource.sourcePath) === "recon.agent.md",
-    ),
-    ...resources.skills.filter(
-      (resource) => basename(dirname(resource.sourcePath)) === "recon",
-    ),
-    ...resources.stances,
-  ];
-}
-
 async function writeProjectedResource(
   resource: DiscoveredResource,
   outPath: string,
@@ -621,18 +558,10 @@ async function writeCompositionIndex(
 
 async function writePiCapabilityReport(
   outDir: string,
-  composition: CanonicalComposition,
+  plan: ProjectionPlan,
 ): Promise<void> {
-  const selected = new Set([
-    "skill:recon",
-    "skill:diagnostic-questioning",
-    "skill:interpretive-synthesis",
-    "skill:observational-grounding",
-    "skill:relational-continuity",
-  ]);
   const catalog = [];
-  for (const resource of composition.resources) {
-    if (!selected.has(resource.identity)) continue;
+  for (const { resource, pluginPath } of plan.profileResources) {
     const data = matter(await readFile(resource.sourcePath, "utf-8")).data as Record<
       string,
       unknown
@@ -641,10 +570,7 @@ async function writePiCapabilityReport(
       name: resource.name,
       description:
         typeof data.description === "string" ? data.description : "",
-      location:
-        resource.section === "skills"
-          ? `./skills/${resource.name}/SKILL.md`
-          : `./stances/${resource.name}/SKILL.md`,
+      location: pluginPath,
     });
   }
 
@@ -653,8 +579,8 @@ async function writePiCapabilityReport(
     JSON.stringify(
       {
         schemaVersion: 1,
-        profile: "wycats-recon",
-        workflow: "recon",
+        profile: PI_PROFILE.name,
+        workflow: plan.profileResources[0].resource.name,
         runtimePrerequisites: {
           pi: {
             inspectedVersion: "0.85.1",
@@ -719,13 +645,9 @@ async function build() {
   const isClaudeCode = config.target === "claude-code";
   const isCodex = config.target === CODEX_TARGET;
   const isPi = config.target === PI_TARGET;
-  const projectedResources = resourcesProjectedForTarget(config.target, resources);
-  const outputBySourcePath = new Map(
-    projectedResources.map((resource) => [
-      resolve(resource.sourcePath),
-      projectedResourcePath(outDir, config.target, resource),
-    ]),
-  );
+  const plan = await createProjectionPlan(composition, config.target, outDir);
+  const projectedResources = plan.resources.map(({ resource }) => resource);
+  const { outputBySourcePath } = plan;
 
   // Source and target preflight intentionally complete before generated output changes.
   await prepareProjectionOutput({
@@ -757,27 +679,21 @@ async function build() {
         config,
         composition,
         outputBySourcePath,
+        plan.profileResources.map(({ resource }) => resource.name),
       ),
     );
   }
 
-  if (isPi) {
-    await cp(join(ROOT, "skills", "recon"), join(outDir, "skills", "recon"), {
-      recursive: true,
-    });
-    await copyDir("stances", outDir);
-  } else {
-    await copyDir("skills", outDir);
-    if (isClaudeCode || isCodex) {
-      for (const stance of resources.stances) {
-        const outPath = outputBySourcePath.get(resolve(stance.sourcePath));
-        if (!outPath) throw new Error(`Missing output path for ${stance.pluginPath}`);
-        await mkdir(dirname(outPath), { recursive: true });
-        await cp(stance.sourcePath, outPath);
+  for (const copy of plan.supportCopies) {
+    if (copy.optional) {
+      try {
+        await stat(copy.source);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") continue;
+        throw error;
       }
-    } else {
-      await copyDir("stances", outDir);
     }
+    await cp(copy.source, copy.destination, { recursive: true });
   }
 
   const skillResources = projectedResources.filter(
@@ -797,17 +713,12 @@ async function build() {
     );
   }
 
-  const skillPaths = skillResources.map(
-    (resource) =>
-      `./${relative(outDir, outputBySourcePath.get(resolve(resource.sourcePath)) ?? "").split("\\").join("/")}`,
-  );
-  const stancePaths = stanceResources.map(
-    (resource) =>
-      `./${relative(outDir, outputBySourcePath.get(resolve(resource.sourcePath)) ?? "").split("\\").join("/")}`,
-  );
+  const skillPaths = plan.resources.filter(({ resource }) => resource.section === "skills").map(({ pluginPath }) => pluginPath);
+  const stancePaths = plan.resources.filter(({ resource }) => resource.section === "stances").map(({ pluginPath }) => pluginPath);
+
   const allSkillPaths = [...skillPaths, ...stancePaths];
 
-  const hookPaths = isCodex || isPi
+  const hookPaths = !plan.includesHooks
     ? []
     : await buildHooks(
         outDir,
@@ -816,6 +727,7 @@ async function build() {
       );
 
   await writeCompositionIndex(outDir, composition, outputBySourcePath);
+  await writeFile(join(outDir, "projection-resources.json"), JSON.stringify(projectionResourceMap(plan), null, 2) + "\n");
 
   const packageJson = isPi
     ? {
@@ -826,7 +738,7 @@ async function build() {
         keywords: ["pi-package"],
         engines: { node: ">=24.0.0" },
         pi: {
-          skills: ["./skills/recon"],
+          skills: plan.resources.filter(({ resource, exposure }) => resource.section === "skills" && exposure === "public").map(({ pluginPath }) => posix.dirname(pluginPath)),
           subagents: { agents: ["./agents"] },
         },
       }
@@ -837,7 +749,7 @@ async function build() {
   );
 
   if (isPi) {
-    await writePiCapabilityReport(outDir, composition);
+    await writePiCapabilityReport(outDir, plan);
     console.log(`Built to ${relative(ROOT, outDir)}/`);
     console.log(`  agents:       ${String(agentPaths.length)} pi-subagents profile`);
     console.log(`  skills:       ${String(skillPaths.length)} public workflow`);
@@ -919,8 +831,7 @@ async function build() {
     console.log(`  manifest:     .codex-plugin/plugin.json`);
   } else {
     // VS Code: copy instructions; generate plugin.json
-    await copyDir("instructions", outDir);
-    for (const resource of resources.instructions) {
+    for (const resource of projectedResources.filter((resource) => resource.section === "instructions")) {
       const outPath = outputBySourcePath.get(resolve(resource.sourcePath));
       if (!outPath) throw new Error(`Missing output path for ${resource.pluginPath}`);
       await writeProjectedResource(
@@ -930,9 +841,7 @@ async function build() {
         outputBySourcePath,
       );
     }
-    const instructionPaths = resources.instructions.map(
-      (resource) => resource.pluginPath,
-    );
+    const instructionPaths = plan.resources.filter(({ resource }) => resource.section === "instructions").map(({ pluginPath }) => pluginPath);
 
     const pluginJson: PluginJson = {
       name: pluginMeta.name,
