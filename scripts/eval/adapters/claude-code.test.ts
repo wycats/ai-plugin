@@ -36,6 +36,14 @@ const suite: EvaluationSuite = {
 function testAdapter(): { adapter: ClaudeCodeCliAdapter; root: string } {
   const root = mkdtempSync(join(tmpdir(), "claude-adapter-"));
   writeFileSync(join(root, "plugin.json"), '{"name":"wycats-ai-plugin"}\n');
+  const projection = join(root, "out", "claude-code");
+  mkdirSync(projection, { recursive: true });
+  writeFileSync(join(projection, "projection-resources.json"), JSON.stringify({
+    schemaVersion: 1, target: "claude-code", resources: [
+      { canonicalSource: "./agents/slop-linter.agent.md", generatedSource: "./agents/custom-review.agent.md", identity: "agent:slop-linter", exposure: "public" },
+      { canonicalSource: "./stances/relational-continuity/SKILL.md", generatedSource: "./skills/relational-continuity/SKILL.md", identity: "skill:relational-continuity", exposure: "private" },
+    ],
+  }));
   return { adapter: new ClaudeCodeCliAdapter(root), root };
 }
 
@@ -64,9 +72,9 @@ void test("rejects skill and stance names that share a Claude projection", async
   try {
     for (const section of ["skills", "stances"]) {
       mkdirSync(join(root, section, "shared"), { recursive: true });
-      writeFileSync(join(root, section, "shared", "SKILL.md"), "Resource body");
+      writeFileSync(join(root, section, "shared", "SKILL.md"), "---\nname: shared\ndescription: Fixture\n---\nResource body");
     }
-    await assert.rejects(validateClaudeCodeProjection(root), /skill 'shared' collides/);
+    await assert.rejects(validateClaudeCodeProjection(root), /canonical identity 'skill:shared' collides/);
     rmSync(join(root, "stances", "shared", "SKILL.md"));
     await validateClaudeCodeProjection(root);
   } finally {
@@ -132,7 +140,7 @@ void test("adds only the Claude Code invocation envelope to a canonical request"
   }
 });
 
-void test("projects skills and stances through Claude Code's skill surface", () => {
+void test("uses built resource addresses while invoking skills and stances through Claude Code's skill surface", () => {
   const { adapter, root } = testAdapter();
   try {
     const stanceSuite: EvaluationSuite = {
@@ -149,7 +157,7 @@ void test("projects skills and stances through Claude Code's skill surface", () 
     );
     assert.equal(
       adapter.projectedResourcePath(suite.resource),
-      join(root, "out", "claude-code", "agents", "slop-linter.agent.md"),
+      join(root, "out", "claude-code", "agents", "custom-review.agent.md"),
     );
     assert.equal(
       adapter.projectedResourcePath(stanceSuite.resource),

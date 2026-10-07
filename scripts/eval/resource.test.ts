@@ -5,20 +5,32 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { resolveCanonicalResourcePath, validateCanonicalResource } from "./resource.ts";
 
-void test("keeps canonical resource symlinks inside the repository", async () => {
+void test("keeps canonical resources reached through links inside the repository", async () => {
   const temporary = await mkdtemp(join(tmpdir(), "eval-resource-"));
   const root = join(temporary, "repo");
   try {
     await mkdir(root);
-    const inside = join(root, "inside.md");
-    const outside = join(temporary, "outside.md");
+    const insideDirectory = join(root, "inside");
+    const outsideDirectory = join(temporary, "outside");
+    await mkdir(insideDirectory);
+    await mkdir(outsideDirectory);
+    const inside = join(insideDirectory, "resource.md");
+    const outside = join(outsideDirectory, "resource.md");
     await writeFile(inside, "Inside");
     await writeFile(outside, "Outside");
-    await symlink(inside, join(root, "inside-link.md"));
-    await symlink(outside, join(root, "outside-link.md"));
-    assert.equal(await resolveCanonicalResourcePath(root, "inside-link.md"), join(root, "inside-link.md"));
-    await assert.rejects(resolveCanonicalResourcePath(root, "outside-link.md"), /must resolve inside/);
-    await assert.rejects(resolveCanonicalResourcePath(root, "../outside.md"), /must resolve inside/);
+    // Directory junctions need no symlink privileges on Windows. Node ignores
+    // the type on POSIX, where these become ordinary directory symlinks.
+    await symlink(insideDirectory, join(root, "inside-link"), "junction");
+    await symlink(outsideDirectory, join(root, "outside-link"), "junction");
+    assert.equal(await resolveCanonicalResourcePath(root, "inside-link/resource.md"), join(root, "inside-link", "resource.md"));
+    await assert.rejects(resolveCanonicalResourcePath(root, "outside-link/resource.md"), /must resolve inside/);
+    if (process.platform !== "win32") {
+      await symlink(inside, join(root, "inside-link.md"));
+      await symlink(outside, join(root, "outside-link.md"));
+      assert.equal(await resolveCanonicalResourcePath(root, "inside-link.md"), join(root, "inside-link.md"));
+      await assert.rejects(resolveCanonicalResourcePath(root, "outside-link.md"), /must resolve inside/);
+    }
+    await assert.rejects(resolveCanonicalResourcePath(root, "../outside/resource.md"), /must resolve inside/);
     await assert.rejects(resolveCanonicalResourcePath(root, "missing.md"), /Canonical resource does not exist: missing.md/);
   } finally {
     await rm(temporary, { recursive: true, force: true });

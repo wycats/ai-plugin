@@ -6,6 +6,11 @@ same request into each host and report the target, transport, model mapping,
 selected launcher model role and target model, source revision, raw response,
 and grade.
 
+The Claude Code adapter resolves resource addresses from the build's
+`projection-resources.json`. Reports include the captured map's path and digest
+alongside the projected resource digest. Invocation evidence and the canonical
+behavioral protocol remain independent of the generated file's location.
+
 Every suite declares the behavioral protocol it exercises. Version one supports
 `document-review/v1`: the resource evaluates a document and returns structured
 findings plus the complete rewritten document. A resource with a different task

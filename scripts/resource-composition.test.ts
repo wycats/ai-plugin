@@ -27,6 +27,27 @@ function skill(name: string, body: string): string {
   return `---\nname: ${name}\ndescription: Fixture ${name}\n---\n\n# ${name}\n\n${body}\n`;
 }
 
+void test("discovery keeps plugin paths portable and source paths native", async () => {
+  const { root, dispose } = await fixture({
+    "agents/nested/review.agent.md": "Agent fixture.",
+    "skills/source/SKILL.md": skill("source", "Workflow."),
+    "stances/target/SKILL.md": skill("target", "Stance."),
+  });
+  try {
+    const discovered = await discoverResourceFiles(root);
+    for (const [section, path] of [
+      ["agents", "agents/nested/review.agent.md"],
+      ["skills", "skills/source/SKILL.md"],
+      ["stances", "stances/target/SKILL.md"],
+    ] as const) {
+      assert.equal(discovered[section][0].pluginPath, `./${path}`);
+      assert.equal(discovered[section][0].sourcePath, join(root, path));
+    }
+  } finally {
+    await dispose();
+  }
+});
+
 void test("projects quoted composition links and preserves every non-destination byte", async () => {
   const { root, dispose } = await fixture({
     "skills/source/SKILL.md": skill(
@@ -255,9 +276,11 @@ void test("output overrides preserve source, unrelated data, and symlink targets
     await assert.rejects(assertSafeOutputOverride(source, join(source, "skills")), /outside/);
     await assert.rejects(assertSafeOutputOverride(source, root), /ancestors/);
     await assert.rejects(assertSafeOutputOverride(source, join(root, "occupied")), /empty directory/);
-    await symlink(source, join(root, "source-link"), "dir");
+    // Junctions exercise physical containment on Windows without symlink privileges.
+    // On other platforms Node creates ordinary directory symlinks.
+    await symlink(source, join(root, "source-link"), "junction");
     await assert.rejects(assertSafeOutputOverride(source, join(root, "source-link", "new")), /outside/);
-    await symlink(join(root, "occupied"), join(root, "output-link"), "dir");
+    await symlink(join(root, "occupied"), join(root, "output-link"), "junction");
     await assert.rejects(assertSafeOutputOverride(source, join(root, "output-link")), /symlink/);
     await mkdir(join(root, "empty"));
     await assertSafeOutputOverride(source, join(root, "empty"));

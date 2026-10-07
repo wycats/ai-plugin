@@ -87,6 +87,13 @@ The session skills form a gradient based on how much the user serves as a bridge
 
 - **`/walkthrough`**: two people reading code together, one chunk at a time. The agent surfaces structure; the user steers toward what matters. Pauses between chunks are where the value comes from.
 
+### Architectural restructuring
+
+- **`/architectural-distillation`**: recover what an evolved system has learned
+  from its present behavior and historical record, then express that knowledge
+  through the architecture requiring the fewest independent concepts while
+  preserving every meaningful distinction.
+
 ### Workflow orchestration
 
 - **`/steer-by-vision`**: explicit project reorientation that recovers the experienced outcome, selects one smallest meaningful end-to-end bet, keeps longer arcs warm, and names the evidence that will reopen steering.

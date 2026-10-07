@@ -17,15 +17,16 @@
     "publish-codex": "node scripts/publish-codex.ts",
     "publish-pi": "node scripts/publish-pi.ts",
     "test:pi-publication": "node --test scripts/publish-pi.test.ts",
+    "test:publication": "node --test scripts/publish-generated.test.ts scripts/publish-pi.test.ts",
     "publish-vscode": "node scripts/publish-vscode.ts",
     "eval": "node scripts/eval/run.ts",
     "test:eval": "node --test scripts/eval/core.test.ts scripts/eval/resource.test.ts scripts/eval/run.test.ts scripts/eval/adapters/claude-code.test.ts",
-    "test:composition": "node --test scripts/resource-composition.test.ts scripts/pi-projection.test.ts scripts/pi-subagents-integration.test.ts",
+    "test:composition": "node --test scripts/resource-composition.test.ts scripts/projection-plan.test.ts scripts/pi-projection.test.ts scripts/pi-subagents-integration.test.ts",
     "test:pi-runtime": "node --test scripts/pi-subagents-integration.test.ts",
     "test-cc": "node scripts/test-cc.ts",
     "validate": "node scripts/validate.ts",
     "lint": "eslint scripts/",
-    "check": "tsc --noEmit && eslint scripts/ && pnpm test:eval && pnpm test:composition && pnpm test:pi-publication"
+    "check": "tsc --noEmit && eslint scripts/ && pnpm test:eval && pnpm test:composition && pnpm test:publication"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

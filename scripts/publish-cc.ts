@@ -1,134 +1,56 @@
-/**
- * Publishes the Claude Code build output to the `cc-plugin` branch.
- *
- * 1. Builds with target: "claude-code" from the example config
- * 2. Copies build output to a temp directory
- * 3. Adds marketplace.json so the branch is both a plugin and a marketplace
- * 4. Force-pushes to origin/cc-plugin as an orphan commit
- *
- * After running, users can install persistently:
- *   /plugin marketplace add wycats/vscode-ai-plugin@cc-plugin
- *   /plugin install wycats-ai-plugin@wycats-ai-plugin
- */
+/** Publish the generated Claude Code plugin and marketplace on cc-plugin. */
+import { readFile, writeFile, mkdir, cp, access } from "node:fs/promises";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
+import { CLAUDE_CODE_TARGET, outputPathForTarget } from "./target-output.ts";
+import { gitOutput, publishGeneratedOutput } from "./publish-generated.ts";
 
-import {
-  readFile,
-  writeFile,
-  mkdir,
-  cp,
-  mkdtemp,
-  rm,
-  access,
-} from "node:fs/promises";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
-import { execFileSync, execSync } from "node:child_process";
-import {
-  CLAUDE_CODE_TARGET,
-  displayOutputDirectoryForTarget,
-  outputPathForTarget,
-} from "./target-output.ts";
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
+export const CLAUDE_CODE_PUBLICATION_BRANCH = "cc-plugin";
 
-const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
-const CC_OUT = outputPathForTarget(ROOT, CLAUDE_CODE_TARGET);
-const CC_OUT_REL = displayOutputDirectoryForTarget(CLAUDE_CODE_TARGET);
-const CC_CONFIG = "config.claude-code.example.json";
-
-async function fileExists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function ensureCCBuild(): void {
-  execFileSync(process.execPath, ["scripts/build.ts", "--config", CC_CONFIG], {
-    cwd: ROOT,
-    stdio: "inherit",
+export async function publishClaudeCodeOutput(output: string, remote: string): Promise<string> {
+  const manifest = JSON.parse(await readFile(join(output, ".claude-plugin", "plugin.json"), "utf8")) as { name?: string; version?: string; description?: string };
+  if (!manifest.name || !manifest.version || !manifest.description) throw new Error("Claude Code publication requires a generated plugin manifest");
+  return publishGeneratedOutput({
+    remote, branch: CLAUDE_CODE_PUBLICATION_BRANCH, message: `Update Claude Code plugin (${manifest.version})`,
+    prepare: async (stage) => {
+      const plugin = join(stage, "plugin");
+      await cp(output, plugin, { recursive: true });
+      await access(join(plugin, "composition-index.json"));
+      await access(join(plugin, "projection-resources.json"));
+      const stagedManifest = JSON.parse(await readFile(join(plugin, ".claude-plugin", "plugin.json"), "utf8")) as typeof manifest;
+      if (stagedManifest.name !== manifest.name || stagedManifest.version !== manifest.version || stagedManifest.description !== manifest.description) throw new Error("Claude Code package changed while staging");
+      const marketplace = {
+        $schema: "https://anthropic.com/claude-code/marketplace.schema.json",
+        name: manifest.name, version: manifest.version, description: manifest.description,
+        owner: { name: "wycats" },
+        plugins: [{ name: manifest.name, source: "./plugin", description: manifest.description }],
+      };
+      await mkdir(join(stage, ".claude-plugin"), { recursive: true });
+      await writeFile(join(stage, ".claude-plugin", "marketplace.json"), JSON.stringify(marketplace, null, 2) + "\n");
+    },
   });
 }
 
-async function publish() {
+async function main(): Promise<void> {
   console.log("Building Claude Code plugin...\n");
-  ensureCCBuild();
-
-  // Verify build output
-  const manifestPath = join(CC_OUT, ".claude-plugin", "plugin.json");
-  if (!(await fileExists(manifestPath))) {
-    console.error(`Build output not found at ${CC_OUT_REL}/`);
-    process.exit(1);
-  }
-
-  // Read plugin metadata for marketplace
-  const pluginMeta = JSON.parse(await readFile(manifestPath, "utf-8")) as {
-    name: string;
-    version: string;
-    description: string;
-  };
-
-  // Create temp directory: marketplace at root, plugin in plugin/ subdir
-  const tmp = await mkdtemp(join(tmpdir(), "cc-plugin-"));
-
-  try {
-    // Copy build output into plugin/ subdirectory
-    const pluginDir = join(tmp, "plugin");
-    await cp(CC_OUT, pluginDir, { recursive: true });
-
-    // Generate marketplace.json at the repo root
-    const marketplace = {
-      $schema: "https://anthropic.com/claude-code/marketplace.schema.json",
-      name: pluginMeta.name,
-      version: pluginMeta.version,
-      description: pluginMeta.description,
-      owner: { name: "wycats" },
-      plugins: [
-        {
-          name: pluginMeta.name,
-          source: "./plugin",
-          description: pluginMeta.description,
-        },
-      ],
-    };
-
-    const marketplaceDir = join(tmp, ".claude-plugin");
-    await mkdir(marketplaceDir, { recursive: true });
-    await writeFile(
-      join(marketplaceDir, "marketplace.json"),
-      JSON.stringify(marketplace, null, 2) + "\n",
-    );
-
-    // Get remote URL from main repo
-    const remoteUrl = execSync("git remote get-url origin", {
-      cwd: ROOT,
-      encoding: "utf-8",
-    }).trim();
-
-    // Init git, commit, and force-push
-    execSync("git init", { cwd: tmp, stdio: "pipe" });
-    execSync("git add -A", { cwd: tmp, stdio: "pipe" });
-    execSync(
-      `git commit -m "Update Claude Code plugin (${pluginMeta.version})"`,
-      { cwd: tmp, stdio: "pipe" },
-    );
-    execSync(`git push ${remoteUrl} HEAD:refs/heads/cc-plugin --force`, {
-      cwd: tmp,
-      stdio: "inherit",
-    });
-
-    console.log("\nPublished to cc-plugin branch.");
-    console.log("\nFor first-time install:");
-    console.log(`  /plugin marketplace add wycats/vscode-ai-plugin@cc-plugin`);
-    console.log(`  /plugin install ${pluginMeta.name}@${pluginMeta.name}`);
-    console.log("\nTo update after publishing:");
-    console.log(`  /plugin marketplace update ${pluginMeta.name}`);
-  } finally {
-    await rm(tmp, { recursive: true, force: true });
-  }
+  execFileSync(process.execPath, ["scripts/build.ts", "--config", "config.claude-code.example.json"], { cwd: ROOT, stdio: "inherit" });
+  const output = outputPathForTarget(ROOT, CLAUDE_CODE_TARGET);
+  const remote = gitOutput(ROOT, ["remote", "get-url", "origin"]);
+  await publishClaudeCodeOutput(output, remote);
+  const manifest = JSON.parse(await readFile(join(output, ".claude-plugin", "plugin.json"), "utf8")) as { name: string };
+  console.log(`\nPublished to ${CLAUDE_CODE_PUBLICATION_BRANCH} branch.`);
+  console.log("\nFor first-time install:");
+  console.log("  /plugin marketplace add wycats/vscode-ai-plugin@cc-plugin");
+  console.log(`  /plugin install ${manifest.name}@${manifest.name}`);
+  console.log("\nTo update after publishing:");
+  console.log(`  /plugin marketplace update ${manifest.name}`);
 }
 
-publish().catch((err: unknown) => {
-  console.error("Publish failed:", err);
-  process.exit(1);
-});
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error: unknown) => {
+    console.error("Publish failed:", error);
+    process.exitCode = 1;
+  });
+}
