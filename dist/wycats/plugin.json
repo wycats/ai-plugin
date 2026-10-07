@@ -27,6 +27,9 @@
   ],
   "skills": [
     {
+      "path": "./skills/architectural-distillation/SKILL.md"
+    },
+    {
       "path": "./skills/code-review/SKILL.md"
     },
     {
