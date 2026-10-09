@@ -25,6 +25,29 @@ When writing into a template, inhabit the section's communicative job before fil
 
 The first few lines of a skill should describe the _shape_ of the work, not the first step. The agent needs to know what kind of process this is before it starts executing. A sentence like "this skill has three phases — the second is the core" reframes everything that follows.
 
+## Supply context where the judgment happens
+
+Write from what the reader or executing agent can know at the point of use. A
+skill's opening gives the shape of the work; a phase supplies the distinctions
+needed for its judgment; a linked reference supplies detail when that detail
+becomes useful. A concept introduced only in the originating conversation is
+not yet available to a future reader of the skill.
+
+Keep these levels faithful to one another. A concise workflow step can rely on
+a precise contract without reproducing all its mechanics. Opening the reference
+should explain how to fulfill the step, including the assumptions it depends on.
+If following the reference changes what the step meant, revise the relationship.
+
+The same standard applies to delegated tasks: give the worker the settled
+decisions and relevant context needed for its part. Keep unresolved choices that
+affect the whole visible to the coordinator. Specification quality determines
+how much understanding execution has to reconstruct.
+
+This is the [reader-orientation](stances/reader-orientation/SKILL.md) stance
+applied to skill design. Add detail or indirection when it improves the reader's
+ability to act; a clear boundary can contain substantial mechanics without
+bringing them all into the main path.
+
 ## The critical path is visually dominant
 
 If there's one thing the agent must not skip, make it the longest section, position it where attention is highest, and state its importance explicitly. Structural prominence is preattentive — the agent registers it before reasoning about content.

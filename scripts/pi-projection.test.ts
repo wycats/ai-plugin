@@ -90,7 +90,19 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
       await discoverResourceFiles(out),
     );
     assert.deepEqual(composition.diagnostics, []);
-    assert.equal(composition.composition?.references.length, 16);
+    assert.ok(composition.composition);
+
+    const canonical = await loadCanonicalComposition(
+      ROOT,
+      await discoverResourceFiles(ROOT),
+    );
+    assert.deepEqual(canonical.diagnostics, []);
+    assert.ok(canonical.composition);
+    // Pi carries all stances privately, but only Recon's workflow and agent.
+    const expectedReferences = canonical.composition.references.filter(
+      ({ source }) => source.section === "stances" || source.name === "recon",
+    );
+    assert.equal(composition.composition.references.length, expectedReferences.length);
 
     const index = JSON.parse(
       await readFile(join(out, "composition-index.json"), "utf-8"),
@@ -99,7 +111,14 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
       edges: Array<Record<string, unknown>>;
     };
     assert.equal(index.schemaVersion, 2);
-    assert.equal(index.edges.length, 16);
+    assert.deepEqual(
+      index.edges.map((edge) => [edge.canonicalSource, edge.canonicalTarget, edge.relation]),
+      expectedReferences.map(({ source, target, relation }) => [source.pluginPath, target.pluginPath, relation]),
+    );
+    assert.deepEqual(
+      index.edges.map((edge) => [edge.generatedSource, edge.generatedTarget, edge.relation]),
+      composition.composition.references.map(({ source, target, relation }) => [source.pluginPath, target.pluginPath, relation]),
+    );
     assert.equal(index.edges[0].canonicalSource, "./agents/recon.agent.md");
     assert.equal(index.edges[0].canonicalLine, 18);
     assert.equal(index.edges[0].generatedSource, "./agents/wycats-recon.agent.md");
