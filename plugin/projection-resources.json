@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "target": "codex",
+  "resources": [
+    {
+      "canonicalSource": "./agents/execute.agent.md",
+      "generatedSource": "./agents/execute.agent.md",
+      "identity": "agent:execute",
+      "exposure": "reference"
+    },
+    {
+      "canonicalSource": "./agents/pre-read.agent.md",
+      "generatedSource": "./agents/pre-read.agent.md",
+      "identity": "agent:pre-read",
+      "exposure": "reference"
+    },
+    {
+      "canonicalSource": "./agents/prepare.agent.md",
+      "generatedSource": "./agents/prepare.agent.md",
+      "identity": "agent:prepare",
+      "exposure": "reference"
+    },
+    {
+      "canonicalSource": "./agents/recon-worker.agent.md",
+      "generatedSource": "./agents/recon-worker.agent.md",
+      "identity": "agent:recon-worker",
+      "exposure": "reference"
+    },
+    {
+      "canonicalSource": "./agents/recon.agent.md",
+      "generatedSource": "./agents/recon.agent.md",
+      "identity": "agent:recon",
+      "exposure": "reference"
+    },
+    {
+      "canonicalSource": "./agents/review.agent.md",
+      "generatedSource": "./agents/review.agent.md",
+      "identity": "agent:review",
+      "exposure": "reference"
+    },
+    {
+      "canonicalSource": "./agents/slop-linter.agent.md",
+      "generatedSource": "./agents/slop-linter.agent.md",
+      "identity": "agent:slop-linter",
+      "exposure": "reference"
+    },
+    {
+      "canonicalSource": "./skills/architectural-distillation/SKILL.md",
+      "generatedSource": "./skills/architectural-distillation/SKILL.md",
+      "identity": "skill:architectural-distillation",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/code-review/SKILL.md",
+      "generatedSource": "./skills/code-review/SKILL.md",
+      "identity": "skill:code-review",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/dangling-thread-review/SKILL.md",
+      "generatedSource": "./skills/dangling-thread-review/SKILL.md",
+      "identity": "skill:dangling-thread-review",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/gh-resolve-review-threads/SKILL.md",
+      "generatedSource": "./skills/gh-resolve-review-threads/SKILL.md",
+      "identity": "skill:gh-resolve-review-threads",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/gh-write-pr-description/SKILL.md",
+      "generatedSource": "./skills/gh-write-pr-description/SKILL.md",
+      "identity": "skill:gh-write-pr-description",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "identity": "skill:implementation-quality",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/pause-and-ground/SKILL.md",
+      "generatedSource": "./skills/pause-and-ground/SKILL.md",
+      "identity": "skill:pause-and-ground",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/per-cycle/SKILL.md",
+      "generatedSource": "./skills/per-cycle/SKILL.md",
+      "identity": "skill:per-cycle",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/recon/SKILL.md",
+      "generatedSource": "./skills/recon/SKILL.md",
+      "identity": "skill:recon",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/rfc-writing/SKILL.md",
+      "generatedSource": "./skills/rfc-writing/SKILL.md",
+      "identity": "skill:rfc-writing",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/session-close/SKILL.md",
+      "generatedSource": "./skills/session-close/SKILL.md",
+      "identity": "skill:session-close",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/session-load/SKILL.md",
+      "generatedSource": "./skills/session-load/SKILL.md",
+      "identity": "skill:session-load",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/session-rest/SKILL.md",
+      "generatedSource": "./skills/session-rest/SKILL.md",
+      "identity": "skill:session-rest",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/session-save/SKILL.md",
+      "generatedSource": "./skills/session-save/SKILL.md",
+      "identity": "skill:session-save",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/steer-by-vision/SKILL.md",
+      "generatedSource": "./skills/steer-by-vision/SKILL.md",
+      "identity": "skill:steer-by-vision",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/thread-coordinator/SKILL.md",
+      "generatedSource": "./skills/thread-coordinator/SKILL.md",
+      "identity": "skill:thread-coordinator",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/walkthrough/SKILL.md",
+      "generatedSource": "./skills/walkthrough/SKILL.md",
+      "identity": "skill:walkthrough",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./stances/authorial-continuity/SKILL.md",
+      "generatedSource": "./skills/authorial-continuity/SKILL.md",
+      "identity": "skill:authorial-continuity",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/collaborative-grounding/SKILL.md",
+      "generatedSource": "./skills/collaborative-grounding/SKILL.md",
+      "identity": "skill:collaborative-grounding",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/diagnostic-questioning/SKILL.md",
+      "generatedSource": "./skills/diagnostic-questioning/SKILL.md",
+      "identity": "skill:diagnostic-questioning",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/gap-reading/SKILL.md",
+      "generatedSource": "./skills/gap-reading/SKILL.md",
+      "identity": "skill:gap-reading",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/hypothesis-evaluating/SKILL.md",
+      "generatedSource": "./skills/hypothesis-evaluating/SKILL.md",
+      "identity": "skill:hypothesis-evaluating",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/hypothesis-forming/SKILL.md",
+      "generatedSource": "./skills/hypothesis-forming/SKILL.md",
+      "identity": "skill:hypothesis-forming",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/interpretive-synthesis/SKILL.md",
+      "generatedSource": "./skills/interpretive-synthesis/SKILL.md",
+      "identity": "skill:interpretive-synthesis",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/joint-reading/SKILL.md",
+      "generatedSource": "./skills/joint-reading/SKILL.md",
+      "identity": "skill:joint-reading",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/observational-grounding/SKILL.md",
+      "generatedSource": "./skills/observational-grounding/SKILL.md",
+      "identity": "skill:observational-grounding",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/public-design-reasoning/SKILL.md",
+      "generatedSource": "./skills/public-design-reasoning/SKILL.md",
+      "identity": "skill:public-design-reasoning",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "generatedSource": "./skills/reader-orientation/SKILL.md",
+      "identity": "skill:reader-orientation",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/relational-continuity/SKILL.md",
+      "generatedSource": "./skills/relational-continuity/SKILL.md",
+      "identity": "skill:relational-continuity",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/socratic-elicitation/SKILL.md",
+      "generatedSource": "./skills/socratic-elicitation/SKILL.md",
+      "identity": "skill:socratic-elicitation",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/vision-steering/SKILL.md",
+      "generatedSource": "./skills/vision-steering/SKILL.md",
+      "identity": "skill:vision-steering",
+      "exposure": "private"
+    }
+  ]
+}

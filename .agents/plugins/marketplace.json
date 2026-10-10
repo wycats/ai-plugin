@@ -1,0 +1,20 @@
+{
+  "name": "wycats-ai-plugin",
+  "interface": {
+    "displayName": "Wycats AI Plugin"
+  },
+  "plugins": [
+    {
+      "name": "wycats-ai-plugin",
+      "source": {
+        "source": "local",
+        "path": "./plugin"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
