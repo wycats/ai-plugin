@@ -42,3 +42,8 @@ A real estate agent and a contractor walking through a house together. The agent
 Joint reading is **collaborative grounding** anchored to shared material. The agent's perception and the user's situated knowledge combine through the shared artifact they're both looking at.
 
 Composes well with **interpretive synthesis** (the big-picture revision during a walkthrough is joint reading + interpretive synthesis). Composes well with **diagnostic questioning** when the reading surfaces ambiguities that need the user's input. The walkthrough skill uses joint reading as its primary stance.
+
+Composes with [reader-orientation](../reader-orientation/SKILL.md "composition:reference")
+when a shared reading reveals context the artifact has left implicit. A question
+at a particular line can expose a missing explanation, an unfamiliar concept,
+or a relationship the implementation itself needs to express more clearly.

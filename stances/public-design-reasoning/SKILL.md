@@ -64,3 +64,9 @@ to be articulated, **interpretive-synthesis** when many design details need one
 coherent account, **hypothesis-evaluating** when readiness depends on evidence,
 and **relational-continuity** when wording must remain attached to the work
 that produced it.
+
+[Reader orientation](../reader-orientation/SKILL.md "composition:reference")
+attends to the context available at different entry points. An overview, an API
+page, and an example can expose different detail while supporting the same
+understanding. Each supplies the relationships its reader needs there, with a
+clear route to deeper explanation.

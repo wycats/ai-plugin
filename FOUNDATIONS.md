@@ -55,6 +55,34 @@ location, adapt that envelope. When it cannot express a capability, make the
 loss visible. When the semantics themselves need to differ, revise the
 canonical articulation or introduce an explicit variant.
 
+## Understanding at the point of encounter
+
+The context available to an author and the context available to a reader are
+different. An author can mentally supply a relationship that a paragraph, type,
+or interface never expresses. An agent with a long conversation behind it can
+make the same mistake: the account is coherent in its context while leaving a
+new reader to infer a missing connection.
+
+[Reader orientation](stances/reader-orientation/SKILL.md) makes this information
+boundary part of the task: what can someone understand where they encounter the work?
+A useful level of detail exposes the relationships needed for the current
+judgment, while a trustworthy contract lets other detail wait. Deeper inspection
+should explain that contract without overturning the understanding it supplied.
+
+This extends coherence across situated projections to levels of explanation.
+A workflow overview, a bounded task, and its implementation can expose different
+detail while preserving the same guarantees and distinctions. Repeating the
+entire context at every level would obscure those relationships; omitting a
+necessary assumption would make the account misleading.
+
+The same principle explains the value of distilling work before delegation.
+The coordinator resolves relationships that would otherwise require repeated
+inference, then puts the necessary decisions, evidence, and constraints into
+the task. This can reduce the reasoning burden of execution. The coordinator
+retains responsibility for whether the assembled result still expresses the
+whole; findings that challenge the task's assumptions return to that level of
+judgment.
+
 ## How stances compose
 
 ### Reinforcement
