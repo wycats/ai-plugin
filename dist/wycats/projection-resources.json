@@ -75,6 +75,12 @@
       "exposure": "public"
     },
     {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "identity": "skill:implementation-quality",
+      "exposure": "public"
+    },
+    {
       "canonicalSource": "./skills/pause-and-ground/SKILL.md",
       "generatedSource": "./skills/pause-and-ground/SKILL.md",
       "identity": "skill:pause-and-ground",
@@ -198,6 +204,12 @@
       "canonicalSource": "./stances/public-design-reasoning/SKILL.md",
       "generatedSource": "./stances/public-design-reasoning/SKILL.md",
       "identity": "skill:public-design-reasoning",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "identity": "skill:reader-orientation",
       "exposure": "private"
     },
     {

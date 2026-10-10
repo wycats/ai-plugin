@@ -42,6 +42,9 @@
       "path": "./skills/gh-write-pr-description/SKILL.md"
     },
     {
+      "path": "./skills/implementation-quality/SKILL.md"
+    },
+    {
       "path": "./skills/pause-and-ground/SKILL.md"
     },
     {
@@ -103,6 +106,9 @@
     },
     {
       "path": "./stances/public-design-reasoning/SKILL.md"
+    },
+    {
+      "path": "./stances/reader-orientation/SKILL.md"
     },
     {
       "path": "./stances/relational-continuity/SKILL.md"

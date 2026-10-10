@@ -40,6 +40,96 @@
       "canonicalTargetIdentity": "skill:interpretive-synthesis"
     },
     {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "canonicalSourceIdentity": "skill:implementation-quality",
+      "canonicalLine": 16,
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "relation": "load",
+      "generatedTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTargetIdentity": "skill:reader-orientation"
+    },
+    {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "canonicalSourceIdentity": "skill:implementation-quality",
+      "canonicalLine": 31,
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./skills/recon/SKILL.md",
+      "canonicalTarget": "./skills/recon/SKILL.md",
+      "canonicalTargetIdentity": "skill:recon"
+    },
+    {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "canonicalSourceIdentity": "skill:implementation-quality",
+      "canonicalLine": 41,
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/joint-reading/SKILL.md",
+      "canonicalTarget": "./stances/joint-reading/SKILL.md",
+      "canonicalTargetIdentity": "skill:joint-reading"
+    },
+    {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "canonicalSourceIdentity": "skill:implementation-quality",
+      "canonicalLine": 43,
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:collaborative-grounding"
+    },
+    {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "canonicalSourceIdentity": "skill:implementation-quality",
+      "canonicalLine": 59,
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTargetIdentity": "skill:interpretive-synthesis"
+    },
+    {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "canonicalSourceIdentity": "skill:implementation-quality",
+      "canonicalLine": 113,
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/public-design-reasoning/SKILL.md",
+      "canonicalTarget": "./stances/public-design-reasoning/SKILL.md",
+      "canonicalTargetIdentity": "skill:public-design-reasoning"
+    },
+    {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "canonicalSourceIdentity": "skill:implementation-quality",
+      "canonicalLine": 115,
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/authorial-continuity/SKILL.md",
+      "canonicalTarget": "./stances/authorial-continuity/SKILL.md",
+      "canonicalTargetIdentity": "skill:authorial-continuity"
+    },
+    {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "canonicalSourceIdentity": "skill:implementation-quality",
+      "canonicalLine": 127,
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./skills/architectural-distillation/SKILL.md",
+      "canonicalTarget": "./skills/architectural-distillation/SKILL.md",
+      "canonicalTargetIdentity": "skill:architectural-distillation"
+    },
+    {
+      "canonicalSource": "./skills/implementation-quality/SKILL.md",
+      "canonicalSourceIdentity": "skill:implementation-quality",
+      "canonicalLine": 150,
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/hypothesis-evaluating/SKILL.md",
+      "canonicalTarget": "./stances/hypothesis-evaluating/SKILL.md",
+      "canonicalTargetIdentity": "skill:hypothesis-evaluating"
+    },
+    {
       "canonicalSource": "./skills/recon/SKILL.md",
       "canonicalSourceIdentity": "skill:recon",
       "canonicalLine": 10,
@@ -130,6 +220,16 @@
       "canonicalTargetIdentity": "skill:diagnostic-questioning"
     },
     {
+      "canonicalSource": "./stances/joint-reading/SKILL.md",
+      "canonicalSourceIdentity": "skill:joint-reading",
+      "canonicalLine": 46,
+      "generatedSource": "./stances/joint-reading/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTargetIdentity": "skill:reader-orientation"
+    },
+    {
       "canonicalSource": "./stances/observational-grounding/SKILL.md",
       "canonicalSourceIdentity": "skill:observational-grounding",
       "canonicalLine": 95,
@@ -148,6 +248,66 @@
       "generatedTarget": "./stances/collaborative-grounding/SKILL.md",
       "canonicalTarget": "./stances/collaborative-grounding/SKILL.md",
       "canonicalTargetIdentity": "skill:collaborative-grounding"
+    },
+    {
+      "canonicalSource": "./stances/public-design-reasoning/SKILL.md",
+      "canonicalSourceIdentity": "skill:public-design-reasoning",
+      "canonicalLine": 68,
+      "generatedSource": "./stances/public-design-reasoning/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTargetIdentity": "skill:reader-orientation"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 68,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTargetIdentity": "skill:interpretive-synthesis"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 72,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/joint-reading/SKILL.md",
+      "canonicalTarget": "./stances/joint-reading/SKILL.md",
+      "canonicalTargetIdentity": "skill:joint-reading"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 74,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:collaborative-grounding"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 78,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/public-design-reasoning/SKILL.md",
+      "canonicalTarget": "./stances/public-design-reasoning/SKILL.md",
+      "canonicalTargetIdentity": "skill:public-design-reasoning"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 80,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/relational-continuity/SKILL.md",
+      "canonicalTarget": "./stances/relational-continuity/SKILL.md",
+      "canonicalTargetIdentity": "skill:relational-continuity"
     },
     {
       "canonicalSource": "./stances/relational-continuity/SKILL.md",

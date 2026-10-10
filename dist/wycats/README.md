@@ -62,6 +62,12 @@ When writing a skill, you're choosing *how the agent should think about the task
 
 **Public design reasoning** shapes durable proposal prose for RFCs, architecture notes, and canonization summaries. It treats sections as reader contracts: each heading matters because of the work it does for users, implementers, maintainers, educators, and future readers.
 
+**Reader orientation** starts from what someone can know where they encounter
+code, an interface, or an explanation. It supplies the relationships needed to
+reason locally, with deeper detail available through deliberate investigation.
+The implementation-quality skill applies this stance to a codebase's flow,
+types, organization, and documentation.
+
 **Joint reading** is what happens when two people examine code or a document together. The agent sees structural patterns; the user sees design intent. The walkthrough skill uses this stance.
 
 **Diagnostic questioning** is asking the right question at the right time. The one that maximally reduces uncertainty about the user's priorities. High-variance questions (where the agent genuinely can't predict the answer) come first, because their answers often resolve lower-variance questions implicitly. The session-rest skill uses this during triage.
@@ -93,6 +99,15 @@ The session skills form a gradient based on how much the user serves as a bridge
   from its present behavior and historical record, then express that knowledge
   through the architecture requiring the fewest independent concepts while
   preserving every meaningful distinction.
+
+### Implementation quality
+
+- **`/implementation-quality`**: follow meaningful operations through callers,
+  types, implementation, and documentation, then improve how those surfaces
+  express the system's concepts. It supports focused improvements and systematic
+  passes, with a coherent baseline for human review and clear contracts around
+  remaining complexity. Compose architectural distillation when the work
+  exposes historical mechanisms obscuring the learned model.
 
 ### Workflow orchestration
 
