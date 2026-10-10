@@ -1,0 +1,22 @@
+{
+  "name": "wycats-ai-plugin-pi",
+  "version": "0.1.0",
+  "description": "Personal agent toolkit: workflow agents, skills, instructions, and hooks. Pi projection.",
+  "private": true,
+  "keywords": [
+    "pi-package"
+  ],
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "pi": {
+    "skills": [
+      "./skills/recon"
+    ],
+    "subagents": {
+      "agents": [
+        "./agents"
+      ]
+    }
+  }
+}
