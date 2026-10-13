@@ -59,7 +59,7 @@ export async function validateClaudeCodeProjection(root: string): Promise<void> 
   const resources = await discoverResourceFiles(root);
   const result = await loadCanonicalComposition(root, resources);
   if (!result.composition) throw new Error(formatCompositionDiagnostics(result.diagnostics));
-  await createProjectionPlan(result.composition, CLAUDE_CODE_TARGET, outputPathForTarget(root, CLAUDE_CODE_TARGET));
+  createProjectionPlan(result.composition, CLAUDE_CODE_TARGET, outputPathForTarget(root, CLAUDE_CODE_TARGET));
 }
 
 function messageContent(event: Record<string, unknown>): unknown[] {

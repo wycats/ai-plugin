@@ -10,7 +10,7 @@
  */
 
 import { readFile, stat } from "node:fs/promises";
-import { basename, dirname, isAbsolute, join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   RESOURCE_SECTIONS,
@@ -106,61 +106,6 @@ async function validatePluginJson() {
         `plugin.json: remove '${section}' entries; build/validate discover resources from the filesystem`,
       );
     }
-  }
-}
-
-async function validateSkills(skills: DiscoveredResource[]) {
-  console.log(`Checking skills (${String(skills.length)})...`);
-
-  await validateSkillLikeResources(skills);
-}
-
-async function validateStances(stances: DiscoveredResource[]) {
-  console.log(`Checking stances (${String(stances.length)})...`);
-
-  await validateSkillLikeResources(stances, (stance, fm) => {
-    if (fm["user-invocable"] !== "false") {
-      error(
-        `${stance.pluginPath}: stances must declare 'user-invocable: false'`,
-      );
-    }
-  });
-}
-
-async function validateSkillLikeResources(
-  resources: DiscoveredResource[],
-  validateFrontmatter?: (
-    resource: DiscoveredResource,
-    frontmatter: Record<string, string>,
-  ) => void,
-) {
-  for (const resource of resources) {
-    const fullPath = resource.sourcePath;
-    const content = await readFile(fullPath, "utf-8");
-    const fm = extractFrontmatter(content);
-
-    if (!fm) {
-      error(`${resource.pluginPath}: missing YAML frontmatter`);
-      continue;
-    }
-
-    if (!fm.name) {
-      error(`${resource.pluginPath}: missing 'name' in frontmatter`);
-    }
-
-    if (!fm.description) {
-      error(`${resource.pluginPath}: missing 'description' in frontmatter`);
-    }
-
-    // Check name matches directory
-    const dirName = basename(dirname(fullPath));
-    if (fm.name && fm.name !== dirName) {
-      error(
-        `${resource.pluginPath}: name '${fm.name}' does not match directory '${dirName}'`,
-      );
-    }
-
-    validateFrontmatter?.(resource, fm);
   }
 }
 
@@ -261,13 +206,11 @@ async function main() {
   const resources = await discoverResourceFiles(ROOT);
 
   await validatePluginJson();
-  await validateSkills(resources.skills);
-  await validateStances(resources.stances);
   await validateAgents(resources.agents);
   await validateInstructions(resources.instructions);
   await validateHooks(resources.hooks);
 
-  console.log("Checking canonical composition links...");
+  console.log("Checking canonical skills, stances, and composition...");
   const composition = await loadCanonicalComposition(ROOT, resources);
   for (const diagnostic of composition.diagnostics) {
     error(`${diagnostic.file}:${String(diagnostic.line)}: ${diagnostic.message}`);

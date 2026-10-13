@@ -49,24 +49,21 @@ available to a host; it does not become the authoring surface.
 
 ## Activation intent and runtime discovery
 
-A resource's description states when it should enter the context.
-`user-invocable` states whether it belongs on the user's direct workflow
-surface. Those fields are semantic activation intent and remain owned by the
-canonical resource.
+A resource's description explains applicability. Its `user-invocable` field
+states whether it belongs on the user's direct workflow surface; `invocation`
+states whether relevance can select it or the user must choose it explicitly.
+Choosing to enter a substantial workflow is part of that workflow's meaning,
+so these declarations belong to the canonical resource.
 
-Each runtime supplies a different discovery contract. The build adapts the
-same intent to that contract:
+The [runtime projection contract](runtime-projection-contract.md) owns the exact
+fields, defaults, supported combinations, output locations, and native target
+mappings. The build normalizes canonical policy once, checks composition, and
+projects that policy through each host's metadata before replacing output.
 
-| Target | Discovery and capability projection |
-| ------ | ----------------------------------- |
-| VS Code | Registers agents, workflow skills, hidden stances, instructions, and hooks through explicit manifest paths |
-| Claude Code | Auto-discovers agents and skills, materializes stances in `skills/`, and consumes a consolidated hook manifest |
-| Codex | Discovers workflow skills and materialized stances from `skills/`; packaged agents are reference material, while this plugin's hooks and instructions are not active |
-
-Different discovery mechanisms can preserve the same activation intent. They
-are not automatically behaviorally equivalent: a host may fail to activate a
-resource, expose a hidden stance, or omit a capability. Projection validation
-therefore checks both content fidelity and the host-visible surface.
+Discovery and enforcement remain distinct. A package may contain a resource
+that its host does not discover, or retain a visibility field that its host
+does not honor. The contract records those limits alongside each mapping;
+package fidelity alone does not establish runtime behavior.
 
 ## Canonical composition links
 
@@ -82,8 +79,9 @@ relative Markdown link whose title is exactly one of these values:
 consultation. `composition:load` requests activation when the governing prose
 applies. The surrounding sentence owns the condition, timing, emphasis, and
 purpose; the title does not establish a separate activation state machine.
-Background guidance can therefore say “keep active throughout,” while a
-situated interruption can say “when surfaces conflict,” and both can use the
+The activation contract permits load edges into contextual resources and
+reference edges into either policy. Background guidance can therefore say
+“keep active throughout,” while a situated interruption can say “when surfaces conflict,” and both can use the
 same load relationship without losing their different shapes.
 
 The supported grammar is an inline Markdown link with a relative destination

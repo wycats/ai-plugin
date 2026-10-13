@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
 import matter from "gray-matter";
 import { discoverResourceFiles } from "./resource-discovery.ts";
-import { loadCanonicalComposition } from "./resource-composition.ts";
+import { loadCanonicalComposition, parseCompositionLinks } from "./resource-composition.ts";
 
 const execFileAsync = promisify(execFile);
 const ROOT = resolve(import.meta.dirname, "..");
@@ -85,12 +85,19 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
     );
     assert.equal(generatedRecon.content, canonicalRecon.content);
 
-    const composition = await loadCanonicalComposition(
-      out,
-      await discoverResourceFiles(out),
-    );
-    assert.deepEqual(composition.diagnostics, []);
-    assert.ok(composition.composition);
+    // Generated metadata belongs to the host, so inspect links without applying
+    // canonical source-policy validation to the generated package.
+    const projectedEdges: string[][] = [];
+    const generatedResources = await discoverResourceFiles(out);
+    for (const resource of [...generatedResources.agents, ...generatedResources.skills, ...generatedResources.stances]) {
+      const links = parseCompositionLinks(await readFile(resource.sourcePath, "utf8"));
+      assert.deepEqual(links.diagnostics, []);
+      for (const link of links.links) {
+        const target = resolve(dirname(resource.sourcePath), link.destination);
+        await readFile(target);
+        projectedEdges.push([resource.pluginPath, `./${relative(out, target).replaceAll("\\", "/")}`, link.title?.slice("composition:".length) ?? ""]);
+      }
+    }
 
     const canonical = await loadCanonicalComposition(
       ROOT,
@@ -102,7 +109,7 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
     const expectedReferences = canonical.composition.references.filter(
       ({ source }) => source.section === "stances" || source.name === "recon",
     );
-    assert.equal(composition.composition.references.length, expectedReferences.length);
+    assert.equal(projectedEdges.length, expectedReferences.length);
 
     const index = JSON.parse(
       await readFile(join(out, "composition-index.json"), "utf-8"),
@@ -117,7 +124,7 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
     );
     assert.deepEqual(
       index.edges.map((edge) => [edge.generatedSource, edge.generatedTarget, edge.relation]),
-      composition.composition.references.map(({ source, target, relation }) => [source.pluginPath, target.pluginPath, relation]),
+      projectedEdges,
     );
     assert.equal(index.edges[0].canonicalSource, "./agents/recon.agent.md");
     assert.equal(index.edges[0].canonicalLine, 18);

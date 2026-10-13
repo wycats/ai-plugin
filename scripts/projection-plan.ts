@@ -1,6 +1,5 @@
-import { readFile } from "node:fs/promises";
 import { dirname, isAbsolute, join, posix, relative, resolve, sep } from "node:path";
-import matter from "gray-matter";
+import { codexSkillSidecar } from "./skill-activation.ts";
 import { PI_PROFILE } from "./pi-profile.ts";
 import {
   formatCompositionDiagnostics,
@@ -15,6 +14,8 @@ export interface ProjectedResource {
   outputPath: string;
   pluginPath: string;
   exposure: "public" | "private" | "reference";
+  /** Resolved before output cleanup; emitted after copying supporting files. */
+  skillMetadata?: { frontmatter: Record<string, unknown>; codexSidecar?: Record<string, unknown> };
 }
 
 export interface ProjectionPlan {
@@ -22,17 +23,17 @@ export interface ProjectionPlan {
   resources: ProjectedResource[];
   profileResources: ProjectedResource[];
   outputBySourcePath: ReadonlyMap<string, string>;
-  supportCopies: Array<{ source: string; destination: string; optional: boolean }>;
+  supportCopies: Array<{ source: string; destination: string; optional: boolean; excludedDirectories?: string[] }>;
   includesHooks: boolean;
 }
 
 /** One address and exposure decision for every materialized canonical resource.
  * Composition links retain prose-governed activation; this is no runtime loader. */
-export async function createProjectionPlan(
+export function createProjectionPlan(
   composition: CanonicalComposition,
   target: string,
   outDir: string,
-): Promise<ProjectionPlan> {
+): ProjectionPlan {
   if (!isBuildTarget(target)) throw new Error(`Unsupported build target '${target}'`);
   const selected = composition.resources.filter((resource) => {
     if (target === PI_TARGET) {
@@ -48,15 +49,35 @@ export async function createProjectionPlan(
       : resource.section === "stances" && (target === "claude-code" || target === CODEX_TARGET)
         ? `skills/${resource.name}/SKILL.md`
         : resource.pluginPath.slice(2);
-    const frontmatter = matter(await readFile(resource.sourcePath, "utf8")).data as Record<string, unknown>;
+    const frontmatter = resource.frontmatter;
+    let skillMetadata: ProjectedResource["skillMetadata"];
+    if (resource.activation) {
+      try {
+        const projected: Record<string, unknown> = { ...frontmatter, "user-invocable": resource.activation.userInvocable };
+        delete projected.invocation;
+        if (target === CODEX_TARGET) {
+          if (!/^skills\/[^/]+\/SKILL\.md$/.test(destination)) {
+            throw new Error("Codex requires skill directories immediately under skills/");
+          }
+          skillMetadata = { frontmatter: projected,
+            codexSidecar: codexSkillSidecar(frontmatter, resource.activation, resource.skillSidecar) };
+        } else {
+          skillMetadata = { frontmatter: { ...projected,
+            "disable-model-invocation": resource.activation.invocation === "explicit" } };
+        }
+      } catch (error) {
+        throw new Error(`${target}: ${resource.pluginPath}: ${error instanceof Error ? error.message : String(error)}`, { cause: error });
+      }
+    }
     resources.push({
       resource,
       outputPath: resolve(outDir, destination),
       pluginPath: `./${destination}`,
+      skillMetadata,
       exposure: target === CODEX_TARGET && resource.section === "agents"
         ? "reference"
         : resource.section === "stances" || resource.section === "instructions" ||
-            frontmatter["user-invocable"] === false
+            (resource.activation?.userInvocable ?? frontmatter["user-invocable"]) === false
           ? "private"
           : "public",
     });
@@ -77,9 +98,21 @@ export async function createProjectionPlan(
   const copyDirectory = (path: string, optional = true) => ({
     source: join(composition.root, path), destination: join(outDir, path), optional,
   });
-  const supportCopies = target === PI_TARGET
+  const supportCopies: ProjectionPlan["supportCopies"] = target === PI_TARGET
     ? [copyDirectory(dirname(PI_PROFILE.resources[0].slice(2)), false), copyDirectory("stances")]
     : [copyDirectory("skills"), ...(target === VSCODE_TARGET ? [copyDirectory("stances"), copyDirectory("instructions")] : [])];
+  if (target === "claude-code" || target === CODEX_TARGET) {
+    for (const { resource, outputPath } of resources) {
+      if (resource.section === "stances") {
+        const source = dirname(resource.sourcePath);
+        // Nested resources own their support files and are projected independently.
+        const excludedDirectories = composition.resources
+          .map((nested) => dirname(nested.sourcePath))
+          .filter((directory) => directory.startsWith(`${source}${sep}`));
+        supportCopies.push({ source, destination: dirname(outputPath), optional: false, excludedDirectories });
+      }
+    }
+  }
   return { target, resources, profileResources, outputBySourcePath, supportCopies,
     includesHooks: target === VSCODE_TARGET || target === "claude-code" };
 }
