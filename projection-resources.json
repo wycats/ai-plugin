@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "target": "pi",
+  "resources": [
+    {
+      "canonicalSource": "./agents/recon.agent.md",
+      "generatedSource": "./agents/wycats-recon.agent.md",
+      "identity": "agent:recon",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./skills/recon/SKILL.md",
+      "generatedSource": "./skills/recon/SKILL.md",
+      "identity": "skill:recon",
+      "exposure": "public"
+    },
+    {
+      "canonicalSource": "./stances/authorial-continuity/SKILL.md",
+      "generatedSource": "./stances/authorial-continuity/SKILL.md",
+      "identity": "skill:authorial-continuity",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/collaborative-grounding/SKILL.md",
+      "generatedSource": "./stances/collaborative-grounding/SKILL.md",
+      "identity": "skill:collaborative-grounding",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/diagnostic-questioning/SKILL.md",
+      "generatedSource": "./stances/diagnostic-questioning/SKILL.md",
+      "identity": "skill:diagnostic-questioning",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/gap-reading/SKILL.md",
+      "generatedSource": "./stances/gap-reading/SKILL.md",
+      "identity": "skill:gap-reading",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/hypothesis-evaluating/SKILL.md",
+      "generatedSource": "./stances/hypothesis-evaluating/SKILL.md",
+      "identity": "skill:hypothesis-evaluating",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/hypothesis-forming/SKILL.md",
+      "generatedSource": "./stances/hypothesis-forming/SKILL.md",
+      "identity": "skill:hypothesis-forming",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/interpretive-synthesis/SKILL.md",
+      "generatedSource": "./stances/interpretive-synthesis/SKILL.md",
+      "identity": "skill:interpretive-synthesis",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/joint-reading/SKILL.md",
+      "generatedSource": "./stances/joint-reading/SKILL.md",
+      "identity": "skill:joint-reading",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/observational-grounding/SKILL.md",
+      "generatedSource": "./stances/observational-grounding/SKILL.md",
+      "identity": "skill:observational-grounding",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/public-design-reasoning/SKILL.md",
+      "generatedSource": "./stances/public-design-reasoning/SKILL.md",
+      "identity": "skill:public-design-reasoning",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "identity": "skill:reader-orientation",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/relational-continuity/SKILL.md",
+      "generatedSource": "./stances/relational-continuity/SKILL.md",
+      "identity": "skill:relational-continuity",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/socratic-elicitation/SKILL.md",
+      "generatedSource": "./stances/socratic-elicitation/SKILL.md",
+      "identity": "skill:socratic-elicitation",
+      "exposure": "private"
+    },
+    {
+      "canonicalSource": "./stances/vision-steering/SKILL.md",
+      "generatedSource": "./stances/vision-steering/SKILL.md",
+      "identity": "skill:vision-steering",
+      "exposure": "private"
+    }
+  ]
+}

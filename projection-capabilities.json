@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "profile": "wycats-recon",
+  "workflow": "recon",
+  "runtimePrerequisites": {
+    "pi": {
+      "inspectedVersion": "0.85.1",
+      "preflight": "re-run pi --version and re-verify package behavior after upgrades"
+    },
+    "piSubagents": {
+      "required": true,
+      "inspectedVersion": "0.68.0",
+      "install": "pi install npm:pi-subagents",
+      "preflight": "run /subagents-doctor and inspect wycats-recon Prompt Audit before behavioral probes"
+    }
+  },
+  "agentFrontmatter": {
+    "listFormat": "YAML block list (- item)",
+    "verifiedParser": "pi-subagents 0.68.0 parseFrontmatterList"
+  },
+  "activation": {
+    "mechanism": "model-directed progressive disclosure",
+    "markers": [
+      "composition:load",
+      "composition:reference"
+    ],
+    "automaticRuntimeLoader": false
+  },
+  "supported": [
+    "public Recon workflow discovery",
+    "private canonical stance catalog for the delegated Recon profile",
+    "canonical link navigation and target-relative projection",
+    "project context inheritance",
+    "local filesystem reads, search, and shell commands"
+  ],
+  "omitted": [
+    "browser tools",
+    "persistent memory",
+    "Exo context tools",
+    "nested delegation and canonical fan-out execution",
+    "dedicated testing tools (shell commands remain available)"
+  ],
+  "note": "The canonical fan-out prose is preserved. This local-code prototype reports unavailable capabilities rather than substituting different semantics.",
+  "selectedResourceCatalog": [
+    {
+      "name": "recon",
+      "description": "Use when investigating unfamiliar code, tracing data flows, mapping architecture, or answering questions that require adaptive exploration — where the agent needs to follow leads, use tools interactively, and synthesize findings rather than just search for known terms.",
+      "location": "./skills/recon/SKILL.md"
+    },
+    {
+      "name": "diagnostic-questioning",
+      "description": "Use when investigating unfamiliar territory, narrowing possibilities through targeted questions, or diagnosing a problem by updating your own model of the situation.",
+      "location": "./stances/diagnostic-questioning/SKILL.md"
+    },
+    {
+      "name": "interpretive-synthesis",
+      "description": "Use when building a coherent account from many observations, summarizing conversation state, or explaining how pieces connect. The skill is in what gets left out.",
+      "location": "./stances/interpretive-synthesis/SKILL.md"
+    },
+    {
+      "name": "observational-grounding",
+      "description": "Use when observations from different surfaces appear to disagree and the agent must keep each observation in its observed form before explaining causes: UI vs behavior, logs vs state, metrics vs reports, tool output vs user-visible result.",
+      "location": "./stances/observational-grounding/SKILL.md"
+    },
+    {
+      "name": "relational-continuity",
+      "description": "Background guidance for all plugin work: keep language inside the work, focus on what we're doing, and use precise and meaningful language that stays attached to the work underway.",
+      "location": "./stances/relational-continuity/SKILL.md"
+    }
+  ]
+}

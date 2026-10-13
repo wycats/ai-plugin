@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 2,
+  "coordinates": {
+    "canonicalLine": "line in canonicalSource; generated files may add or transform frontmatter",
+    "generatedSource": "projected file path; no generated line is asserted"
+  },
+  "semantics": {
+    "reference": "consultation availability",
+    "load": "requested activation when the governing prose applies"
+  },
+  "edges": [
+    {
+      "canonicalSource": "./agents/recon.agent.md",
+      "canonicalSourceIdentity": "agent:recon",
+      "canonicalLine": 18,
+      "generatedSource": "./agents/wycats-recon.agent.md",
+      "relation": "load",
+      "generatedTarget": "./skills/recon/SKILL.md",
+      "canonicalTarget": "./skills/recon/SKILL.md",
+      "canonicalTargetIdentity": "skill:recon"
+    },
+    {
+      "canonicalSource": "./agents/recon.agent.md",
+      "canonicalSourceIdentity": "agent:recon",
+      "canonicalLine": 18,
+      "generatedSource": "./agents/wycats-recon.agent.md",
+      "relation": "load",
+      "generatedTarget": "./stances/diagnostic-questioning/SKILL.md",
+      "canonicalTarget": "./stances/diagnostic-questioning/SKILL.md",
+      "canonicalTargetIdentity": "skill:diagnostic-questioning"
+    },
+    {
+      "canonicalSource": "./agents/recon.agent.md",
+      "canonicalSourceIdentity": "agent:recon",
+      "canonicalLine": 18,
+      "generatedSource": "./agents/wycats-recon.agent.md",
+      "relation": "load",
+      "generatedTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTargetIdentity": "skill:interpretive-synthesis"
+    },
+    {
+      "canonicalSource": "./skills/recon/SKILL.md",
+      "canonicalSourceIdentity": "skill:recon",
+      "canonicalLine": 10,
+      "generatedSource": "./skills/recon/SKILL.md",
+      "relation": "load",
+      "generatedTarget": "./stances/diagnostic-questioning/SKILL.md",
+      "canonicalTarget": "./stances/diagnostic-questioning/SKILL.md",
+      "canonicalTargetIdentity": "skill:diagnostic-questioning"
+    },
+    {
+      "canonicalSource": "./skills/recon/SKILL.md",
+      "canonicalSourceIdentity": "skill:recon",
+      "canonicalLine": 10,
+      "generatedSource": "./skills/recon/SKILL.md",
+      "relation": "load",
+      "generatedTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTargetIdentity": "skill:interpretive-synthesis"
+    },
+    {
+      "canonicalSource": "./skills/recon/SKILL.md",
+      "canonicalSourceIdentity": "skill:recon",
+      "canonicalLine": 10,
+      "generatedSource": "./skills/recon/SKILL.md",
+      "relation": "load",
+      "generatedTarget": "./stances/observational-grounding/SKILL.md",
+      "canonicalTarget": "./stances/observational-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:observational-grounding"
+    },
+    {
+      "canonicalSource": "./skills/recon/SKILL.md",
+      "canonicalSourceIdentity": "skill:recon",
+      "canonicalLine": 10,
+      "generatedSource": "./skills/recon/SKILL.md",
+      "relation": "load",
+      "generatedTarget": "./stances/relational-continuity/SKILL.md",
+      "canonicalTarget": "./stances/relational-continuity/SKILL.md",
+      "canonicalTargetIdentity": "skill:relational-continuity"
+    },
+    {
+      "canonicalSource": "./skills/recon/SKILL.md",
+      "canonicalSourceIdentity": "skill:recon",
+      "canonicalLine": 48,
+      "generatedSource": "./skills/recon/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/observational-grounding/SKILL.md",
+      "canonicalTarget": "./stances/observational-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:observational-grounding"
+    },
+    {
+      "canonicalSource": "./stances/diagnostic-questioning/SKILL.md",
+      "canonicalSourceIdentity": "skill:diagnostic-questioning",
+      "canonicalLine": 60,
+      "generatedSource": "./stances/diagnostic-questioning/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:collaborative-grounding"
+    },
+    {
+      "canonicalSource": "./stances/diagnostic-questioning/SKILL.md",
+      "canonicalSourceIdentity": "skill:diagnostic-questioning",
+      "canonicalLine": 62,
+      "generatedSource": "./stances/diagnostic-questioning/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTargetIdentity": "skill:interpretive-synthesis"
+    },
+    {
+      "canonicalSource": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalSourceIdentity": "skill:interpretive-synthesis",
+      "canonicalLine": 49,
+      "generatedSource": "./stances/interpretive-synthesis/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:collaborative-grounding"
+    },
+    {
+      "canonicalSource": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalSourceIdentity": "skill:interpretive-synthesis",
+      "canonicalLine": 51,
+      "generatedSource": "./stances/interpretive-synthesis/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/diagnostic-questioning/SKILL.md",
+      "canonicalTarget": "./stances/diagnostic-questioning/SKILL.md",
+      "canonicalTargetIdentity": "skill:diagnostic-questioning"
+    },
+    {
+      "canonicalSource": "./stances/joint-reading/SKILL.md",
+      "canonicalSourceIdentity": "skill:joint-reading",
+      "canonicalLine": 46,
+      "generatedSource": "./stances/joint-reading/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTargetIdentity": "skill:reader-orientation"
+    },
+    {
+      "canonicalSource": "./stances/observational-grounding/SKILL.md",
+      "canonicalSourceIdentity": "skill:observational-grounding",
+      "canonicalLine": 95,
+      "generatedSource": "./stances/observational-grounding/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./skills/recon/SKILL.md",
+      "canonicalTarget": "./skills/recon/SKILL.md",
+      "canonicalTargetIdentity": "skill:recon"
+    },
+    {
+      "canonicalSource": "./stances/observational-grounding/SKILL.md",
+      "canonicalSourceIdentity": "skill:observational-grounding",
+      "canonicalLine": 107,
+      "generatedSource": "./stances/observational-grounding/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:collaborative-grounding"
+    },
+    {
+      "canonicalSource": "./stances/public-design-reasoning/SKILL.md",
+      "canonicalSourceIdentity": "skill:public-design-reasoning",
+      "canonicalLine": 68,
+      "generatedSource": "./stances/public-design-reasoning/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTargetIdentity": "skill:reader-orientation"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 68,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTargetIdentity": "skill:interpretive-synthesis"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 72,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/joint-reading/SKILL.md",
+      "canonicalTarget": "./stances/joint-reading/SKILL.md",
+      "canonicalTargetIdentity": "skill:joint-reading"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 74,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:collaborative-grounding"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 78,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/public-design-reasoning/SKILL.md",
+      "canonicalTarget": "./stances/public-design-reasoning/SKILL.md",
+      "canonicalTargetIdentity": "skill:public-design-reasoning"
+    },
+    {
+      "canonicalSource": "./stances/reader-orientation/SKILL.md",
+      "canonicalSourceIdentity": "skill:reader-orientation",
+      "canonicalLine": 80,
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/relational-continuity/SKILL.md",
+      "canonicalTarget": "./stances/relational-continuity/SKILL.md",
+      "canonicalTargetIdentity": "skill:relational-continuity"
+    },
+    {
+      "canonicalSource": "./stances/relational-continuity/SKILL.md",
+      "canonicalSourceIdentity": "skill:relational-continuity",
+      "canonicalLine": 52,
+      "generatedSource": "./stances/relational-continuity/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTarget": "./stances/collaborative-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:collaborative-grounding"
+    },
+    {
+      "canonicalSource": "./stances/relational-continuity/SKILL.md",
+      "canonicalSourceIdentity": "skill:relational-continuity",
+      "canonicalLine": 53,
+      "generatedSource": "./stances/relational-continuity/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTargetIdentity": "skill:interpretive-synthesis"
+    }
+  ]
+}
