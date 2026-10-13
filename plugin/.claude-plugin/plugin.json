@@ -1,0 +1,5 @@
+{
+  "name": "wycats-ai-plugin",
+  "version": "0.1.0",
+  "description": "Personal agent toolkit: workflow agents, skills, instructions, and hooks."
+}
