@@ -116,9 +116,10 @@ filtering and host-dispatched pnpm enforcement; they do not establish a filesyst
 access boundary or guarantee every future model's behavior.
 
 After a window reload, slash completion uses `/wycats reconstruction-fixture`.
-The subsequent request selected through that completion is blocked by Copilot's
-sign-in/model-availability state; its invocation expansion remains unqualified.
-Copilot Agent Host's distinct hook envelope also remains outside this proof.
+Selecting that completion and submitting a read-only request leads the model to
+read the fixture, its linked stance, and its supporting contract, then accurately
+summarize its purpose without edits or terminal commands. Copilot Agent Host's
+distinct hook envelope remains outside this proof.
 The released plugin was excluded from the probe profile; home-directory skills
 remain discoverable, so the profile is not a hermetic model-context boundary.
 Local receipts live with the durable probe environment under
@@ -127,8 +128,8 @@ Local receipts live with the durable probe environment under
 The experiment supports a concrete architectural choice: retain grouping for
 authors, give the reader explicit semantic data, and let adapters choose runtime
 layout. It establishes no promise that canonical source can be installed directly.
-The remaining host check can change adapter details without deciding source
-meaning by directory again.
+Further host qualification can change adapter details while the reader continues
+to supply resolved semantics to each adapter.
 
 ## Sources
 
