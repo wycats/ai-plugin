@@ -63,7 +63,7 @@ or interface never expresses. An agent with a long conversation behind it can
 make the same mistake: the account is coherent in its context while leaving a
 new reader to infer a missing connection.
 
-[Reader orientation](stances/reader-orientation/SKILL.md) makes this information
+[Reader orientation](skills/stances/reader-orientation/SKILL.md) makes this information
 boundary part of the task: what can someone understand where they encounter the work?
 A useful level of detail exposes the relationships needed for the current
 judgment, while a trustworthy contract lets other detail wait. Deeper inspection

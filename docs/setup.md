@@ -25,7 +25,7 @@ This means the same agent definitions work for everyone — you just change the 
 
 ## VS Code local registration
 
-For VS Code, the build writes the plugin to `out/wycats/`. Local registration adds that output directory to `chat.plugins.paths` and the hooks directory to `chat.hookFilesLocations` in a VS Code `settings.json` file.
+For VS Code, the build writes the plugin to `out/wycats/`. Local registration adds that output directory to `chat.pluginLocations` in the selected VS Code `settings.json` file. The Agent Plugins 1.0 package discovers its Copilot hooks through `com.github.copilot/hooks/hooks.json`; separate hook registration is unnecessary. The installer removes this checkout's older plugin and hook registrations while preserving unrelated entries.
 
 The registration target is explicit. The installer does not default to Stable VS Code, because many local development sessions run in VS Code Insiders.
 
@@ -88,7 +88,7 @@ Add the local marketplace and install:
 
 ```sh
 codex plugin marketplace add ./out/codex-marketplace
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
+codex plugin add wycats@wycats
 ```
 
 Published Codex artifacts are generated from `main` and force-pushed to the
@@ -96,29 +96,74 @@ Published Codex artifacts are generated from `main` and force-pushed to the
 
 ```sh
 codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
+codex plugin add wycats@wycats
 ```
 
 To refresh the configured Git marketplace after updates:
 
 ```sh
-codex plugin marketplace upgrade wycats-ai-plugin
+codex plugin marketplace upgrade wycats
 ```
 
 Then restart Codex. If the installed plugin cache appears stale, remove and
 re-add the plugin after upgrading the marketplace.
 
-If you installed the earlier main-branch Codex marketplace, migrate once:
+## Renaming an existing installation
+
+The public plugin and marketplace name is `wycats`; the repository remains
+`wycats/vscode-ai-plugin`. Host-qualified references now use `wycats:`, such as
+`wycats:recon`. Update any saved references or enablement settings that name the
+old plugin. The old and new identities should not both remain enabled.
+
+For published installations, run this migration after the renamed artifacts
+are available on the target's publication branch.
+
+### Codex
+
+Remove the old plugin and marketplace, then register the generated marketplace:
 
 ```sh
 codex plugin remove wycats-ai-plugin@wycats-ai-plugin
 codex plugin marketplace remove wycats-ai-plugin
 codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
+codex plugin add wycats@wycats
 ```
 
-No VS Code migration is needed. VS Code still uses root `marketplace.json` and
-`dist/wycats/` on `main`.
+Restart Codex. This also migrates installations that used the earlier
+main-branch marketplace. For a local build, use `./out/codex-marketplace`
+in the marketplace-add command instead of the Git source and `--ref`.
+
+### Claude Code
+
+For the repository's dedicated marketplace, remove the old registration and
+install from the generated branch:
+
+```sh
+claude plugin marketplace remove wycats-ai-plugin
+claude plugin marketplace add wycats/vscode-ai-plugin#cc-plugin
+claude plugin install wycats@wycats
+```
+
+[Removing a Claude marketplace also uninstalls its plugins](https://code.claude.com/docs/en/plugin-marketplaces#remove-the-marketplace-to-start-over).
+Preserve the installation scope if you previously installed at project or local
+scope. A local `--plugin-dir` launch instead needs a rebuilt package and a new
+session.
+
+### VS Code
+
+A local `chat.pluginLocations` registration points to the package directory,
+so rebuild and reload the window; its path stays the same. For a marketplace
+installation, [uninstall the old plugin](https://code.visualstudio.com/docs/agent-customization/agent-plugins),
+refresh the repository marketplace, and install `wycats`.
+The publication workflow regenerates both `dist/wycats/` and the root
+`marketplace.json` together from the new manifest.
+
+### Pi
+
+The Git source and `wycats-recon` agent profile stay the same. Update the package
+from `pi-plugin` and reload Pi as described in the generated package README;
+the generated package manifest now takes its name from the canonical plugin
+manifest.
 
 ## Configuring `config.json`
 

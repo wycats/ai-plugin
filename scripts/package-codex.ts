@@ -67,7 +67,7 @@ export async function packageCodexMarketplace(): Promise<void> {
   const marketplace = {
     name: pluginMeta.name,
     interface: {
-      displayName: pluginMeta.interface?.displayName ?? "Wycats AI Plugin",
+      displayName: pluginMeta.interface?.displayName ?? pluginMeta.name,
     },
     plugins: [
       {

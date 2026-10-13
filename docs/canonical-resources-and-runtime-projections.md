@@ -49,9 +49,10 @@ available to a host; it does not become the authoring surface.
 
 ## Activation intent and runtime discovery
 
-A resource's description explains applicability. Its `user-invocable` field
-states whether it belongs on the user's direct workflow surface; `invocation`
-states whether relevance can select it or the user must choose it explicitly.
+A resource's description explains applicability. Its `wycats.user-invocable`
+metadata states whether it belongs on the user's direct workflow surface;
+`wycats.invocation` states whether relevance can select it or the user must
+choose it explicitly.
 Choosing to enter a substantial workflow is part of that workflow's meaning,
 so these declarations belong to the canonical resource.
 
@@ -155,11 +156,40 @@ simulating equivalence through different guidance.
 
 ## Authoring boundary
 
-The root `stances/`, `skills/`, `agents/`, `instructions/`, and neutral hook
-manifests are the plugin's canonical authoring surfaces. Abstract model roles,
+The grouped `skills/stances/` and `skills/workflows/` directories, root `agents/`
+and `instructions/`, and neutral hook manifests are the plugin's canonical
+authoring surfaces. Instruction resources declare semantic kind and activation
+in string-valued `wycats.*` metadata. The source reader separates those meanings
+from physical location; adapters choose target paths from the normalized model. Abstract model roles,
 tool groups, and canonical hook tool names let the build adapt execution
 details without rewriting behavior. Generated `out/`, tracked `dist/wycats/`,
 and publication branches are derived runtime artifacts.
+
+Composition and evaluation share the [canonical source reader](../scripts/resource-source.ts).
+It resolves the authoring format into a name, kind, identity, and activation
+policy. A nested container retains its leaf name; an agent's declared name
+takes precedence over its filename. Legacy directory conventions are interpreted
+at this boundary, so consumers receive the same meaning whichever source format
+an author uses. Whether grouping should eventually supply the kind is an
+authoring decision; adapters continue to consume the resolved model.
+
+Generated files have a different contract from source files. Native activation
+keys are valid in a generated skill even though authors cannot declare them in
+canonical source. Evaluation checks the source against its suite identity, then
+checks the generated resource's discovery fields without reinterpreting its host
+envelope as authoring metadata. Invocation uses the validated name; the resource
+map supplies the generated address.
+
+Hook projection follows the same direction. Neutral manifests describe policies,
+events, and scripts; the [hook adapters](../scripts/hook-projection.ts) produce
+each host's final envelope directly. VS Code Local uses flat event handlers and
+host-expanded package roots. Claude Code retains matcher groups and shell-expanded
+roots. Their shared policy does not erase those execution differences.
+Script paths are relative to `scripts/hooks/` and may contain nested directories
+and any Node-supported file extension. Source validation and both adapters require
+portable path characters: letters, digits, underscores, periods, hyphens, and
+forward slashes, with no parent traversal. This lets each host compose the script
+path with its package-root expansion without introducing shell syntax.
 
 This repository is the proving ground for this architecture and owns the
 resources it authors. It does not need to become the permanent home of every

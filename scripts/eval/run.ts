@@ -14,7 +14,7 @@ import {
   type EvaluationResponse,
   type Grade,
 } from "./core.ts";
-import { resolveCanonicalResourcePath, validateCanonicalResource } from "./resource.ts";
+import { resolveCanonicalResourcePath, validateCanonicalResource, validateProjectedResource } from "./resource.ts";
 import { validateReportPath } from "./output.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("../..", import.meta.url)));
@@ -172,7 +172,7 @@ async function run(): Promise<void> {
   ]);
   const projectedResourcePath = adapter.projectedResourcePath(suite.resource);
   const projectedResourceSource = await readFile(projectedResourcePath, "utf-8");
-  validateCanonicalResource(suite.resource, projectedResourceSource);
+  validateProjectedResource(suite.resource, projectedResourceSource);
   const execution = {
     ...adapterMetadata,
     projectedResource: {

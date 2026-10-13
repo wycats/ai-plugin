@@ -14,40 +14,56 @@ tool mappings, hooks, and publication protocols remain outside its scope.
 
 ### 1.1 Declaration
 
-Authors declare activation policy as **top-level YAML frontmatter keys in the
-canonical `SKILL.md`**, alongside `name` and `description`. That file lives
-under the repository's `skills/` or `stances/` directory.
+Authors declare semantic kind and activation policy in the `metadata` mapping
+of the canonical `SKILL.md`. Workflows live under `skills/workflows/<name>/`;
+stances live under `skills/stances/<name>/`. Those groups orient authors; the
+explicit kind governs semantic validation and projection independently of path.
 
 For example, an explicitly selected workflow at
-`skills/behavioral-reconstruction/SKILL.md` would declare:
+`skills/workflows/behavioral-reconstruction/SKILL.md` would declare:
 
 ```yaml
 ---
 name: behavioral-reconstruction
 description: Reconstruct a system through an independently usable behavioral contract.
-user-invocable: true
-invocation: explicit
+metadata:
+  wycats.kind: workflow
+  wycats.user-invocable: "true"
+  wycats.invocation: explicit
 ---
 ```
 
-The Markdown body follows the closing `---`. Reconstruction is an illustrative
-workflow; the declaration does not add it to the package.
+The Markdown body follows the closing `---`. Reconstruction is illustrative;
+the declaration does not add it to the package.
 
-| Field | Values | Default | Meaning |
-| --- | --- | --- | --- |
-| `user-invocable` | YAML boolean | `true` | Whether the resource belongs on the user's direct skill-selection surface |
-| `invocation` | `contextual` or `explicit` | `contextual` | Whether relevance can select the resource, or user selection is required |
+| Metadata field | Required string values | Meaning |
+| --- | --- | --- |
+| `wycats.kind` | `workflow` or `stance` | The semantic role of these instructions |
+| `wycats.user-invocable` | `"true"` or `"false"` | Whether the resource belongs on the user's direct skill-selection surface |
+| `wycats.invocation` | `contextual` or `explicit` | Whether relevance can select the resource, or user selection is required |
 
-Each declaration governs only its resource. Omitted keys take the stated
-defaults. This contract defines no plugin-wide default, directory inheritance,
-or per-target override. The fields belong directly in the resource's
-frontmatter, rather than in nested `metadata`, body prose, an agent definition,
-or `plugin.json`.
+All three fields must be explicit in the grouped authoring format. The metadata
+map has string values, following Agent Skills' extension convention. These keys
+are interpreted by this compiler; a generic host assigns them no portable
+activation guarantee. Each declaration governs only its resource, with no
+plugin-wide default, directory inheritance, or per-target semantic override.
+
+The source reader normalizes the declaration into typed kind and activation.
+Adapters consume that model and remove the three authoring keys from generated
+frontmatter. Unrelated metadata is preserved. Source location remains available
+for diagnostics, provenance, and link resolution. Skill names remain globally
+unique across stances and workflows; grouping adds no namespace to identity.
 
 `name` identifies the resource; `description` explains applicability. Neither
-overrides activation policy. Null values, quoted booleans, unknown invocation
-values, and duplicate activation keys are invalid. Stances must explicitly
-declare `user-invocable: false`, as required by existing stance authoring.
+overrides activation policy. Missing or non-string authoring values, unknown
+values, duplicate YAML keys, and simultaneous top-level activation fields are
+invalid. A stance must declare `wycats.user-invocable: "false"`.
+
+The reader also accepts the earlier flat source format for existing fixtures and
+consumers: top-level boolean `user-invocable` defaults to `true`, and top-level
+`invocation` defaults to `contextual`. Its directory supplies the legacy kind.
+An explicit authoring metadata declaration takes ownership of all three fields;
+legacy and metadata activation declarations cannot coexist on one resource.
 
 ### 1.2 Meaning and supported combinations
 
@@ -126,23 +142,32 @@ internal paths.
 
 | Target | Default output directory | Discovery configured by this plugin |
 | --- | --- | --- |
-| VS Code / Copilot | `out/wycats/` | Copilot-format `plugin.json` declares `"skills": ["./skills/", "./stances/"]` |
+| VS Code / Copilot | `out/wycats/` | Agent Plugins 1.0 `plugin.json` declares the schema; skills use fixed immediate-child discovery under `skills/` |
 | Claude Code | `out/claude-code/` | `.claude-plugin/plugin.json` identifies the plugin; skill paths are omitted for discovery under `skills/` |
 | Codex | `out/codex/` | `.codex-plugin/plugin.json` declares `skills: "./skills/"` |
 | Pi | `out/pi/` | `package.json` lists public skill directories in `pi.skills`; private stance paths are supplied separately to the Recon agent |
 
-Selected workflow skills retain their canonical repository-relative paths
-within the package. Selected stances do so in VS Code and Pi; Claude Code and
-Codex place them at `skills/<name>/SKILL.md`, using the canonical stance name.
+Workflows and stances are projected to `skills/<name>/SKILL.md` for VS Code,
+Claude Code, and Codex. Pi uses `skills/<name>/SKILL.md` for workflows and
+`stances/<name>/SKILL.md` for stances. These paths are chosen from semantic kind
+and identity, independently of the source directory. Native VS Code agents,
+rules, and hooks use `com.github.copilot/agents/`, `com.github.copilot/rules/`,
+and `com.github.copilot/hooks/hooks.json` respectively. Agents and rules retain
+their source-relative paths within those directories; manifest
+`extensions["com.github.copilot"]` entries list their exact paths with
+`exclusive: true`. This preserves nested supporting-file links and keeps
+supporting Markdown out of native discovery. Composition destinations
+are resolved against these final locations before frontmatter is generated.
 
 The mapping table describes the generated package. Its entries have different
 authorities and therefore different reasons to change:
 
 | Concern | Basis for the current mapping | What would change it |
 | --- | --- | --- |
-| VS Code package format | Existing [Copilot-format](https://code.visualstudio.com/docs/agent-customization/agent-plugins#plugin-formats) adapter choice; no older-host compatibility requirement has been established. | Another supported format preserves activation, agents, instructions, hooks, and installation. Retaining existing directories is not itself a requirement. |
+| VS Code package format | [Agent Plugins 1.0](https://code.visualstudio.com/docs/agent-customization/agent-plugins#plugin-formats) provides shared skill discovery; the Copilot namespace carries native components. | Supported host formats or native component contracts change. Source grouping is independent of this choice. |
+| VS Code agent names | Emit `<manifest name>:<canonical agent name>`, including explicit source names. Frontmatter replaces the host's qualified fallback, and [delegation resolves the first matching name](https://github.com/microsoft/vscode/blob/7baac39ec3ca969dab74ac12c097f6a486e46593/src/vs/workbench/contrib/chat/common/tools/builtinTools/runSubagentTool.ts#L486-L489). Qualification distinguishes agents from differently named plugins. | The host separates local names from qualified runtime addresses, or gains unambiguous plugin-aware resolution. |
 | Pi resource selection | Repository-owned scope: the [Pi profile](../scripts/pi-profile.ts) deliberately starts with Recon. | Another workflow is selected for support and its capabilities and delegated context are validated. Host format support alone does not expand the profile. |
-| Codex skill depth | [Host requirement](https://developers.openai.com/plugins/deploy/submission-errors#skill-errors): immediate children of `skills/`. Preserving workflow paths is our adapter choice. | The host permits deeper packages, or we define an explicit relocation for nested workflows. Until then, those workflows fail target preflight. |
+| Codex skill depth | [Host requirement](https://developers.openai.com/plugins/deploy/submission-errors#skill-errors): immediate children of `skills/`. The adapter flattens source groups using globally unique skill names. | A new identity or host discovery contract requires different placement. |
 
 Exact package membership and generated addresses belong to
 `projection-resources.json`; Pi's delegated membership is defined by its profile.
@@ -150,7 +175,7 @@ These inventories change with the projection plan and are not repeated here.
 
 ### 2.2 Metadata translation
 
-Adapters must remove canonical `invocation` from generated frontmatter, retain
+Adapters must consume normalized canonical `invocation`, remove it from generated frontmatter, retain
 normalized `user-invocable`, and emit the following native invocation value for
 each selected skill or stance. Values are emitted explicitly for both policies.
 All locations in this table are relative to the projected `SKILL.md` directory.
@@ -291,9 +316,11 @@ The following cases exercise distinct parts of the projection contract:
 
 | Input | Required result |
 | --- | --- |
-| Both fields omitted on a skill | Normalize to `true` / `contextual`; emit the native contextual value |
+| Legacy skill with both fields omitted | Normalize to `true` / `contextual`; emit the native contextual value |
+| Grouped metadata missing kind or activation fields | Reject the incomplete declaration |
 | Public explicit-only skill | Preserve public exposure; emit the native explicit-only value |
-| `user-invocable: "false"` | Reject the string value |
+| Legacy `user-invocable: "false"` | Reject the string value |
+| Metadata `wycats.user-invocable: false` | Reject the non-string value |
 | Hidden explicit-only resource | Reject the unsupported combination |
 | Reference to explicit-only skill | Retain the reference and rewrite its destination normally |
 | Load edge into explicit-only skill | Reject the edge |
@@ -306,8 +333,8 @@ The following cases exercise distinct parts of the projection contract:
 | Invalid Codex interface shape or required value | Fail Codex preflight before replacing output |
 | Relocated stance with sidecar assets | Preserve the resource-relative sidecar and asset paths |
 | Frontmatter change before a composition link | Preserve body bytes except the intended destination rewrite |
-| Nested workflow path for Codex | Reject the unsupported package layout |
-| VS Code skill manifest | Emit directory strings for both `skills/` and `stances/`; object-array entries do not satisfy this contract |
+| Grouped workflow path for Codex | Relocate to immediate `skills/<name>/SKILL.md`; rewrite incoming and outgoing composition links |
+| VS Code manifest | Emit the Agent Plugins 1.0 schema and portable metadata; components use fixed discovery paths |
 | Source-authored native activation key | Reject duplicate policy ownership |
 | Target without an explicit-only mapping | Fail before replacing output |
 

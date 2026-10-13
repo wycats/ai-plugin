@@ -1,4 +1,4 @@
-# vscode-ai-plugin
+# wycats
 
 An agent toolkit for VS Code Copilot, Claude Code, Codex, and Pi, grounded in a theory of how language activates reasoning in language models.
 
@@ -51,7 +51,7 @@ The repo has two kinds of documentation: foundational theory that explains why t
 
 ## Stances
 
-When writing a skill, you're choosing *how the agent should think about the task*. We've found that certain collaborative patterns recur across different skills, and naming them makes them composable. The `stances/` directory contains these named patterns:
+When writing a skill, you're choosing *how the agent should think about the task*. We've found that certain collaborative patterns recur across different skills, and naming them makes them composable. The `skills/stances/` directory contains these named patterns:
 
 **Collaborative grounding** is the most fundamental. The agent has perception (tools, files, search) and superhuman breadth across all of human expression. The user has situated knowledge: intent, priorities, energy, the state of the world beyond the screen. Neither perspective is sufficient alone. Good collaboration combines both: the agent shares what it sees, the user contributes what the agent can't access.
 
@@ -181,36 +181,27 @@ the plugin:
 
 ```sh
 codex plugin marketplace add ./out/codex-marketplace
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
+codex plugin add wycats@wycats
 ```
 
 The published Codex marketplace lives on the generated `codex-plugin` branch:
 
 ```sh
 codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
+codex plugin add wycats@wycats
 ```
 
 To update an installed Codex marketplace snapshot:
 
 ```sh
-codex plugin marketplace upgrade wycats-ai-plugin
+codex plugin marketplace upgrade wycats
 ```
 
 Then restart Codex. If the installed plugin cache appears stale, remove and
 re-add the plugin after upgrading the marketplace.
 
-If you installed the earlier main-branch Codex marketplace, migrate once:
-
-```sh
-codex plugin remove wycats-ai-plugin@wycats-ai-plugin
-codex plugin marketplace remove wycats-ai-plugin
-codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
-```
-
-No VS Code migration is needed; VS Code continues to use `marketplace.json` and
-`dist/wycats/` on `main`.
+For an existing `wycats-ai-plugin` installation, follow the
+[rename migration](docs/setup.md#renaming-an-existing-installation).
 
 ### How the build works
 

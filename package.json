@@ -1,5 +1,5 @@
 {
-  "name": "wycats-ai-plugin",
+  "name": "wycats",
   "version": "0.1.0",
   "private": true,
   "description": "Personal agent toolkit: workflow agents, skills, instructions, and hooks.",
@@ -21,7 +21,7 @@
     "publish-vscode": "node scripts/publish-vscode.ts",
     "eval": "node scripts/eval/run.ts",
     "test:eval": "node --test scripts/eval/core.test.ts scripts/eval/resource.test.ts scripts/eval/run.test.ts scripts/eval/adapters/claude-code.test.ts",
-    "test:composition": "node --test scripts/resource-composition.test.ts scripts/skill-activation.test.ts scripts/projection-plan.test.ts scripts/pi-projection.test.ts scripts/pi-subagents-integration.test.ts",
+    "test:composition": "node --test scripts/resource-composition.test.ts scripts/skill-activation.test.ts scripts/projection-plan.test.ts scripts/pi-projection.test.ts scripts/pi-subagents-integration.test.ts scripts/vscode-plugin.test.ts scripts/hook-projection.test.ts scripts/install-local.test.ts",
     "test:pi-runtime": "node --test scripts/pi-subagents-integration.test.ts",
     "test-cc": "node scripts/test-cc.ts",
     "validate": "node scripts/validate.ts",
