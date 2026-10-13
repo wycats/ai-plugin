@@ -96,9 +96,10 @@ The session skills form a gradient based on how much the user serves as a bridge
 ### Architectural restructuring
 
 - **`/architectural-distillation`**: recover what an evolved system has learned
-  from its present behavior and historical record, then express that knowledge
-  through the architecture requiring the fewest independent concepts while
-  preserving every meaningful distinction.
+  from its present behavior and historical record, articulate the learned model,
+  and test that account against the difficult cases. Use it to derive the
+  architecture requiring the fewest independent concepts while preserving every
+  meaningful distinction.
 
 ### Implementation quality
 

@@ -40,6 +40,36 @@
       "canonicalTargetIdentity": "skill:interpretive-synthesis"
     },
     {
+      "canonicalSource": "./skills/architectural-distillation/SKILL.md",
+      "canonicalSourceIdentity": "skill:architectural-distillation",
+      "canonicalLine": 66,
+      "generatedSource": "./skills/architectural-distillation/SKILL.md",
+      "relation": "load",
+      "generatedTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTarget": "./stances/interpretive-synthesis/SKILL.md",
+      "canonicalTargetIdentity": "skill:interpretive-synthesis"
+    },
+    {
+      "canonicalSource": "./skills/architectural-distillation/SKILL.md",
+      "canonicalSourceIdentity": "skill:architectural-distillation",
+      "canonicalLine": 94,
+      "generatedSource": "./skills/architectural-distillation/SKILL.md",
+      "relation": "reference",
+      "generatedTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTarget": "./stances/reader-orientation/SKILL.md",
+      "canonicalTargetIdentity": "skill:reader-orientation"
+    },
+    {
+      "canonicalSource": "./skills/architectural-distillation/SKILL.md",
+      "canonicalSourceIdentity": "skill:architectural-distillation",
+      "canonicalLine": 103,
+      "generatedSource": "./skills/architectural-distillation/SKILL.md",
+      "relation": "load",
+      "generatedTarget": "./stances/gap-reading/SKILL.md",
+      "canonicalTarget": "./stances/gap-reading/SKILL.md",
+      "canonicalTargetIdentity": "skill:gap-reading"
+    },
+    {
       "canonicalSource": "./skills/implementation-quality/SKILL.md",
       "canonicalSourceIdentity": "skill:implementation-quality",
       "canonicalLine": 16,
