@@ -447,7 +447,7 @@ function buildVSCodeHooks(
 
     const outFile = join(hooksOutDir, `${m.name}.json`);
     writes.push(writeFile(outFile, JSON.stringify({ hooks }, null, 2) + "\n"));
-    outPaths.push("./" + relative(outDir, outFile));
+    outPaths.push("./" + relative(outDir, outFile).split("\\").join("/"));
   }
 
   return Promise.all(writes).then(() => outPaths);
