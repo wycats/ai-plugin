@@ -1,4 +1,4 @@
-/** A bounded source-format experiment. Production discovery and builds are unchanged. */
+/** Compare source layouts through the production reader and projection planner. */
 import assert from "node:assert/strict";
 import { cp, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";

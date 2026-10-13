@@ -35,7 +35,8 @@ import {
   type CanonicalComposition,
 } from "./resource-composition.ts";
 import { assertSafeOutputOverride, prepareProjectionOutput } from "./projection-output.ts";
-import { buildVSCodePlugin } from "./vscode-plugin.ts";
+import { VSCODE_PLUGIN_HOOK_PATH, vscodePluginManifest } from "./vscode-plugin.ts";
+import { projectVSCodeHooks, projectClaudeCodeHooks, type HookManifest } from "./hook-projection.ts";
 import { PI_PROFILE, piAgentContext } from "./pi-profile.ts";
 import { createProjectionPlan, projectionResourceMap, type ProjectionPlan, type ProjectedResource } from "./projection-plan.ts";
 
@@ -342,17 +343,6 @@ async function buildAgent(
   return `./${relative(outDir, outPath).split("\\").join("/")}`;
 }
 
-// --- Hook manifest (neutral format) ---
-
-interface HookManifest {
-  type: "policy" | "observer" | "side-effect";
-  name: string;
-  events: string[];
-  tool?: string;
-  script: string;
-  timeout?: number;
-}
-
 /**
  * Build hooks for the target platform from neutral manifests.
  *
@@ -379,14 +369,15 @@ async function buildHooks(
   // Copy the package so hook imports resolve in the output
   await copyAgentHooksPackage(outDir);
 
-  const hooksOutDir = join(outDir, "hooks");
-  await mkdir(hooksOutDir, { recursive: true });
-
-  if (config.target === "claude-code") {
-    return buildCCHooks(manifests, config, hooksOutDir);
-  } else {
-    return buildVSCodeHooks(manifests, hooksOutDir, outDir);
-  }
+  const isClaudeCode = config.target === "claude-code";
+  const pluginPath = isClaudeCode ? "./hooks/hooks.json" : VSCODE_PLUGIN_HOOK_PATH;
+  const hooks = isClaudeCode
+    ? projectClaudeCodeHooks(manifests, config.hookMatchers)
+    : projectVSCodeHooks(manifests);
+  const destination = join(outDir, pluginPath);
+  await mkdir(dirname(destination), { recursive: true });
+  await writeFile(destination, JSON.stringify({ hooks }, null, 2) + "\n");
+  return [pluginPath];
 }
 
 async function copyAgentHooksPackage(outDir: string): Promise<void> {
@@ -419,79 +410,6 @@ async function copyAgentHooksPackage(outDir: string): Promise<void> {
   });
 
   await writeFile(join(hooksDest, "src", "index.js"), outputText);
-}
-
-/** VS Code adapter: one JSON file per hook, flat handler arrays. */
-function buildVSCodeHooks(
-  manifests: HookManifest[],
-  hooksOutDir: string,
-  outDir: string,
-): Promise<string[]> {
-  const writes: Promise<void>[] = [];
-  const outPaths: string[] = [];
-
-  for (const m of manifests) {
-    const hooks: Record<
-      string,
-      { type: string; command: string; timeout?: number }[]
-    > = {};
-    for (const event of m.events) {
-      hooks[event] = [
-        {
-          type: "command",
-          command: `node scripts/hooks/${m.script}`,
-          ...(m.timeout !== undefined ? { timeout: m.timeout } : {}),
-        },
-      ];
-    }
-
-    const outFile = join(hooksOutDir, `${m.name}.json`);
-    writes.push(writeFile(outFile, JSON.stringify({ hooks }, null, 2) + "\n"));
-    outPaths.push("./" + relative(outDir, outFile).split("\\").join("/"));
-  }
-
-  return Promise.all(writes).then(() => outPaths);
-}
-
-/** Claude Code adapter: consolidated hooks.json with matcher groups. */
-function buildCCHooks(
-  manifests: HookManifest[],
-  config: Config,
-  hooksOutDir: string,
-): Promise<string[]> {
-  const matchers = config.hookMatchers ?? {};
-  const consolidated: Record<
-    string,
-    {
-      matcher?: string;
-      hooks: { type: string; command: string; timeout?: number }[];
-    }[]
-  > = {};
-
-  for (const m of manifests) {
-    const handler = {
-      type: "command" as const,
-      command: `node "$CLAUDE_PLUGIN_ROOT/scripts/hooks/${m.script}"`,
-      ...(m.timeout !== undefined ? { timeout: m.timeout } : {}),
-    };
-
-    const group: { matcher?: string; hooks: (typeof handler)[] } = {
-      hooks: [handler],
-    };
-    if (m.tool && matchers[m.tool]) {
-      group.matcher = matchers[m.tool];
-    }
-
-    for (const event of m.events) {
-      consolidated[event] ??= [];
-      consolidated[event].push(group);
-    }
-  }
-
-  return writeFile(
-    join(hooksOutDir, "hooks.json"),
-    JSON.stringify({ hooks: consolidated }, null, 2) + "\n",
-  ).then(() => ["./hooks/hooks.json"]);
 }
 
 async function writeProjectedResource(
@@ -853,7 +771,8 @@ async function build() {
     }
     const instructionPaths = plan.resources.filter(({ resource }) => resource.kind === "instruction").map(({ pluginPath }) => pluginPath);
 
-    const nativeHookPaths = await buildVSCodePlugin(outDir, pluginMeta, hookPaths, { agentPaths, instructionPaths });
+    const manifest = vscodePluginManifest(pluginMeta, { agentPaths, instructionPaths });
+    await writeFile(join(outDir, "plugin.json"), JSON.stringify(manifest, null, 2) + "\n");
 
     console.log(`Built to ${relative(ROOT, outDir)}/`);
     console.log(`  agents:       ${String(agentPaths.length)}`);
@@ -861,7 +780,7 @@ async function build() {
       `  skills:       ${String(skillPaths.length)} workflow + ${String(stancePaths.length)} stances = ${String(allSkillPaths.length)}`,
     );
     console.log(`  instructions: ${String(instructionPaths.length)}`);
-    console.log(`  hooks:        ${String(nativeHookPaths.length)}`);
+    console.log(`  hooks:        ${String(hookPaths.length)}`);
   }
 }
 

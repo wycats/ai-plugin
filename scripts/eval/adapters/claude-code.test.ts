@@ -47,6 +47,15 @@ function testAdapter(): { adapter: ClaudeCodeCliAdapter; root: string } {
   return { adapter: new ClaudeCodeCliAdapter(root), root };
 }
 
+void test("invokes a named nested agent using validated identity rather than its filename", () => {
+  const resource = { identity: "wycats-plugin:agents/careful-review", name: "careful-review", path: "agents/team/reviewer.agent.md" };
+  const invocation = claudeCodeInvocation(resource, "wycats", "Review.", "Projected.");
+  assert.deepEqual(invocation.resourceArguments, ["--agent", "wycats:careful-review"]);
+  const result = parseClaudeCodeStream(JSON.stringify({ type: "result", subtype: "success", result: "Reviewed." }),
+    resource, "wycats", invocation.directInvocation);
+  assert.equal(result.resourceInvocation.resource, "wycats:careful-review");
+});
+
 void test("supplies captured config bytes and cleans up after build failure", async () => {
   const source = '{"target":"claude-code","models":{"balanced":"sonnet"}}';
   let snapshotPath = "";

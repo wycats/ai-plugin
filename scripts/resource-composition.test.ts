@@ -119,7 +119,7 @@ void test("accepts cycles without recursively expanding the graph", async () => 
 void test("reports canonical identity collisions", async () => {
   const { root, dispose } = await fixture({
     "skills/shared/SKILL.md": skill("shared", "Workflow."),
-    "stances/other/SKILL.md": skill("shared", "Stance."),
+    "stances/shared/SKILL.md": skill("shared", "Stance."),
   });
   try {
     const result = await loadCanonicalComposition(

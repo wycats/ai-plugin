@@ -7,7 +7,7 @@ import { parseResourceFrontmatter, serializeResourceFrontmatter } from "./resour
 import { createProjectionPlan, parseProjectionResourceMap, projectionResourceMap, resolveProjectedResource } from "./projection-plan.ts";
 import { discoverResourceFiles } from "./resource-discovery.ts";
 import { loadCanonicalComposition, projectCompositionLinks } from "./resource-composition.ts";
-import { buildVSCodePlugin } from "./vscode-plugin.ts";
+import { vscodePluginManifest } from "./vscode-plugin.ts";
 
 async function fixture(body = "Recon.") {
   const root = await mkdtemp(join(tmpdir(), "projection-plan-"));
@@ -217,10 +217,9 @@ void test("native resource discovery preserves nested paths and keeps support Ma
       agentPaths: plan.resources.filter(({ resource }) => resource.kind === "agent").map(({ pluginPath }) => pluginPath),
       instructionPaths: plan.resources.filter(({ resource }) => resource.kind === "instruction").map(({ pluginPath }) => pluginPath),
     };
-    await buildVSCodePlugin(out, { name: "native-path-fixture", version: "1.0.0", description: "Fixture" }, [], components);
-    const manifest = JSON.parse(await readFile(join(out, "plugin.json"), "utf8")) as {
-      extensions: { "com.github.copilot": { agents: { paths: string[]; exclusive: boolean }; rules: { paths: string[]; exclusive: boolean } } };
-    };
+    const manifest = vscodePluginManifest(
+      { name: "native-path-fixture", version: "1.0.0", description: "Fixture" }, components);
+    assert.ok(manifest.extensions);
     const discovery = manifest.extensions["com.github.copilot"];
     assert.ok(discovery.agents.paths.includes("./agents/team/helper.agent.md"));
     assert.ok(discovery.rules.paths.includes("./rules/team/extra.instructions.md"));

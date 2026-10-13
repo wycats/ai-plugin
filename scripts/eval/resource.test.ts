@@ -7,7 +7,12 @@ import {
   canonicalResourceDescriptor,
   resolveCanonicalResourcePath,
   validateCanonicalResource,
+  validateProjectedResource,
 } from "./resource.ts";
+import { discoverResourceFiles } from "../resource-discovery.ts";
+import { loadCanonicalComposition } from "../resource-composition.ts";
+import { createProjectionPlan } from "../projection-plan.ts";
+import { serializeResourceFrontmatter } from "../resource-frontmatter.ts";
 
 void test("keeps canonical resources reached through links inside the repository", async () => {
   const temporary = await mkdtemp(join(tmpdir(), "eval-resource-"));
@@ -279,4 +284,43 @@ Instructions.
       /grouped skill sources require explicit wycats authoring metadata/,
     );
   }
+});
+
+void test("evaluation and composition agree on names and kinds across source layouts", async () => {
+  const root = await mkdtemp(join(tmpdir(), "eval-source-"));
+  const files = {
+    "agents/team/reviewer.agent.md": "---\nname: careful-review\ndescription: Review\n---\nReview.",
+    "agents/team/unnamed.agent.md": "---\ndescription: Review\n---\nReview.",
+    "skills/workflows/outer/reader-orientation/SKILL.md": groupedStanceSource,
+  };
+  try {
+    for (const [path, content] of Object.entries(files)) {
+      await mkdir(join(root, path, ".."), { recursive: true });
+      await writeFile(join(root, path), content);
+    }
+    const { composition, diagnostics } = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.deepEqual(diagnostics, []);
+    assert.ok(composition);
+    for (const [path, content] of Object.entries(files)) {
+      const descriptor = canonicalResourceDescriptor(path, content);
+      const parsed = composition.bySourcePath.get(join(root, path));
+      assert.ok(parsed);
+      assert.equal(descriptor.name, parsed.name);
+      assert.equal(descriptor.kind, parsed.kind);
+      validateCanonicalResource({ name: parsed.name, path, identity: `wycats-plugin:${descriptor.locator}` }, content);
+    }
+    assert.equal(canonicalResourceDescriptor("agents/team/reviewer.agent.md", files["agents/team/reviewer.agent.md"]).name, "careful-review");
+    assert.equal(canonicalResourceDescriptor("agents/team/unnamed.agent.md", files["agents/team/unnamed.agent.md"]).name, "unnamed");
+
+    const plan = createProjectionPlan(composition, "claude-code", join(root, "out"));
+    const stance = plan.resources.find(({ resource }) => resource.kind === "stance");
+    assert.ok(stance?.skillMetadata);
+    const resource = { name: "reader-orientation", identity: "wycats-plugin:stances/reader-orientation",
+      path: "skills/workflows/outer/reader-orientation/SKILL.md" };
+    const generated = serializeResourceFrontmatter(stance.skillMetadata.frontmatter, "Stance.");
+    assert.doesNotThrow(() => { validateProjectedResource(resource, generated); });
+    assert.throws(() => { validateCanonicalResource(resource, generated); }, /explicit wycats authoring metadata/);
+    assert.throws(() => { validateProjectedResource(resource, generated.replace("name: reader-orientation", "name: wrong")); }, /does not match canonical name/);
+    assert.throws(() => { validateProjectedResource(resource, "---\nname: reader-orientation\n---\n"); }, /non-empty description/);
+  } finally { await rm(root, { recursive: true, force: true }); }
 });

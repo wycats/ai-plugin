@@ -1,12 +1,10 @@
 import { readFile } from "node:fs/promises";
 import { dirname, extname, isAbsolute, relative, resolve, sep } from "node:path";
-import matter from "gray-matter";
-import { parseResourceFrontmatter } from "./resource-frontmatter.ts";
-import { normalizeSkillSource, readSkillSidecar, type SkillActivation } from "./skill-activation.ts";
+import { readSkillSidecar } from "./skill-activation.ts";
+import { parseCanonicalResource, type CanonicalResourceContent } from "./resource-source.ts";
 import type {
   DiscoveredResource,
   ResourceSection,
-  ResourceKind,
 } from "./resource-discovery.ts";
 
 export const COMPOSITION_RELATIONS = ["reference", "load"] as const;
@@ -23,15 +21,7 @@ export interface CompositionDiagnostic {
   message: string;
 }
 
-export interface CanonicalResource {
-  identity: string;
-  name: string;
-  section: ResourceSection;
-  kind: ResourceKind;
-  sourcePath: string;
-  pluginPath: string;
-  frontmatter: Record<string, unknown>;
-  activation?: SkillActivation;
+export interface CanonicalResource extends DiscoveredResource, CanonicalResourceContent {
   skillSidecar?: Record<string, unknown>;
 }
 
@@ -72,21 +62,6 @@ interface ParseResult {
 function displayPath(root: string, path: string): string {
   const value = relative(root, path);
   return value === "" || value.startsWith(`..${sep}`) ? path : value;
-}
-
-function resourceName(resource: DiscoveredResource, parsed: Record<string, unknown>): string {
-  const declared = parsed.name;
-  if (typeof declared === "string" && declared.trim() !== "") {
-    return declared;
-  }
-
-  const filename = resource.sourcePath.split(/[\\/]/).at(-1) ?? "resource";
-  return filename.replace(/\.agent\.md$|\.instructions\.md$|\.md$/g, "");
-}
-
-function resourceIdentity(kind: ResourceKind, name: string): string {
-  const namespace = kind === "agent" || kind === "instruction" ? kind : "skill";
-  return `${namespace}:${name}`;
 }
 
 function lineAt(content: string, offset: number): number {
@@ -410,50 +385,17 @@ export async function loadCanonicalComposition(
   for (const resource of canonicalMarkdownResources(discovered)) {
     const sourcePath = resolve(resource.sourcePath);
     const content = await readFile(sourcePath, "utf-8");
-    let parsedData: Record<string, unknown>;
-    let kind: ResourceKind;
-    let activation: SkillActivation | undefined;
-    let skillSidecar: Record<string, unknown> | undefined;
+    let entry: CanonicalResource;
     try {
-      if (resource.section === "skills" || resource.section === "stances") {
-        const grouped = /^\.\/skills\/(?:workflows|stances)\//.test(resource.pluginPath);
-        const source = normalizeSkillSource(parseResourceFrontmatter(content).data,
-          grouped ? undefined : resource.section === "stances" ? "stance" : "workflow");
-        ({ frontmatter: parsedData, activation, kind } = source);
-        skillSidecar = await readSkillSidecar(sourcePath);
-        if (typeof parsedData.description !== "string" || parsedData.description.trim() === "") {
-          throw new Error("description must be a nonempty string");
-        }
-      } else {
-        parsedData = matter(content).data as Record<string, unknown>;
-        kind = resource.section === "agents" ? "agent" : "instruction";
-      }
+      const parsed = parseCanonicalResource(resource, content);
+      const skillSidecar = parsed.activation ? await readSkillSidecar(sourcePath) : undefined;
+      entry = { ...resource, ...parsed, sourcePath, skillSidecar };
     } catch (error) {
       diagnostics.push({ file: displayPath(canonicalRoot, sourcePath), line: 1,
         message: error instanceof Error ? error.message : String(error) });
       continue;
     }
-    const name = resourceName(resource, parsedData);
-    if (kind === "workflow" || kind === "stance") {
-      const declaredName = parsedData.name;
-      const directoryName = dirname(sourcePath).split(/[\\/]/).at(-1) ?? "";
-      if (typeof declaredName !== "string" || declaredName.trim() === "") {
-        diagnostics.push({
-          file: displayPath(canonicalRoot, sourcePath),
-          line: 1,
-          message: "canonical resource is missing a non-empty frontmatter name",
-        });
-      } else if (declaredName !== directoryName) {
-        diagnostics.push({
-          file: displayPath(canonicalRoot, sourcePath),
-          line: 1,
-          message: `canonical resource name '${declaredName}' does not match directory '${directoryName}'`,
-        });
-      }
-    }
-    const identity = resourceIdentity(kind, name);
-    const entry: CanonicalResource = { ...resource, sourcePath, name, identity, kind,
-      frontmatter: parsedData, activation, skillSidecar };
+    const { identity } = entry;
     const prior = identities.get(identity);
     if (prior) {
       diagnostics.push({

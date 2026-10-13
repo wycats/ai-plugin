@@ -2,8 +2,7 @@ import matter from "gray-matter";
 import { isAbsolute, posix, relative, resolve, sep } from "node:path";
 import { realpath } from "node:fs/promises";
 import type { EvaluationResource } from "./core.ts";
-import { normalizeSkillSource } from "../skill-activation.ts";
-import type { SkillKind } from "../resource-discovery.ts";
+import { parseCanonicalResource } from "../resource-source.ts";
 
 export const CANONICAL_RESOURCE_AUTHORITY = "wycats-plugin";
 
@@ -35,84 +34,55 @@ export interface CanonicalResourceDescriptor {
   locator: string;
 }
 
-function sourceData(source: string | Record<string, unknown>): Record<string, unknown> {
-  return typeof source === "string"
-    ? (matter(source).data as Record<string, unknown>)
-    : source;
-}
-
-function skillSourceKind(
-  path: string,
-): { name: string; pathKind: SkillKind; legacyKind?: SkillKind } | undefined {
-  const grouped = path.match(/^skills\/(workflows|stances)\/(?:[^/]+\/)*([^/]+)\/SKILL\.md$/);
-  if (grouped) {
-    const pathKind = grouped[1] === "workflows" ? "workflow" : "stance";
-    return {
-      name: grouped[2],
-      pathKind,
-    };
+/** Suite locators remain stable identifiers; adapters consume their validated meaning. */
+export function evaluationResourceKind(resource: EvaluationResource): CanonicalResourceDescriptor["kind"] {
+  const prefix = `${CANONICAL_RESOURCE_AUTHORITY}:`;
+  for (const [directory, kind] of [["agents", "agent"], ["skills", "skill"], ["stances", "stance"]] as const) {
+    if (resource.identity === `${prefix}${directory}/${resource.name}`) return kind;
   }
-
-  const legacyWorkflow = path.match(/^skills\/(?:[^/]+\/)*([^/]+)\/SKILL\.md$/);
-  if (legacyWorkflow) return { name: legacyWorkflow[1], pathKind: "workflow", legacyKind: "workflow" };
-
-  const legacyStance = path.match(/^stances\/(?:[^/]+\/)*([^/]+)\/SKILL\.md$/);
-  if (legacyStance) return { name: legacyStance[1], pathKind: "stance", legacyKind: "stance" };
-  return undefined;
+  throw new Error(`Invalid canonical resource identity '${resource.identity}'.`);
 }
 
 export function canonicalResourceDescriptor(
   path: string,
-  source?: string | Record<string, unknown>,
+  source: string,
 ): CanonicalResourceDescriptor {
-  const normalized = path.replaceAll("\\", "/");
-  if (path !== normalized || posix.normalize(normalized) !== normalized) {
+  if (path.includes("\\") || posix.normalize(path) !== path) {
     throw new Error(`Resource path '${path}' must use its canonical repository-relative form.`);
   }
-  const agent = normalized.match(/^agents\/(.+)\.agent\.md$/);
-  if (agent) return { kind: "agent", name: agent[1], locator: `agents/${agent[1]}` };
-
-  const skillSource = skillSourceKind(normalized);
-  if (skillSource) {
-    const kind = source === undefined
-      ? skillSource.pathKind
-      : normalizeSkillSource(sourceData(source), skillSource.legacyKind).kind;
-    const resourceKind = kind === "workflow" ? "skill" : "stance";
-    const locator = `${resourceKind === "skill" ? "skills" : "stances"}/${skillSource.name}`;
-    return {
-      kind: resourceKind,
-      name: skillSource.name,
-      locator,
-    };
+  const section = path.split("/")[0];
+  if (!((section === "agents" && /^agents\/(?:[^/]+\/)*[^/]+\.agent\.md$/.test(path)) ||
+        ((section === "skills" || section === "stances") && /^(?:skills|stances)\/(?:[^/]+\/)+SKILL\.md$/.test(path)))) {
+    throw new Error(`Unsupported canonical resource path: ${path}.`);
   }
+  const parsed = parseCanonicalResource({ section, sourcePath: path, pluginPath: `./${path}` }, source);
+  const kind = parsed.kind === "workflow" ? "skill" : parsed.kind;
+  if (kind === "instruction") throw new Error(`Unsupported evaluation resource: ${path}.`);
+  const directory = kind === "agent" ? "agents" : kind === "skill" ? "skills" : "stances";
+  return { name: parsed.name, kind, locator: `${directory}/${parsed.name}` };
+}
 
-  throw new Error(`Unsupported canonical resource path: ${path}.`);
+function validateDiscoveryFields(name: string, source: string, path: string, requireName: boolean): void {
+  const frontmatter = matter(source).data as Record<string, unknown>;
+  if (typeof frontmatter.description !== "string" || frontmatter.description.trim() === "") {
+    throw new Error(`${path} must declare a non-empty description in frontmatter.`);
+  }
+  if ((requireName || frontmatter.name !== undefined) && frontmatter.name !== name) {
+    throw new Error(`Resource name ${JSON.stringify(frontmatter.name)} in ${path} does not match canonical name '${name}'.`);
+  }
+}
+
+/** Generated envelopes carry native policy, not canonical authoring metadata. */
+export function validateProjectedResource(resource: EvaluationResource, source: string): void {
+  validateDiscoveryFields(resource.name, source, resource.path, true);
 }
 
 export function validateCanonicalResource(
   resource: EvaluationResource,
   source: string,
 ): void {
-  const rawFrontmatter = matter(source).data as Record<string, unknown>;
-  const descriptor = canonicalResourceDescriptor(resource.path, rawFrontmatter);
-  const normalizedSkill = descriptor.kind === "agent"
-    ? undefined
-    : normalizeSkillSource(
-        rawFrontmatter,
-        descriptor.kind === "skill" ? "workflow" : "stance",
-      );
-  const frontmatter = normalizedSkill?.frontmatter ?? rawFrontmatter;
-  if (typeof frontmatter.description !== "string" || frontmatter.description.trim() === "") {
-    throw new Error(`${resource.path} must declare a non-empty description in frontmatter.`);
-  }
-  if (frontmatter.name !== undefined && frontmatter.name !== descriptor.name) {
-    throw new Error(
-      `Resource name ${JSON.stringify(frontmatter.name)} in ${resource.path} does not match canonical name '${descriptor.name}'.`,
-    );
-  }
-  if (descriptor.kind !== "agent" && frontmatter.name === undefined) {
-    throw new Error(`${resource.path} must declare its canonical name in frontmatter.`);
-  }
+  const descriptor = canonicalResourceDescriptor(resource.path, source);
+  validateDiscoveryFields(descriptor.name, source, resource.path, descriptor.kind !== "agent");
   if (resource.name !== descriptor.name) {
     throw new Error(
       `Resource name '${resource.name}' does not match canonical name '${descriptor.name}'.`,
