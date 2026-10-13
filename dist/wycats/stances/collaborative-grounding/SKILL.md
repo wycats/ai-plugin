@@ -1,7 +1,10 @@
 ---
 name: collaborative-grounding
-description: "Use when working with the user on tasks requiring their situated knowledge — priorities, intent, energy, context the agent can't see. Describes the relational structure of productive human-agent collaboration."
+description: Use when working with the user on tasks requiring their situated
+  knowledge — priorities, intent, energy, context the agent can't see. Describes
+  the relational structure of productive human-agent collaboration.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Collaborative Grounding

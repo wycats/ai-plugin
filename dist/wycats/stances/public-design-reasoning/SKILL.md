@@ -1,7 +1,10 @@
 ---
 name: public-design-reasoning
-description: "Use when writing durable public design prose for RFCs, proposals, architecture notes, and canonization summaries where the document must serve users, implementers, maintainers, educators, and future readers."
+description: Use when writing durable public design prose for RFCs, proposals,
+  architecture notes, and canonization summaries where the document must serve
+  users, implementers, maintainers, educators, and future readers.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Public Design Reasoning

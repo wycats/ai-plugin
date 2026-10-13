@@ -1,6 +1,11 @@
 ---
 name: dangling-thread-review
-description: "Review the conversation for threads that were started but not followed — ideas mentioned in passing, decisions deferred implicitly, tensions named but not resolved. Use when taking stock, before saving, or whenever the user wants to know what's been left on the table."
+description: Review the conversation for threads that were started but not
+  followed — ideas mentioned in passing, decisions deferred implicitly, tensions
+  named but not resolved. Use when taking stock, before saving, or whenever the
+  user wants to know what's been left on the table.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Dangling Thread Review

@@ -1,6 +1,10 @@
 ---
 name: walkthrough
-description: "Use when walking through code changes with the user one chunk at a time, pausing for discussion after each chunk, linking directly to code, and checking design alignment as the review progresses."
+description: Use when walking through code changes with the user one chunk at a
+  time, pausing for discussion after each chunk, linking directly to code, and
+  checking design alignment as the review progresses.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Walkthrough

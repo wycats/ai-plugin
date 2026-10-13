@@ -1,6 +1,11 @@
 ---
 name: recon
-description: "Use when investigating unfamiliar code, tracing data flows, mapping architecture, or answering questions that require adaptive exploration — where the agent needs to follow leads, use tools interactively, and synthesize findings rather than just search for known terms."
+description: Use when investigating unfamiliar code, tracing data flows, mapping
+  architecture, or answering questions that require adaptive exploration — where
+  the agent needs to follow leads, use tools interactively, and synthesize
+  findings rather than just search for known terms.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Recon

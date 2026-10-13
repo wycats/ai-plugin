@@ -1,6 +1,12 @@
 ---
 name: gh-resolve-review-threads
-description: "Use when PR review or diff comments are supplied as actionable feedback to implement, including UI flows that send comments without an explicit typed request. Completing this work includes verifying the fix and resolving matching GitHub/Copilot review threads; observation-only requests should leave threads open."
+description: Use when PR review or diff comments are supplied as actionable
+  feedback to implement, including UI flows that send comments without an
+  explicit typed request. Completing this work includes verifying the fix and
+  resolving matching GitHub/Copilot review threads; observation-only requests
+  should leave threads open.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # GH Resolve Review Threads

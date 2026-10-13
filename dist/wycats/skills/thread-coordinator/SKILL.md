@@ -1,6 +1,11 @@
 ---
 name: thread-coordinator
-description: "Use when coordinating multiple live Codex threads, maintaining a coordination heartbeat, routing work across implementation threads, inspecting cross-thread ownership or gates, or keeping a coordinated effort moving through PR, review, evidence, and human-action boundaries."
+description: Use when coordinating multiple live Codex threads, maintaining a
+  coordination heartbeat, routing work across implementation threads, inspecting
+  cross-thread ownership or gates, or keeping a coordinated effort moving
+  through PR, review, evidence, and human-action boundaries.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Thread Coordinator

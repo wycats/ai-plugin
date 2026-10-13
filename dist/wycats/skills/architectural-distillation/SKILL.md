@@ -1,6 +1,10 @@
 ---
 name: architectural-distillation
-description: Restructure mature code so it directly expresses what the system has learned through use and evolution, preserving meaningful constraints and distinctions while removing historical residue and accidental complexity.
+description: Restructure mature code so it directly expresses what the system
+  has learned through use and evolution, preserving meaningful constraints and
+  distinctions while removing historical residue and accidental complexity.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Architectural Distillation

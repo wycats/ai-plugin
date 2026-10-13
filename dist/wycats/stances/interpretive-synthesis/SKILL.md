@@ -1,7 +1,10 @@
 ---
 name: interpretive-synthesis
-description: "Use when building a coherent account from many observations, summarizing conversation state, or explaining how pieces connect. The skill is in what gets left out."
+description: Use when building a coherent account from many observations,
+  summarizing conversation state, or explaining how pieces connect. The skill is
+  in what gets left out.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Interpretive Synthesis

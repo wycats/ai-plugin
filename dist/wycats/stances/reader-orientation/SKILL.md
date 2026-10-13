@@ -1,7 +1,10 @@
 ---
 name: reader-orientation
-description: "Use when shaping code, explanations, interfaces, or instructions around what someone can know where they encounter them, so they can reason locally and investigate deeper without losing the larger idea."
+description: Use when shaping code, explanations, interfaces, or instructions
+  around what someone can know where they encounter them, so they can reason
+  locally and investigate deeper without losing the larger idea.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Reader Orientation

@@ -1,7 +1,10 @@
 ---
 name: joint-reading
-description: "Use when walking through code, documents, or changes with the user where both perspectives contribute — the agent sees structural patterns, the user sees design intent."
+description: Use when walking through code, documents, or changes with the user
+  where both perspectives contribute — the agent sees structural patterns, the
+  user sees design intent.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Joint Reading

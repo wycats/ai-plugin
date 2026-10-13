@@ -1,7 +1,10 @@
 ---
 name: diagnostic-questioning
-description: "Use when investigating unfamiliar territory, narrowing possibilities through targeted questions, or diagnosing a problem by updating your own model of the situation."
+description: Use when investigating unfamiliar territory, narrowing
+  possibilities through targeted questions, or diagnosing a problem by updating
+  your own model of the situation.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Diagnostic Questioning

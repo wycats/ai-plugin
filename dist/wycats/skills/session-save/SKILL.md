@@ -1,6 +1,9 @@
 ---
 name: session-save
-description: "Keeps SESSION-TRAJECTORY.md warm as work progresses and offers checkpoints at natural boundaries. Saving is not stopping."
+description: Keeps SESSION-TRAJECTORY.md warm as work progresses and offers
+  checkpoints at natural boundaries. Saving is not stopping.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Session Save

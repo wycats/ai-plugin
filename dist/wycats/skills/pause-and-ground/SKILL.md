@@ -1,6 +1,10 @@
 ---
 name: pause-and-ground
-description: "Use when debugging, recon, review, or incident work has conflicting observations and needs to pause, restate what is known, check whether surfaces are comparable, and hand off to the next investigative move."
+description: Use when debugging, recon, review, or incident work has conflicting
+  observations and needs to pause, restate what is known, check whether surfaces
+  are comparable, and hand off to the next investigative move.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Pause and Ground

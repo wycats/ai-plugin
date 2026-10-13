@@ -1,7 +1,10 @@
 ---
 name: authorial-continuity
-description: "Use when drafting or revising language that will be attributed to a user, especially public prose where editorial help must preserve the author's judgment, ownership, and relationship with the readers."
+description: Use when drafting or revising language that will be attributed to a
+  user, especially public prose where editorial help must preserve the author's
+  judgment, ownership, and relationship with the readers.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Authorial Continuity

@@ -1,7 +1,10 @@
 ---
 name: socratic-elicitation
-description: "Use when helping the user articulate their own thinking — when they have insight they haven't fully formed, or when the task requires the user to see something the agent can point to but not resolve."
+description: Use when helping the user articulate their own thinking — when they
+  have insight they haven't fully formed, or when the task requires the user to
+  see something the agent can point to but not resolve.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Socratic Elicitation

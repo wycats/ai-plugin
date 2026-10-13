@@ -1,6 +1,11 @@
 ---
 name: rfc-writing
-description: "Use when drafting, revising, reviewing, or promoting RFCs and design proposals, including Exo-managed RFCs, staged RFC lifecycle work, Rust/Ember-style RFC prose, and canonization or recommendation work for related RFCs."
+description: Use when drafting, revising, reviewing, or promoting RFCs and
+  design proposals, including Exo-managed RFCs, staged RFC lifecycle work,
+  Rust/Ember-style RFC prose, and canonization or recommendation work for
+  related RFCs.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # RFC Writing

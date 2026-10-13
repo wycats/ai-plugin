@@ -1,6 +1,13 @@
 ---
 name: code-review
-description: "Use when reviewing git diffs, local changes, or pull requests for merge-relevant risks: correctness regressions, security/privacy, data integrity, performance, reliability, tests, UX, maintainability, and deployability. Produce evidence-backed findings, inline comments when available, and a reviewer-facing summary focused on findings, residual risk, questions, and readiness."
+description: "Use when reviewing git diffs, local changes, or pull requests for
+  merge-relevant risks: correctness regressions, security/privacy, data
+  integrity, performance, reliability, tests, UX, maintainability, and
+  deployability. Produce evidence-backed findings, inline comments when
+  available, and a reviewer-facing summary focused on findings, residual risk,
+  questions, and readiness."
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Code Review

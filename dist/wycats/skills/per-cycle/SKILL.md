@@ -1,6 +1,10 @@
 ---
 name: per-cycle
-description: "Use when running a prepare-execute-review (PER) cycle, doing a PER workflow, or coordinating work through `prepare`, `execute`, and `review` subagents with explicit gates."
+description: Use when running a prepare-execute-review (PER) cycle, doing a PER
+  workflow, or coordinating work through `prepare`, `execute`, and `review`
+  subagents with explicit gates.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # PER Cycle

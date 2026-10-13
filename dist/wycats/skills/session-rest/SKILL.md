@@ -1,6 +1,11 @@
 ---
 name: session-rest
-description: "End-of-cycle transition: interpret the session, triage dangling threads with the user, and prepare SESSION-TRAJECTORY.md for the next cycle. The user is still around and serves as a light bridge. Invoke with /session-rest."
+description: "End-of-cycle transition: interpret the session, triage dangling
+  threads with the user, and prepare SESSION-TRAJECTORY.md for the next cycle.
+  The user is still around and serves as a light bridge. Invoke with
+  /session-rest."
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Session Rest

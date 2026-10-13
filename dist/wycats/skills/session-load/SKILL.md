@@ -1,6 +1,10 @@
 ---
 name: session-load
-description: "Start a new session cycle by reconciling Project Orientation, restoring repo context, and resuming the active bet or opening vision steering when selection genuinely changed."
+description: Start a new session cycle by reconciling Project Orientation,
+  restoring repo context, and resuming the active bet or opening vision steering
+  when selection genuinely changed.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Session Load

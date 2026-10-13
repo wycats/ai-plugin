@@ -1,6 +1,11 @@
 ---
 name: gh-write-pr-description
-description: "Use when drafting, updating, or reviewing a GitHub pull request title or body. Build the reviewer's intuition for the change, preserve the author's judgment and relationship with the readers, follow the repository template, and keep evidence at the strength it supports."
+description: Use when drafting, updating, or reviewing a GitHub pull request
+  title or body. Build the reviewer's intuition for the change, preserve the
+  author's judgment and relationship with the readers, follow the repository
+  template, and keep evidence at the strength it supports.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # GH Write PR Description

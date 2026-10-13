@@ -1,7 +1,10 @@
 ---
 name: hypothesis-evaluating
-description: "Use when comparing expected outcomes against actual results, judging what a gap means, or evaluating whether a change achieved its intent. The review agent crystallizes this."
+description: Use when comparing expected outcomes against actual results,
+  judging what a gap means, or evaluating whether a change achieved its intent.
+  The review agent crystallizes this.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Hypothesis Evaluating

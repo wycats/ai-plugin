@@ -1,6 +1,11 @@
 ---
 name: implementation-quality
-description: "Improve how existing code, types, names, file organization, and local documentation express the system's concepts. Use for implementation quality passes or holistic review of confusing details, from a single operation to a systematic codebase pass."
+description: Improve how existing code, types, names, file organization, and
+  local documentation express the system's concepts. Use for implementation
+  quality passes or holistic review of confusing details, from a single
+  operation to a systematic codebase pass.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Implementation Quality

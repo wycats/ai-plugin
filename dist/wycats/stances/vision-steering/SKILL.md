@@ -1,7 +1,11 @@
 ---
 name: vision-steering
-description: "Use when selecting among locally valid project moves by relating them to a durable project thesis, or when new evidence should revise the route while the user's situated judgment remains authoritative about what the project is for."
+description: Use when selecting among locally valid project moves by relating
+  them to a durable project thesis, or when new evidence should revise the route
+  while the user's situated judgment remains authoritative about what the
+  project is for.
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Vision Steering

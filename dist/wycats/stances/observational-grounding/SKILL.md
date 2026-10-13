@@ -1,7 +1,11 @@
 ---
 name: observational-grounding
-description: "Use when observations from different surfaces appear to disagree and the agent must keep each observation in its observed form before explaining causes: UI vs behavior, logs vs state, metrics vs reports, tool output vs user-visible result."
+description: "Use when observations from different surfaces appear to disagree
+  and the agent must keep each observation in its observed form before
+  explaining causes: UI vs behavior, logs vs state, metrics vs reports, tool
+  output vs user-visible result."
 user-invocable: false
+disable-model-invocation: false
 ---
 
 # Observational Grounding
