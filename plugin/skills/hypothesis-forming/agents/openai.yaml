@@ -1,0 +1,7 @@
+interface:
+  display_name: hypothesis-forming
+  short_description: Use when predicting what code looks like before reading it,
+    anticipating where a plan will encounter friction, or forming expectations
+    specific enough to be tested. The prepare agent crystallizes this.
+policy:
+  allow_implicit_invocation: true

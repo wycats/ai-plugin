@@ -1,0 +1,7 @@
+interface:
+  display_name: hypothesis-evaluating
+  short_description: Use when comparing expected outcomes against actual results,
+    judging what a gap means, or evaluating whether a change achieved its
+    intent. The review agent crystallizes this.
+policy:
+  allow_implicit_invocation: true

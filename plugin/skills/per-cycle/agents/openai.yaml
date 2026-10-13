@@ -1,0 +1,7 @@
+interface:
+  display_name: per-cycle
+  short_description: Use when running a prepare-execute-review (PER) cycle, doing
+    a PER workflow, or coordinating work through `prepare`, `execute`, and
+    `review` subagents with explicit gates.
+policy:
+  allow_implicit_invocation: true

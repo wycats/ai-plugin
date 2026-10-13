@@ -1,0 +1,8 @@
+interface:
+  display_name: gap-reading
+  short_description: The cognitive mode of reading for what a coherent narrative
+    left out — threads abandoned, overtaken, or never recognized as significant.
+    Complements interpretive-synthesis (which builds the account) by
+    interrogating what it smoothed away.
+policy:
+  allow_implicit_invocation: true

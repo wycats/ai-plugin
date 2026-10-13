@@ -1,0 +1,7 @@
+interface:
+  display_name: public-design-reasoning
+  short_description: Use when writing durable public design prose for RFCs,
+    proposals, architecture notes, and canonization summaries where the document
+    must serve users, implementers, maintainers, educators, and future readers.
+policy:
+  allow_implicit_invocation: true

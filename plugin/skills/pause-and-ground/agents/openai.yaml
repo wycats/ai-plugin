@@ -1,0 +1,8 @@
+interface:
+  display_name: pause-and-ground
+  short_description: Use when debugging, recon, review, or incident work has
+    conflicting observations and needs to pause, restate what is known, check
+    whether surfaces are comparable, and hand off to the next investigative
+    move.
+policy:
+  allow_implicit_invocation: true

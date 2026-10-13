@@ -1,0 +1,8 @@
+interface:
+  display_name: session-rest
+  short_description: "End-of-cycle transition: interpret the session, triage
+    dangling threads with the user, and prepare SESSION-TRAJECTORY.md for the
+    next cycle. The user is still around and serves as a light bridge. Invoke
+    with /session-rest."
+policy:
+  allow_implicit_invocation: true

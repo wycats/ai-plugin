@@ -1,0 +1,38 @@
+{
+  "name": "wycats-ai-plugin",
+  "version": "0.1.0",
+  "description": "Personal agent toolkit: workflow agents, skills, instructions, and hooks.",
+  "author": {
+    "name": "wycats",
+    "url": "https://github.com/wycats"
+  },
+  "homepage": "https://github.com/wycats/vscode-ai-plugin",
+  "repository": "https://github.com/wycats/vscode-ai-plugin",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "agents",
+    "skills",
+    "workflow",
+    "review"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Wycats AI Plugin",
+    "shortDescription": "Personal workflow skills for Codex",
+    "longDescription": "A personal agent toolkit for Codex with workflow skills, session lifecycle support, collaborative review patterns, and reusable stances for stronger agent collaboration.",
+    "developerName": "wycats",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/wycats/vscode-ai-plugin",
+    "defaultPrompt": [
+      "Use the session lifecycle skills for this repo",
+      "Walk me through this code with the walkthrough skill",
+      "Run a recon pass over this project"
+    ],
+    "brandColor": "#2F6FED"
+  }
+}

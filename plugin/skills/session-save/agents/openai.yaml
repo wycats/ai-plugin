@@ -1,0 +1,6 @@
+interface:
+  display_name: session-save
+  short_description: Keeps SESSION-TRAJECTORY.md warm as work progresses and
+    offers checkpoints at natural boundaries. Saving is not stopping.
+policy:
+  allow_implicit_invocation: true

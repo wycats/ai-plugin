@@ -1,0 +1,7 @@
+interface:
+  display_name: diagnostic-questioning
+  short_description: Use when investigating unfamiliar territory, narrowing
+    possibilities through targeted questions, or diagnosing a problem by
+    updating your own model of the situation.
+policy:
+  allow_implicit_invocation: true

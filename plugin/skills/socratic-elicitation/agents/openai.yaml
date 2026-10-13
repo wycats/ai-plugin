@@ -1,0 +1,7 @@
+interface:
+  display_name: socratic-elicitation
+  short_description: Use when helping the user articulate their own thinking —
+    when they have insight they haven't fully formed, or when the task requires
+    the user to see something the agent can point to but not resolve.
+policy:
+  allow_implicit_invocation: true

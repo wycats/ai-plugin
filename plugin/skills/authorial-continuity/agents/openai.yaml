@@ -1,0 +1,8 @@
+interface:
+  display_name: authorial-continuity
+  short_description: Use when drafting or revising language that will be
+    attributed to a user, especially public prose where editorial help must
+    preserve the author's judgment, ownership, and relationship with the
+    readers.
+policy:
+  allow_implicit_invocation: true

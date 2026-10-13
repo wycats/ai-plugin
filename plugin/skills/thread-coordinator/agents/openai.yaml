@@ -1,0 +1,9 @@
+interface:
+  display_name: thread-coordinator
+  short_description: Use when coordinating multiple live Codex threads,
+    maintaining a coordination heartbeat, routing work across implementation
+    threads, inspecting cross-thread ownership or gates, or keeping a
+    coordinated effort moving through PR, review, evidence, and human-action
+    boundaries.
+policy:
+  allow_implicit_invocation: true

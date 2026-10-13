@@ -1,0 +1,7 @@
+interface:
+  display_name: interpretive-synthesis
+  short_description: Use when building a coherent account from many observations,
+    summarizing conversation state, or explaining how pieces connect. The skill
+    is in what gets left out.
+policy:
+  allow_implicit_invocation: true

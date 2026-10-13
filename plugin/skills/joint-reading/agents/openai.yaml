@@ -1,0 +1,7 @@
+interface:
+  display_name: joint-reading
+  short_description: Use when walking through code, documents, or changes with the
+    user where both perspectives contribute — the agent sees structural
+    patterns, the user sees design intent.
+policy:
+  allow_implicit_invocation: true

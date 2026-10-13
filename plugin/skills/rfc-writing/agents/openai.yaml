@@ -1,0 +1,8 @@
+interface:
+  display_name: rfc-writing
+  short_description: Use when drafting, revising, reviewing, or promoting RFCs and
+    design proposals, including Exo-managed RFCs, staged RFC lifecycle work,
+    Rust/Ember-style RFC prose, and canonization or recommendation work for
+    related RFCs.
+policy:
+  allow_implicit_invocation: true

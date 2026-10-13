@@ -1,0 +1,7 @@
+interface:
+  display_name: session-load
+  short_description: Start a new session cycle by reconciling Project Orientation,
+    restoring repo context, and resuming the active bet or opening vision
+    steering when selection genuinely changed.
+policy:
+  allow_implicit_invocation: true

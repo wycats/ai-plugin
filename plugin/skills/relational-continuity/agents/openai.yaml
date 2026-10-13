@@ -1,0 +1,7 @@
+interface:
+  display_name: relational-continuity
+  short_description: "Background guidance for all plugin work: keep language
+    inside the work, focus on what we're doing, and use precise and meaningful
+    language that stays attached to the work underway."
+policy:
+  allow_implicit_invocation: true
