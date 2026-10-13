@@ -2,10 +2,11 @@ import { readFile } from "node:fs/promises";
 import { dirname, extname, isAbsolute, relative, resolve, sep } from "node:path";
 import matter from "gray-matter";
 import { parseResourceFrontmatter } from "./resource-frontmatter.ts";
-import { parseSkillActivation, readSkillSidecar, type SkillActivation } from "./skill-activation.ts";
+import { normalizeSkillSource, readSkillSidecar, type SkillActivation } from "./skill-activation.ts";
 import type {
   DiscoveredResource,
   ResourceSection,
+  ResourceKind,
 } from "./resource-discovery.ts";
 
 export const COMPOSITION_RELATIONS = ["reference", "load"] as const;
@@ -26,6 +27,7 @@ export interface CanonicalResource {
   identity: string;
   name: string;
   section: ResourceSection;
+  kind: ResourceKind;
   sourcePath: string;
   pluginPath: string;
   frontmatter: Record<string, unknown>;
@@ -82,16 +84,8 @@ function resourceName(resource: DiscoveredResource, parsed: Record<string, unkno
   return filename.replace(/\.agent\.md$|\.instructions\.md$|\.md$/g, "");
 }
 
-function resourceIdentity(
-  resource: DiscoveredResource,
-  name: string,
-): string {
-  const namespace =
-    resource.section === "agents"
-      ? "agent"
-      : resource.section === "instructions"
-        ? "instruction"
-        : "skill";
+function resourceIdentity(kind: ResourceKind, name: string): string {
+  const namespace = kind === "agent" || kind === "instruction" ? kind : "skill";
   return `${namespace}:${name}`;
 }
 
@@ -417,18 +411,22 @@ export async function loadCanonicalComposition(
     const sourcePath = resolve(resource.sourcePath);
     const content = await readFile(sourcePath, "utf-8");
     let parsedData: Record<string, unknown>;
+    let kind: ResourceKind;
     let activation: SkillActivation | undefined;
     let skillSidecar: Record<string, unknown> | undefined;
     try {
       if (resource.section === "skills" || resource.section === "stances") {
-        parsedData = parseResourceFrontmatter(content).data;
-        activation = parseSkillActivation(parsedData, resource.section);
+        const grouped = /^\.\/skills\/(?:workflows|stances)\//.test(resource.pluginPath);
+        const source = normalizeSkillSource(parseResourceFrontmatter(content).data,
+          grouped ? undefined : resource.section === "stances" ? "stance" : "workflow");
+        ({ frontmatter: parsedData, activation, kind } = source);
         skillSidecar = await readSkillSidecar(sourcePath);
         if (typeof parsedData.description !== "string" || parsedData.description.trim() === "") {
           throw new Error("description must be a nonempty string");
         }
       } else {
         parsedData = matter(content).data as Record<string, unknown>;
+        kind = resource.section === "agents" ? "agent" : "instruction";
       }
     } catch (error) {
       diagnostics.push({ file: displayPath(canonicalRoot, sourcePath), line: 1,
@@ -436,7 +434,7 @@ export async function loadCanonicalComposition(
       continue;
     }
     const name = resourceName(resource, parsedData);
-    if (resource.section === "skills" || resource.section === "stances") {
+    if (kind === "workflow" || kind === "stance") {
       const declaredName = parsedData.name;
       const directoryName = dirname(sourcePath).split(/[\\/]/).at(-1) ?? "";
       if (typeof declaredName !== "string" || declaredName.trim() === "") {
@@ -453,8 +451,8 @@ export async function loadCanonicalComposition(
         });
       }
     }
-    const identity = resourceIdentity(resource, name);
-    const entry: CanonicalResource = { ...resource, sourcePath, name, identity,
+    const identity = resourceIdentity(kind, name);
+    const entry: CanonicalResource = { ...resource, sourcePath, name, identity, kind,
       frontmatter: parsedData, activation, skillSidecar };
     const prior = identities.get(identity);
     if (prior) {

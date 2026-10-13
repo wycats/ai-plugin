@@ -12,8 +12,9 @@
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, dirname, resolve } from "node:path";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { homedir, platform } from "node:os";
+import { fileURLToPath } from "node:url";
 import {
   modify,
   applyEdits,
@@ -26,14 +27,17 @@ import {
   outputPathForTarget,
   VSCODE_TARGET,
 } from "./target-output.ts";
+import { COPILOT_NAMESPACE } from "./vscode-plugin.ts";
 
-const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
+const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
 type VSCodeChannel = "stable" | "insiders";
 
 interface CliOptions {
   settingsPath?: string;
   vscodeChannel?: VSCodeChannel;
+  configPath?: string;
+  outputPath?: string;
   dryRun: boolean;
 }
 
@@ -58,6 +62,8 @@ function usage(): string {
     "  --settings <path>                 Settings JSONC file to update.",
     "  --vscode-channel <stable|insiders> Convenience alias for the standard VS Code settings path.",
     "  --dry-run                         Build and report changes without writing settings.",
+    "  --config <path>                   Build using an explicit config file.",
+    "  --output <path>                   Build into a fresh external scratch directory.",
     "",
     "Environment fallbacks, in precedence order after direct CLI settings:",
     "  VSCODE_SETTINGS_PATH, VSCODE_CHANNEL",
@@ -95,6 +101,25 @@ function parseCliOptions(args: string[]): CliOptions {
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
+
+    if (arg === "--") continue;
+
+    if (arg === "--config" || arg === "--output") {
+      const value = takeOptionValue(args, index, arg);
+      if (arg === "--config") options.configPath = value;
+      else options.outputPath = value;
+      index += 1;
+      continue;
+    }
+
+    if (arg.startsWith("--config=") || arg.startsWith("--output=")) {
+      const separator = arg.indexOf("=");
+      const value = arg.slice(separator + 1);
+      if (!value) throw new Error(`${arg.slice(0, separator)} requires a value.`);
+      if (arg.startsWith("--config=")) options.configPath = value;
+      else options.outputPath = value;
+      continue;
+    }
 
     if (arg === "--dry-run") {
       options.dryRun = true;
@@ -325,46 +350,37 @@ function isJsoncPathEnabled(content: string, path: string[]): boolean {
   return getJsoncValue(content, path) === true;
 }
 
-function applyRegistrationActions(
+export function applyRegistrationActions(
   content: string,
   outPath: string,
+  root = ROOT,
 ): RegistrationActions {
-  const staleOutPath = legacyVSCodeOutputPath(ROOT);
-  const staleHooksPath = join(staleOutPath, "hooks");
-  const hooksPath = join(outPath, "hooks");
   const staleEntriesRemoved: string[] = [];
   const alreadyEnabledEntries: string[] = [];
   const entriesEnabled: string[] = [];
 
-  if (hasJsoncPath(content, ["chat.plugins.paths", staleOutPath])) {
-    content = removeJsoncValue(content, ["chat.plugins.paths", staleOutPath]);
-    staleEntriesRemoved.push(`chat.plugins.paths[${staleOutPath}]`);
+  const ownedOutputs = new Set([outPath, outputPathForTarget(root, VSCODE_TARGET), legacyVSCodeOutputPath(root)]);
+  for (const ownedOutput of ownedOutputs) {
+    const obsolete: string[][] = [
+      ["chat.plugins.paths", ownedOutput],
+      ["chat.hookFilesLocations", join(ownedOutput, "hooks")],
+      ["chat.hookFilesLocations", join(ownedOutput, COPILOT_NAMESPACE, "hooks")],
+      ["chat.hookFilesLocations", join(ownedOutput, COPILOT_NAMESPACE, "hooks", "hooks.json")],
+    ];
+    if (ownedOutput !== outPath) obsolete.push(["chat.pluginLocations", ownedOutput]);
+    for (const path of obsolete) {
+      if (hasJsoncPath(content, path)) {
+        content = removeJsoncValue(content, path);
+        staleEntriesRemoved.push(`${path[0]}[${path[1]}]`);
+      }
+    }
   }
 
-  if (hasJsoncPath(content, ["chat.hookFilesLocations", staleHooksPath])) {
-    content = removeJsoncValue(content, [
-      "chat.hookFilesLocations",
-      staleHooksPath,
-    ]);
-    staleEntriesRemoved.push(`chat.hookFilesLocations[${staleHooksPath}]`);
-  }
-
-  if (isJsoncPathEnabled(content, ["chat.plugins.paths", outPath])) {
-    alreadyEnabledEntries.push(`chat.plugins.paths[${outPath}]`);
+  if (isJsoncPathEnabled(content, ["chat.pluginLocations", outPath])) {
+    alreadyEnabledEntries.push(`chat.pluginLocations[${outPath}]`);
   } else {
-    content = setJsoncValue(content, ["chat.plugins.paths", outPath], true);
-    entriesEnabled.push(`chat.plugins.paths[${outPath}]`);
-  }
-
-  if (isJsoncPathEnabled(content, ["chat.hookFilesLocations", hooksPath])) {
-    alreadyEnabledEntries.push(`chat.hookFilesLocations[${hooksPath}]`);
-  } else {
-    content = setJsoncValue(
-      content,
-      ["chat.hookFilesLocations", hooksPath],
-      true,
-    );
-    entriesEnabled.push(`chat.hookFilesLocations[${hooksPath}]`);
+    content = setJsoncValue(content, ["chat.pluginLocations", outPath], true);
+    entriesEnabled.push(`chat.pluginLocations[${outPath}]`);
   }
 
   return {
@@ -392,21 +408,19 @@ function logRegistrationPlan(
   settingsTarget: ResolvedSettingsTarget,
   outPath: string,
 ): void {
-  const hooksPath = join(outPath, "hooks");
-
   console.log(`Resolved settings path: ${settingsTarget.path}`);
   console.log(`Settings source: ${settingsTarget.source}`);
   console.log(`Plugin path: ${outPath}`);
-  console.log(`Hooks path: ${hooksPath}`);
+  console.log(`Hooks: discovered through ${COPILOT_NAMESPACE}/hooks/hooks.json by the plugin`);
   logList("Stale entries that would be removed", actions.staleEntriesRemoved);
   logList("Entries already enabled", actions.alreadyEnabledEntries);
   logList("Entries that would be added/enabled", actions.entriesEnabled);
 }
 
-async function readConfiguredTarget(): Promise<string> {
+async function readConfiguredTarget(configPath: string): Promise<string> {
   try {
     const config = JSON.parse(
-      await readFile(join(ROOT, "config.json"), "utf-8"),
+      await readFile(configPath, "utf-8"),
     ) as { target?: string };
     return config.target ?? "vscode";
   } catch {
@@ -419,11 +433,14 @@ async function installLocal() {
   const options = parseCliOptions(process.argv.slice(2));
 
   // Step 1: run the build
-  execSync("node scripts/build.ts", { cwd: ROOT, stdio: "inherit" });
+  const configPath = resolve(ROOT, options.configPath ?? process.env.VSCODE_AI_PLUGIN_CONFIG_PATH ?? "config.json");
+  const buildArgs = ["scripts/build.ts", "--config", configPath];
+  if (options.outputPath) buildArgs.push("--output", options.outputPath);
+  execFileSync(process.execPath, buildArgs, { cwd: ROOT, stdio: "inherit" });
 
   // Step 2: determine output path from config
-  const target = await readConfiguredTarget();
-  const outPath = outputPathForTarget(ROOT, target);
+  const target = await readConfiguredTarget(configPath);
+  const outPath = options.outputPath ? resolve(ROOT, options.outputPath) : outputPathForTarget(ROOT, target);
 
   if (target !== VSCODE_TARGET) {
     console.log(
@@ -469,7 +486,9 @@ async function installLocal() {
   console.log("Reload VS Code windows to pick up changes.");
 }
 
-installLocal().catch((err: unknown) => {
-  console.error("Install failed:", err);
-  process.exit(1);
-});
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  installLocal().catch((err: unknown) => {
+    console.error("Install failed:", err);
+    process.exit(1);
+  });
+}

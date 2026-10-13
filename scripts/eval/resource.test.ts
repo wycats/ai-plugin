@@ -3,7 +3,11 @@ import test from "node:test";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveCanonicalResourcePath, validateCanonicalResource } from "./resource.ts";
+import {
+  canonicalResourceDescriptor,
+  resolveCanonicalResourcePath,
+  validateCanonicalResource,
+} from "./resource.ts";
 
 void test("keeps canonical resources reached through links inside the repository", async () => {
   const temporary = await mkdtemp(join(tmpdir(), "eval-resource-"));
@@ -148,7 +152,7 @@ void test("requires runtime discovery frontmatter", () => {
         `---\nname: quiet-review\ndescription: Reviews quietly.\n---\n\nInstructions.\n`,
       );
     },
-    /must declare 'user-invocable: false' in frontmatter/,
+    /stances must declare 'user-invocable: false'/,
   );
   assert.doesNotThrow(() => {
     validateCanonicalResource(
@@ -160,4 +164,101 @@ void test("requires runtime discovery frontmatter", () => {
       `---\nname: quiet-review\ndescription: Reviews quietly.\nuser-invocable: false\n---\n\nInstructions.\n`,
     );
   });
+});
+
+const groupedStanceSource = `---
+name: reader-orientation
+description: Orient readers around the context they need.
+metadata:
+  wycats.kind: stance
+  wycats.user-invocable: "false"
+  wycats.invocation: contextual
+---
+
+Read for what the reader needs to know.
+`;
+
+void test("validates grouped stance metadata while retaining its stable locator", () => {
+  const path = "skills/stances/reader-orientation/SKILL.md";
+  assert.deepEqual(canonicalResourceDescriptor(path, groupedStanceSource), {
+    kind: "stance",
+    name: "reader-orientation",
+    locator: "stances/reader-orientation",
+  });
+  assert.doesNotThrow(() => {
+    validateCanonicalResource(
+      {
+        identity: "wycats-plugin:stances/reader-orientation",
+        name: "reader-orientation",
+        path,
+      },
+      groupedStanceSource,
+    );
+  });
+});
+
+void test("uses declared semantic kind and rejects a locator that disagrees with it", () => {
+  const path = "skills/workflows/reader-orientation/SKILL.md";
+  assert.equal(canonicalResourceDescriptor(path, groupedStanceSource).locator, "stances/reader-orientation");
+  assert.throws(
+    () => {
+      validateCanonicalResource(
+        {
+          identity: "wycats-plugin:skills/reader-orientation",
+          name: "reader-orientation",
+          path,
+        },
+        groupedStanceSource,
+      );
+    },
+    /does not match canonical identity 'wycats-plugin:stances\/reader-orientation'/,
+  );
+});
+
+void test("rejects invalid activation metadata in grouped skill sources", () => {
+  const sourceWithInvalidActivation = groupedStanceSource.replace(
+    "wycats.invocation: contextual",
+    "wycats.invocation: automatic",
+  );
+  assert.throws(
+    () => {
+      validateCanonicalResource(
+        {
+          identity: "wycats-plugin:stances/reader-orientation",
+          name: "reader-orientation",
+          path: "skills/stances/reader-orientation/SKILL.md",
+        },
+        sourceWithInvalidActivation,
+      );
+    },
+    /invocation must be 'contextual' or 'explicit'/,
+  );
+});
+
+void test("requires explicit metadata for grouped workflow and stance sources", () => {
+  const sourceWithoutMetadata = `---
+name: example
+description: Example skill.
+---
+
+Instructions.
+`;
+  for (const [path, locator] of [
+    ["skills/workflows/example/SKILL.md", "skills/example"],
+    ["skills/stances/example/SKILL.md", "stances/example"],
+  ]) {
+    assert.throws(
+      () => {
+        validateCanonicalResource(
+          {
+            identity: `wycats-plugin:${locator}`,
+            name: "example",
+            path,
+          },
+          sourceWithoutMetadata,
+        );
+      },
+      /grouped skill sources require explicit wycats authoring metadata/,
+    );
+  }
 });

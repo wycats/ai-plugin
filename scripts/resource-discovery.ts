@@ -11,7 +11,12 @@ export const RESOURCE_SECTIONS = [
 
 export type ResourceSection = (typeof RESOURCE_SECTIONS)[number];
 
+/** Meaning is independent of the directory containing the source file. */
+export type SkillKind = "workflow" | "stance";
+export type ResourceKind = SkillKind | "agent" | "instruction";
+
 export interface DiscoveredResource {
+  /** Physical source section; semantic consumers use CanonicalResource.kind. */
   section: ResourceSection;
   sourcePath: string;
   pluginPath: string;

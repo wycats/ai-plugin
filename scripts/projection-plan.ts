@@ -27,6 +27,17 @@ export interface ProjectionPlan {
   includesHooks: boolean;
 }
 
+function projectedDestination(resource: CanonicalResource, target: BuildTarget): string {
+  if (resource.kind === "workflow" || resource.kind === "stance") {
+    const directory = target === PI_TARGET && resource.kind === "stance" ? "stances" : "skills";
+    return `${directory}/${resource.name}/SKILL.md`;
+  }
+  if (target === PI_TARGET && resource.kind === "agent") return `agents/${PI_PROFILE.name}.agent.md`;
+  if (target === VSCODE_TARGET && resource.kind === "agent") return `com.github.copilot/${resource.pluginPath.slice(2)}`;
+  if (target === VSCODE_TARGET && resource.kind === "instruction") return `com.github.copilot/rules/${resource.pluginPath.slice("./instructions/".length)}`;
+  return resource.pluginPath.slice(2);
+}
+
 /** One address and exposure decision for every materialized canonical resource.
  * Composition links retain prose-governed activation; this is no runtime loader. */
 export function createProjectionPlan(
@@ -37,18 +48,14 @@ export function createProjectionPlan(
   if (!isBuildTarget(target)) throw new Error(`Unsupported build target '${target}'`);
   const selected = composition.resources.filter((resource) => {
     if (target === PI_TARGET) {
-      return resource.pluginPath === PI_PROFILE.agent ||
-        resource.pluginPath === PI_PROFILE.resources[0] || resource.section === "stances";
+      return resource.identity === PI_PROFILE.agent ||
+        resource.identity === PI_PROFILE.resources[0] || resource.kind === "stance";
     }
-    return resource.section !== "instructions" || target === VSCODE_TARGET;
+    return resource.kind !== "instruction" || target === VSCODE_TARGET;
   });
   const resources: ProjectedResource[] = [];
   for (const resource of selected) {
-    const destination = target === PI_TARGET && resource.section === "agents"
-      ? `agents/${PI_PROFILE.name}.agent.md`
-      : resource.section === "stances" && (target === "claude-code" || target === CODEX_TARGET)
-        ? `skills/${resource.name}/SKILL.md`
-        : resource.pluginPath.slice(2);
+    const destination = projectedDestination(resource, target);
     const frontmatter = resource.frontmatter;
     let skillMetadata: ProjectedResource["skillMetadata"];
     if (resource.activation) {
@@ -74,9 +81,9 @@ export function createProjectionPlan(
       outputPath: resolve(outDir, destination),
       pluginPath: `./${destination}`,
       skillMetadata,
-      exposure: target === CODEX_TARGET && resource.section === "agents"
+      exposure: target === CODEX_TARGET && resource.kind === "agent"
         ? "reference"
-        : resource.section === "stances" || resource.section === "instructions" ||
+        : resource.kind === "stance" || resource.kind === "instruction" ||
             (resource.activation?.userInvocable ?? frontmatter["user-invocable"]) === false
           ? "private"
           : "public",
@@ -87,31 +94,29 @@ export function createProjectionPlan(
   if (diagnostics.length) {
     throw new Error(`Target projection validation failed before output cleanup:\n${formatCompositionDiagnostics(diagnostics)}`);
   }
-  const profileResources = target === PI_TARGET ? PI_PROFILE.resources.map((path) => {
-    const projected = resources.find(({ resource }) => resource.pluginPath === path);
-    if (!projected) throw new Error(`Pi profile requires canonical resource '${path}'`);
+  const profileResources = target === PI_TARGET ? PI_PROFILE.resources.map((identity) => {
+    const projected = resources.find(({ resource }) => resource.identity === identity);
+    if (!projected) throw new Error(`Pi profile requires canonical resource '${identity}'`);
     return projected;
   }) : [];
-  if (target === PI_TARGET && !resources.some(({ resource }) => resource.pluginPath === PI_PROFILE.agent)) {
+  if (target === PI_TARGET && !resources.some(({ resource }) => resource.identity === PI_PROFILE.agent)) {
     throw new Error(`Pi profile requires canonical agent '${PI_PROFILE.agent}'`);
   }
-  const copyDirectory = (path: string, optional = true) => ({
-    source: join(composition.root, path), destination: join(outDir, path), optional,
-  });
-  const supportCopies: ProjectionPlan["supportCopies"] = target === PI_TARGET
-    ? [copyDirectory(dirname(PI_PROFILE.resources[0].slice(2)), false), copyDirectory("stances")]
-    : [copyDirectory("skills"), ...(target === VSCODE_TARGET ? [copyDirectory("stances"), copyDirectory("instructions")] : [])];
-  if (target === "claude-code" || target === CODEX_TARGET) {
-    for (const { resource, outputPath } of resources) {
-      if (resource.section === "stances") {
-        const source = dirname(resource.sourcePath);
-        // Nested resources own their support files and are projected independently.
-        const excludedDirectories = composition.resources
-          .map((nested) => dirname(nested.sourcePath))
-          .filter((directory) => directory.startsWith(`${source}${sep}`));
-        supportCopies.push({ source, destination: dirname(outputPath), optional: false, excludedDirectories });
-      }
-    }
+  const supportCopies: ProjectionPlan["supportCopies"] = resources
+    .filter(({ resource }) => resource.kind === "workflow" || resource.kind === "stance")
+    .map(({ resource, outputPath }) => {
+      const source = dirname(resource.sourcePath);
+      // Each container owns its supporting files. Nested discovered containers
+      // receive their own projection rather than leaking raw source envelopes.
+      const excludedDirectories = composition.resources
+        .map((nested) => dirname(nested.sourcePath))
+        .filter((directory) => directory.startsWith(`${source}${sep}`));
+      return { source, destination: dirname(outputPath), optional: false, excludedDirectories };
+    });
+  if (target === VSCODE_TARGET) {
+    // Instruction supporting files retain their existing shared directory scope.
+    supportCopies.push({ source: join(composition.root, "instructions"),
+      destination: join(outDir, "com.github.copilot", "rules"), optional: true });
   }
   return { target, resources, profileResources, outputBySourcePath, supportCopies,
     includesHooks: target === VSCODE_TARGET || target === "claude-code" };

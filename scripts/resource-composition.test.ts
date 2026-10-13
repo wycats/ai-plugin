@@ -293,3 +293,42 @@ void test("output overrides preserve source, unrelated data, and symlink targets
     await dispose();
   }
 });
+
+function metadataSkill(name: string, kind: "workflow" | "stance", invocation: "explicit" | "contextual", body: string): string {
+  return `---\nname: ${name}\ndescription: Metadata ${name}\nmetadata:\n  wycats.kind: ${kind}\n  wycats.user-invocable: "${String(kind === "workflow")}"\n  wycats.invocation: ${invocation}\n---\n${body}`;
+}
+
+void test("grouped resources keep global skill identity and reject contextual loads of explicit entries", async () => {
+  const { root, dispose } = await fixture({
+    "skills/workflows/caller/SKILL.md": metadataSkill("caller", "workflow", "contextual", '[Entry](../entry/SKILL.md "composition:load")'),
+    "skills/workflows/entry/SKILL.md": metadataSkill("entry", "workflow", "explicit", '[Stance](../../stances/target/SKILL.md "composition:load")'),
+    "skills/stances/target/SKILL.md": metadataSkill("target", "stance", "contextual", "Stance."),
+  });
+  try {
+    let loaded = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.match(loaded.diagnostics.map(({ message }) => message).join("\n"), /cannot target explicit-only skill 'entry'/);
+    await writeFile(join(root, "skills/workflows/caller/SKILL.md"), metadataSkill("caller", "workflow", "contextual", '[Entry](../entry/SKILL.md "composition:reference")'));
+    loaded = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.deepEqual(loaded.diagnostics, []);
+    assert.deepEqual(loaded.composition?.references.map(({ relation }) => relation).sort(), ["load", "reference"]);
+    await mkdir(join(root, "skills/stances/entry"), { recursive: true });
+    await writeFile(join(root, "skills/stances/entry/SKILL.md"), metadataSkill("entry", "stance", "contextual", "Duplicate."));
+    loaded = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.match(loaded.diagnostics.map(({ message }) => message).join("\n"), /canonical identity 'skill:entry' collides/);
+  } finally { await dispose(); }
+});
+
+void test("grouped directories require authored meaning instead of implying semantic kind", async () => {
+  const { root, dispose } = await fixture({
+    "skills/stances/target/SKILL.md": skill("target", "Missing metadata."),
+  });
+  try {
+    let loaded = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.match(loaded.diagnostics[0].message, /require explicit wycats/);
+    // Kind remains authoritative even when the author chooses a different grouping.
+    await writeFile(join(root, "skills/stances/target/SKILL.md"), metadataSkill("target", "workflow", "contextual", "Workflow in a grouping."));
+    loaded = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.deepEqual(loaded.diagnostics, []);
+    assert.equal(loaded.composition?.resources[0].kind, "workflow");
+  } finally { await dispose(); }
+});

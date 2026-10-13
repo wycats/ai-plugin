@@ -6,7 +6,7 @@ import { dirname, join, resolve } from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
 import { parseYamlMapping, parseResourceFrontmatter } from "./resource-frontmatter.ts";
-import { parseSkillActivation } from "./skill-activation.ts";
+import { normalizeSkillSource, parseSkillActivation } from "./skill-activation.ts";
 import { discoverResourceFiles } from "./resource-discovery.ts";
 import { loadCanonicalComposition } from "./resource-composition.ts";
 import { createProjectionPlan } from "./projection-plan.ts";
@@ -41,15 +41,15 @@ async function canonical(root: string) {
 }
 
 void test("activation defaults preserve contextual skills and reject ambiguous declarations", () => {
-  assert.deepEqual(parseSkillActivation({}, "skills"), { userInvocable: true, invocation: "contextual" });
-  assert.deepEqual(parseSkillActivation({ "user-invocable": false }, "stances"), { userInvocable: false, invocation: "contextual" });
+  assert.deepEqual(parseSkillActivation({}, "workflow"), { userInvocable: true, invocation: "contextual" });
+  assert.deepEqual(parseSkillActivation({ "user-invocable": false }, "stance"), { userInvocable: false, invocation: "contextual" });
   for (const data of [
     { "user-invocable": "false" }, { "user-invocable": null },
     { invocation: null }, { invocation: "automatic" },
     { "user-invocable": false, invocation: "explicit" },
     { "disable-model-invocation": false },
-  ]) assert.throws(() => parseSkillActivation(data, "skills"));
-  assert.throws(() => parseSkillActivation({}, "stances"), /stances must declare/);
+  ]) assert.throws(() => parseSkillActivation(data, "workflow"));
+  assert.throws(() => parseSkillActivation({}, "stance"), /stances must declare/);
   assert.throws(() => parseResourceFrontmatter(skill("duplicate", "invocation: explicit\ninvocation: contextual\n")), /unique/);
   assert.throws(() => parseResourceFrontmatter("---\n- not-a-mapping\n---\nBody"), /mapping/);
 });
@@ -87,7 +87,7 @@ void test("each target resolves native policy while keeping an explicit skill pu
           policy: { allow_implicit_invocation: false },
         });
       } else assert.equal(recon.skillMetadata.frontmatter["disable-model-invocation"], true);
-      const stance = plan.resources.find(r => r.resource.section === "stances");
+      const stance = plan.resources.find(r => r.resource.kind === "stance");
       assert.equal(stance?.skillMetadata?.frontmatter["user-invocable"], false);
       if (target === "codex") assert.deepEqual(stance.skillMetadata.codexSidecar?.policy, { allow_implicit_invocation: true });
       else assert.equal(stance.skillMetadata.frontmatter["disable-model-invocation"], false);
@@ -124,7 +124,7 @@ void test("built packages preserve body bytes, move stance assets, and expose su
       await build(root, target);
       const out = join(root, "out", target === "vscode" ? "wycats" : target);
       const generated = parseResourceFrontmatter(await readFile(join(out, "skills/recon/SKILL.md"), "utf8"));
-      const relocated = target === "codex" || target === "claude-code";
+      const relocated = target !== "pi";
       assert.equal(generated.body, relocated
         ? original.body.replace("../../stances/diagnostic-questioning/SKILL.md", "../diagnostic-questioning/SKILL.md")
         : original.body);
@@ -150,13 +150,13 @@ void test("built packages preserve body bytes, move stance assets, and expose su
       } else assert.equal(generated.data["disable-model-invocation"], true);
       if (target === "vscode") {
         const manifest = JSON.parse(await readFile(join(out, "plugin.json"), "utf8")) as { skills: string[] };
-        assert.deepEqual(manifest.skills, ["./skills/", "./stances/"]);
+        assert.equal(manifest.skills, undefined);
       }
     }
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-void test("invalid policy, sidecars, and target layouts fail before replacing existing output", async () => {
+void test("invalid policy and sidecars fail before replacing output while grouped target paths are flattened", async () => {
   const root = await fixture();
   try {
     await prepareBuildFixture(root);
@@ -180,7 +180,80 @@ void test("invalid policy, sidecars, and target layouts fail before replacing ex
     }
     await put(root, "skills/recon/SKILL.md", skill("recon"));
     await put(root, "skills/group/nested/SKILL.md", skill("nested"));
-    await assert.rejects(build(root, "codex"), /immediately under skills/);
-    assert.equal(await readFile(sentinel, "utf8"), "keep");
+    await build(root, "codex");
+    assert.equal(parseResourceFrontmatter(await readFile(join(root, "out/codex/skills/nested/SKILL.md"), "utf8")).data.name, "nested");
+    await assert.rejects(readFile(join(root, "out/codex/skills/group/nested/SKILL.md")), { code: "ENOENT" });
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+void test("metadata authoring has one owner for kind and activation while retaining unrelated metadata", () => {
+  const data = { name: "explicit", description: "Explicit workflow", metadata: {
+    "wycats.kind": "workflow", "wycats.user-invocable": "true", "wycats.invocation": "explicit",
+    author: "Yehuda", category: "experiment",
+  } };
+  const normalized = normalizeSkillSource(data);
+  assert.equal(normalized.kind, "workflow");
+  assert.deepEqual(normalized.activation, { userInvocable: true, invocation: "explicit" });
+  assert.deepEqual(normalized.frontmatter.metadata, { author: "Yehuda", category: "experiment" });
+  assert.equal(normalized.frontmatter["user-invocable"], true);
+  assert.equal(normalized.frontmatter.invocation, "explicit");
+  assert.equal(data.metadata["wycats.kind"], "workflow");
+  for (const field of ["user-invocable", "invocation", "disable-model-invocation"]) {
+    assert.throws(() => normalizeSkillSource({ ...data, [field]: false }), /duplicates|adapter-owned/);
+  }
+  for (const metadata of [
+    { ...data.metadata, "wycats.kind": "agent" },
+    { ...data.metadata, "wycats.user-invocable": true },
+    { ...data.metadata, "wycats.user-invocable": "false" },
+    { ...data.metadata, "wycats.invocation": "automatic" },
+    { ...data.metadata, "wycats.kind": "stance" },
+    { ...data.metadata, author: ["Yehuda"] },
+    { "wycats.kind": "workflow", "wycats.user-invocable": "true" },
+    { "wycats.kind": "workflow", "wycats.invocation": "contextual" },
+    { "wycats.user-invocable": "true", "wycats.invocation": "contextual" },
+  ]) assert.throws(() => normalizeSkillSource({ ...data, metadata }));
+  assert.throws(() => normalizeSkillSource({ ...data, metadata: [] }), /explicit wycats/);
+  assert.throws(() => parseResourceFrontmatter(skill("duplicate", 'metadata:\n  wycats.kind: workflow\n  wycats.kind: stance\n')), /unique/);
+});
+
+void test("complete builds ingest grouped metadata directly and preserve native policy and resource support", async () => {
+  const root = await fixture();
+  try {
+    const original = await canonical(root);
+    for (const resource of original.resources.filter((entry) => entry.activation)) {
+      const activation = resource.activation;
+      assert.ok(activation);
+      const groupedPath = `skills/${resource.kind === "stance" ? "stances" : "workflows"}/${resource.name}/SKILL.md`;
+      const authored = skill(resource.name, `metadata:\n  wycats.kind: ${resource.kind}\n  wycats.user-invocable: "${String(activation.userInvocable)}"\n  wycats.invocation: ${activation.invocation}\n  author: preserved\n`,
+        parseResourceFrontmatter(await readFile(resource.sourcePath, "utf8")).body);
+      await put(root, groupedPath, authored);
+      await rm(dirname(resource.sourcePath), { recursive: true });
+    }
+    await put(root, "skills/stances/diagnostic-questioning/assets/note.txt", "stance support");
+    await put(root, "skills/workflows/recon/assets/note.txt", "workflow support");
+    await prepareBuildFixture(root);
+    for (const target of ["vscode", "claude-code", "codex", "pi"]) {
+      await build(root, target);
+      const out = join(root, "out", target === "vscode" ? "wycats" : target);
+      const discovered = await discoverResourceFiles(out);
+      assert.equal(discovered.skills.length, target === "pi" ? 1 : 5);
+      assert.equal(discovered.stances.length, target === "pi" ? 4 : 0);
+      assert.ok(discovered.skills.every((entry) => /^\.\/skills\/[^/]+\/SKILL\.md$/.test(entry.pluginPath)));
+      const recon = parseResourceFrontmatter(await readFile(join(out, "skills/recon/SKILL.md"), "utf8"));
+      assert.deepEqual(recon.data.metadata, { author: "preserved" });
+      assert.equal(recon.data["user-invocable"], true);
+      assert.equal(await readFile(join(out, "skills/recon/assets/note.txt"), "utf8"), "workflow support");
+      const stanceDirectory = join(out, target === "pi" ? "stances" : "skills", "diagnostic-questioning");
+      assert.equal(await readFile(join(stanceDirectory, "assets/note.txt"), "utf8"), "stance support");
+      const stance = parseResourceFrontmatter(await readFile(join(stanceDirectory, "SKILL.md"), "utf8"));
+      assert.equal(stance.data["user-invocable"], false);
+      if (target === "codex") {
+        const sidecar = parseYamlMapping(await readFile(join(out, "skills/recon/agents/openai.yaml"), "utf8"));
+        assert.deepEqual(sidecar.policy, { allow_implicit_invocation: false });
+      } else assert.equal(recon.data["disable-model-invocation"], true);
+      const canonicalBody = parseResourceFrontmatter(await readFile(join(root, "skills/workflows/recon/SKILL.md"), "utf8")).body;
+      assert.equal(recon.body, target === "pi" ? canonicalBody
+        : canonicalBody.replace("../../stances/diagnostic-questioning/SKILL.md", "../diagnostic-questioning/SKILL.md"));
+    }
   } finally { await rm(root, { recursive: true, force: true }); }
 });

@@ -51,7 +51,7 @@ The repo has two kinds of documentation: foundational theory that explains why t
 
 ## Stances
 
-When writing a skill, you're choosing *how the agent should think about the task*. We've found that certain collaborative patterns recur across different skills, and naming them makes them composable. The `stances/` directory contains these named patterns:
+When writing a skill, you're choosing *how the agent should think about the task*. We've found that certain collaborative patterns recur across different skills, and naming them makes them composable. The `skills/stances/` directory contains these named patterns:
 
 **Collaborative grounding** is the most fundamental. The agent has perception (tools, files, search) and superhuman breadth across all of human expression. The user has situated knowledge: intent, priorities, energy, the state of the world beyond the screen. Neither perspective is sufficient alone. Good collaboration combines both: the agent shares what it sees, the user contributes what the agent can't access.
 

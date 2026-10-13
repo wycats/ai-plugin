@@ -2,6 +2,8 @@ import matter from "gray-matter";
 import { isAbsolute, posix, relative, resolve, sep } from "node:path";
 import { realpath } from "node:fs/promises";
 import type { EvaluationResource } from "./core.ts";
+import { normalizeSkillSource } from "../skill-activation.ts";
+import type { SkillKind } from "../resource-discovery.ts";
 
 export const CANONICAL_RESOURCE_AUTHORITY = "wycats-plugin";
 
@@ -33,7 +35,36 @@ export interface CanonicalResourceDescriptor {
   locator: string;
 }
 
-export function canonicalResourceDescriptor(path: string): CanonicalResourceDescriptor {
+function sourceData(source: string | Record<string, unknown>): Record<string, unknown> {
+  return typeof source === "string"
+    ? (matter(source).data as Record<string, unknown>)
+    : source;
+}
+
+function skillSourceKind(
+  path: string,
+): { name: string; pathKind: SkillKind; legacyKind?: SkillKind } | undefined {
+  const grouped = path.match(/^skills\/(workflows|stances)\/([^/]+)\/SKILL\.md$/);
+  if (grouped) {
+    const pathKind = grouped[1] === "workflows" ? "workflow" : "stance";
+    return {
+      name: grouped[2],
+      pathKind,
+    };
+  }
+
+  const legacyWorkflow = path.match(/^skills\/([^/]+)\/SKILL\.md$/);
+  if (legacyWorkflow) return { name: legacyWorkflow[1], pathKind: "workflow", legacyKind: "workflow" };
+
+  const legacyStance = path.match(/^stances\/([^/]+)\/SKILL\.md$/);
+  if (legacyStance) return { name: legacyStance[1], pathKind: "stance", legacyKind: "stance" };
+  return undefined;
+}
+
+export function canonicalResourceDescriptor(
+  path: string,
+  source?: string | Record<string, unknown>,
+): CanonicalResourceDescriptor {
   const normalized = path.replaceAll("\\", "/");
   if (path !== normalized || posix.normalize(normalized) !== normalized) {
     throw new Error(`Resource path '${path}' must use its canonical repository-relative form.`);
@@ -41,12 +72,17 @@ export function canonicalResourceDescriptor(path: string): CanonicalResourceDesc
   const agent = normalized.match(/^agents\/(.+)\.agent\.md$/);
   if (agent) return { kind: "agent", name: agent[1], locator: `agents/${agent[1]}` };
 
-  const skillLike = normalized.match(/^(skills|stances)\/([^/]+)\/SKILL\.md$/);
-  if (skillLike) {
+  const skillSource = skillSourceKind(normalized);
+  if (skillSource) {
+    const kind = source === undefined
+      ? skillSource.pathKind
+      : normalizeSkillSource(sourceData(source), skillSource.legacyKind).kind;
+    const resourceKind = kind === "workflow" ? "skill" : "stance";
+    const locator = `${resourceKind === "skill" ? "skills" : "stances"}/${skillSource.name}`;
     return {
-      kind: skillLike[1] === "skills" ? "skill" : "stance",
-      name: skillLike[2],
-      locator: `${skillLike[1]}/${skillLike[2]}`,
+      kind: resourceKind,
+      name: skillSource.name,
+      locator,
     };
   }
 
@@ -57,8 +93,15 @@ export function validateCanonicalResource(
   resource: EvaluationResource,
   source: string,
 ): void {
-  const descriptor = canonicalResourceDescriptor(resource.path);
-  const frontmatter = matter(source).data as Record<string, unknown>;
+  const rawFrontmatter = matter(source).data as Record<string, unknown>;
+  const descriptor = canonicalResourceDescriptor(resource.path, rawFrontmatter);
+  const normalizedSkill = descriptor.kind === "agent"
+    ? undefined
+    : normalizeSkillSource(
+        rawFrontmatter,
+        descriptor.kind === "skill" ? "workflow" : "stance",
+      );
+  const frontmatter = normalizedSkill?.frontmatter ?? rawFrontmatter;
   if (typeof frontmatter.description !== "string" || frontmatter.description.trim() === "") {
     throw new Error(`${resource.path} must declare a non-empty description in frontmatter.`);
   }
@@ -69,9 +112,6 @@ export function validateCanonicalResource(
   }
   if (descriptor.kind !== "agent" && frontmatter.name === undefined) {
     throw new Error(`${resource.path} must declare its canonical name in frontmatter.`);
-  }
-  if (descriptor.kind === "stance" && frontmatter["user-invocable"] !== false) {
-    throw new Error(`${resource.path} must declare 'user-invocable: false' in frontmatter.`);
   }
   if (resource.name !== descriptor.name) {
     throw new Error(

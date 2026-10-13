@@ -11,7 +11,7 @@ This fixture represents a workflow whose entry changes the scope of the work.
 Its purpose is to exercise packaging and activation policy; it does not implement
 behavioral reconstruction.
 
-Once selected, load [diagnostic questioning](../../../../../stances/diagnostic-questioning/SKILL.md "composition:load")
+Once selected, load [diagnostic questioning](../../../../../skills/stances/diagnostic-questioning/SKILL.md "composition:load")
 to distinguish unanswered questions from assumptions. The local
 [contract sketch](references/contract.md) represents supporting material carried
 with the workflow.

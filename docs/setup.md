@@ -25,7 +25,7 @@ This means the same agent definitions work for everyone — you just change the 
 
 ## VS Code local registration
 
-For VS Code, the build writes the plugin to `out/wycats/`. Local registration adds that output directory to `chat.plugins.paths` and the hooks directory to `chat.hookFilesLocations` in a VS Code `settings.json` file.
+For VS Code, the build writes the plugin to `out/wycats/`. Local registration adds that output directory to `chat.pluginLocations` in the selected VS Code `settings.json` file. The Agent Plugins 1.0 package discovers its Copilot hooks through `com.github.copilot/hooks/hooks.json`; separate hook registration is unnecessary. The installer removes this checkout's older plugin and hook registrations while preserving unrelated entries.
 
 The registration target is explicit. The installer does not default to Stable VS Code, because many local development sessions run in VS Code Insiders.
 

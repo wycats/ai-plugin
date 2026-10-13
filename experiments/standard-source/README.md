@@ -1,17 +1,26 @@
-# Standard-shaped source: Recon prototype
+# Standard-shaped source experiment
 
-Can standard instruction containers make our authoring model easier to understand
-and consume while preserving the distinctions that make the plugin work?
+Can shared instruction containers make our authoring model easier to understand
+while preserving the distinctions that make the plugin work?
 
-This experiment compares three source layouts: today's separate directories,
-flat instruction containers under `skills/`, and containers grouped under
-`skills/workflows/` and `skills/stances/`. Both candidates record meaning in
-Agent Skills metadata. It exercises the existing composition validator and target projection
-planner. Production discovery, builds, and the
-[runtime projection contract](../../docs/runtime-projection-contract.md) retain
-their current behavior. The candidates explore one authoring dialect in two layouts.
+This experiment now runs through the production reader and all four target
+builders. The repository authors workflows under `skills/workflows/` and stances
+under `skills/stances/`. Each `SKILL.md` declares its meaning through string-valued
+Agent Skills metadata:
 
-## Inspect the experiment
+```yaml
+metadata:
+  wycats.kind: stance
+  wycats.user-invocable: "false"
+  wycats.invocation: contextual
+```
+
+These are compiler-owned fields. The directories orient authors; the declared
+kind governs composition, activation, selection, and projection. A generic host
+reading this metadata provides no invocation-policy guarantee. The generated
+package carries each target's native policy.
+
+## Inspect the comparison
 
 From the repository root, run:
 
@@ -21,136 +30,94 @@ node scripts/prototypes/standard-source.ts
 
 Each run prints a fresh directory under `out/standard-source-prototype-*`:
 
-| Directory or file | What to inspect |
+| Artifact | Purpose |
 | --- | --- |
-| `comparison.md` | Start here: links to the same resources in all three layouts and their generated policy |
-| `current-source/` | Recon, its agent, the marked-link dependency closure, and two fixtures in today's layout |
-| `flat/source/` and `grouped/source/` | The same resources with flat or grouped containers and identical authoring metadata |
-| `flat/normalized-source/` and `grouped/normalized-source/` | Each candidate decoded into today's canonical representation |
-| `current-projections/`, `flat/projections/`, and `grouped/projections/` | Comparable resource files produced using the existing target planner and link projector |
-| `report.json` | Resource identities, composition edges, comparisons, and limits |
-| Each candidate's `negative-cases/` | A reference changed to a load, demonstrating rejection at the explicit entry boundary |
+| `comparison.md` | Links to the same resources in three layouts and their generated policies |
+| `current-source/` | A legacy-layout baseline assembled from the authoritative source |
+| `flat/source/`, `grouped/source/` | Equivalent metadata-authored candidates, read directly by the production reader |
+| `current-projections/`, `flat/projections/`, `grouped/projections/` | Resource samples for all four targets |
+| `report.json` | Semantic identities, composition edges, comparisons, and limits |
+| Candidate `negative-cases/` | A reference changed to a load, demonstrating the explicit-entry boundary |
 
-These projections contain resource samples, not complete installable packages.
-They do not exercise target agent-envelope translation, hooks, or installers.
-Run results are generated scratch. The source text remains authoritative in the
-repository; the experiment copies it rather than maintaining another articulation.
+The nine-resource slice contains Recon's workflow and agent, five stances, and
+two fixtures. Recon loads four stances directly; references bring collaborative
+grounding into the closure. The entry fixture references an explicit-only
+reconstruction fixture, which itself loads a contextual stance.
 
-## The source choice, made concrete
+The runner verifies equal identities, kinds, activation, and labeled edges across
+all three layouts. It compares projected paths, exposure, frontmatter, sidecars,
+and bodies, and checks byte-preserving body relocation. It rejects loading the
+explicit workflow, hidden explicit workflows, invalid metadata, and duplicate
+policy ownership. Pi's bounded Recon profile selects seven resources and excludes
+the two fixtures. These samples are not installable packages.
 
-The complete slice has nine resources: Recon's workflow and agent, five stances,
-and the two workflow fixtures. Four stances are loaded directly by Recon; marked
-references also bring in collaborative grounding. Both reference and load edges
-participate in the package's closure, while retaining their different meanings.
+## The complete implementation trial
 
-| Resource | Current | Flat | Grouped |
-| --- | --- | --- | --- |
-| Recon workflow | `skills/recon/SKILL.md` | `skills/recon/SKILL.md` | `skills/workflows/recon/SKILL.md` |
-| Diagnostic stance | `stances/diagnostic-questioning/SKILL.md` | `skills/diagnostic-questioning/SKILL.md` | `skills/stances/diagnostic-questioning/SKILL.md` |
-| Recon agent | `agents/recon.agent.md` | Same | Same |
+The grouped source is also consumed by the ordinary builds:
 
-The flat candidate's `plugin.json` uses the Agent Plugins 1.0 manifest identifier.
-Its eight instruction containers satisfy the immediate-child layout, including
-the five stances. The grouped candidate retains visible semantic groupings but
-has zero skills at that depth. It is an authoring tree read by the prototype's
-recursive reader; it emits no plugin manifest or claim of direct installation.
-Both candidates' `agents/` directory remains compiler-owned authoring material.
-This experiment assigns it no portable agent semantics.
-
-For a stance, today's policy:
-
-```yaml
-name: diagnostic-questioning
-user-invocable: false
+```sh
+pnpm validate
+pnpm check
+pnpm build --config config.example.json
+pnpm build --config config.claude-code.example.json
+pnpm build:codex
+pnpm build:pi
 ```
 
-becomes the following metadata, alongside the unchanged name and description:
+The full source migration covers 17 workflows and 14 stances. Skill prose is
+preserved; relative links and frontmatter change to express the new locations
+and metadata. `CanonicalResource.kind` separates meaning from source `section`.
+Names remain globally unique across workflows and stances. Legacy flat input
+remains accepted by the reader for compatibility and comparison.
 
-```yaml
-metadata:
-  wycats.kind: stance
-  wycats.user-invocable: "false"
-  wycats.invocation: contextual
-```
+VS Code, Claude Code, and Codex flatten instruction containers into
+`skills/<name>/`; Pi retains its selected workflow and private stance surfaces.
+Supporting files travel with their resource. Nested resource containers are
+excluded from a parent's supporting-file copy.
 
-For the explicit-only fixture, the corresponding values are `workflow`, `"true"`,
-and `explicit`. These experimental keys belong to our compiler. Agent Skills
-provides the string-to-string metadata container; it assigns these keys no
-behavior. The prototype deliberately spells out all three values so their
-ownership is visible. Defaulting and namespace spelling remain design choices.
+VS Code now emits an Agent Plugins 1.0 manifest. Agents, rules, and hooks use the
+`com.github.copilot` namespace. Agents and rules retain source-relative paths;
+exclusive manifest path lists make native discovery precise, including nested
+resources and their supporting files. The installer registers the generated package
+through `chat.pluginLocations`; plugin discovery owns its hooks. Bundled hook
+commands use the host-expanded `${PLUGIN_ROOT}` token so they remain relocatable.
+The precise mappings and reasons to revise them live in the
+[runtime projection contract](../../docs/runtime-projection-contract.md).
 
-## What the experiment establishes
+## Evidence and remaining boundary
 
-For each candidate, the runner checks that normalization preserves resource identities, semantic
-kinds, activation policies, and labeled composition edges. A round trip preserves
-body bytes exactly; only marked-link destinations change in the intermediate
-layout. One fixture includes a local supporting file to exercise resource-relative
-placement.
+The migration preserves all 39 resource identities, kinds, and activation policies,
+and all 35 labeled composition relationships, compared with the pre-migration
+checkpoint. Every byte outside link destinations in the 31 instruction bodies
+is preserved.
 
-| Case | Checked result |
-| --- | --- |
-| Recon loads a contextual stance | Link resolves and remains a load |
-| Entry fixture references the explicit workflow | Link resolves and remains a reference |
-| Explicit workflow loads a contextual stance | Accepted |
-| Entry fixture is changed to load the explicit workflow | Rejected by the existing composition validator after normalization |
-| Hidden explicit workflow, non-string metadata, unknown kind, or duplicate top-level policy | Rejected |
-| VS Code, Claude Code, and Codex resource projections | All three layouts produce equal paths, exposure, frontmatter, sidecars, and bodies; the explicit fixture stays public and receives native invocation metadata |
-| Pi resource projection | All three layouts produce the same seven selected resources; its existing Recon profile excludes the two fixtures |
-| Immediate-child discovery layout | Eight eligible containers in the flat candidate; zero in the grouped candidate. This path inspection is not a host loader test. |
+Complete builds and automated checks pass. Tests exercise grouped-source builds,
+composition and explicit-entry failures, native metadata, supporting files,
+installer registration, and generated hook structure. A disposable installation
+also ran the packaged pnpm hook from a different working directory: it denied
+npm and allowed pnpm using the VS Code Local hook envelope.
 
-This is evidence about source representation and generated resources. It does
-not establish host enforcement, visibility, model behavior, complete schema
-conformance, or safe direct installation of the candidate source. In particular,
-discovering `wycats.invocation: explicit` has no standardized effect on a client
-that does not understand our metadata.
+A separate VS Code profile was launched with a complete generated package plus
+the two workflow fixtures. Native discovery and enforcement remain unverified:
+the UI tool selected an existing user window rather than the isolated instance,
+so no interaction was attempted there. The passing compiler and subprocess checks
+do not establish picker visibility, contextual selection, or runtime enforcement.
+Copilot Agent Host's distinct hook envelope also remains outside this proof.
 
-## What changes architecturally
+The experiment supports a concrete architectural choice: retain grouping for
+authors, give the reader explicit semantic data, and let adapters choose runtime
+layout. It establishes no promise that canonical source can be installed directly.
+The remaining host check can change adapter details without deciding source
+meaning by directory again.
 
-Both candidates use a familiar container for instruction resources and make the
-stance/workflow distinction explicit data. The grouped candidate also preserves
-that distinction in the directory tree. Canonical prose and its semantic
-validation survive either representation.
+## Sources
 
-The bridge also reveals a coupling in today's compiler: `section` means both
-semantic category and physical source directory. Discovery supplies that value;
-activation validation, target selection, and placement consume it. This experiment
-restores today's directories before calling those consumers. That is a useful
-way to compare representations, not a proposed permanent compiler stage.
+- [Agent Plugins 1.0](https://agent-plugins.org/specification): manifest and immediate-child skill discovery.
+- [Agent Skills](https://agentskills.io/specification): instruction containers and string-valued metadata.
+- [VS Code plugin support](https://code.visualstudio.com/docs/agent-customization/agent-plugins): format selection and native components.
+- [Prototype runner](../../scripts/prototypes/standard-source.ts): direct comparisons and negative cases.
 
-| Choice | What it buys | What would justify adopting it |
-| --- | --- | --- |
-| Flat `skills/` containers | Published v1's discovery layout and uniform resource shape | Shared tooling or authoring becomes materially simpler, and metadata keeps semantic kind legible |
-| Grouped `skills/` containers | Uniform resource shape with visible stance/workflow grouping | That grouping helps authors understand ownership; compilation handles target discovery layouts |
-| Namespaced skill metadata | A standard extension surface for our authoring fields | Authors can understand its ownership; validation gives precise feedback; adapters preserve consequential policy |
-| Semantic kind independent of source location | Relocation no longer redefines a stance as a workflow | The source reader can normalize either layout directly into the same semantic model |
-| Agent Plugins target packaging | A shared distribution contract | A target package preserves agents, activation, hooks, and installation through that client's supported extensions |
-
-No semantic subsystem disappears in this slice. Composition, activation,
-selection, and host projections still do distinct work. The potential simplification
-is a cleaner boundary: a source reader produces semantic resources; target adapters
-choose their runtime envelopes.
-
-The grouped result removes a tradeoff posed by the flat candidate: common
-containers can retain visible semantic grouping. The remaining decision is
-whether those containers improve authoring and shared tooling enough to justify
-changing the source layout. Standard target packaging can proceed with any of
-the three source choices. Direct installation of canonical source would be a
-further compatibility promise, especially for explicit entry policy.
-
-The normalization bridge still reconstructs today's directories. A production
-source reader that separates semantic kind from physical location remains future
-work. Both candidates also retain globally unique skill names; grouped storage
-does not introduce namespace-qualified identity.
-
-## Source of the conventions
-
-- [Agent Plugins 1.0 specification](https://agent-plugins.org/specification): manifest and immediate-child skill discovery; runtime exposure remains client-defined.
-- [Agent Skills specification](https://agentskills.io/specification): instruction containers, supporting files, and string-valued metadata.
-- [Projection contract](../../docs/runtime-projection-contract.md): the repo's existing activation and projection semantics, reused by the experiment.
-- [Prototype runner](../../scripts/prototypes/standard-source.ts): the normalization bridge, comparisons, and negative cases.
-
-The grouped shape is informed by the
-[namespaced discovery proposal](https://github.com/agentplugins/agent-plugins-spec/pull/67).
-This experiment does not implement or claim conformance to that proposal's
-discovery algorithm, including its terminal skill boundaries and namespace
-identity rules. Compilation to existing resource layouts needs no 1.1 host support.
+The [namespaced discovery proposal](https://github.com/agentplugins/agent-plugins-spec/pull/67)
+informed the grouped source shape. This implementation claims no conformance to
+that proposal's discovery or namespace identity rules; generated packages require
+no 1.1 support.

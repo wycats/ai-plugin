@@ -49,9 +49,10 @@ available to a host; it does not become the authoring surface.
 
 ## Activation intent and runtime discovery
 
-A resource's description explains applicability. Its `user-invocable` field
-states whether it belongs on the user's direct workflow surface; `invocation`
-states whether relevance can select it or the user must choose it explicitly.
+A resource's description explains applicability. Its `wycats.user-invocable`
+metadata states whether it belongs on the user's direct workflow surface;
+`wycats.invocation` states whether relevance can select it or the user must
+choose it explicitly.
 Choosing to enter a substantial workflow is part of that workflow's meaning,
 so these declarations belong to the canonical resource.
 
@@ -155,8 +156,11 @@ simulating equivalence through different guidance.
 
 ## Authoring boundary
 
-The root `stances/`, `skills/`, `agents/`, `instructions/`, and neutral hook
-manifests are the plugin's canonical authoring surfaces. Abstract model roles,
+The grouped `skills/stances/` and `skills/workflows/` directories, root `agents/`
+and `instructions/`, and neutral hook manifests are the plugin's canonical
+authoring surfaces. Instruction resources declare semantic kind and activation
+in string-valued `wycats.*` metadata. The source reader separates those meanings
+from physical location; adapters choose target paths from the normalized model. Abstract model roles,
 tool groups, and canonical hook tool names let the build adapt execution
 details without rewriting behavior. Generated `out/`, tracked `dist/wycats/`,
 and publication branches are derived runtime artifacts.

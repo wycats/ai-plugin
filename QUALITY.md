@@ -43,7 +43,7 @@ decisions and relevant context needed for its part. Keep unresolved choices that
 affect the whole visible to the coordinator. Specification quality determines
 how much understanding execution has to reconstruct.
 
-This is the [reader-orientation](stances/reader-orientation/SKILL.md) stance
+This is the [reader-orientation](skills/stances/reader-orientation/SKILL.md) stance
 applied to skill design. Add detail or indirection when it improves the reader's
 ability to act; a clear boundary can contain substantial mechanics without
 bringing them all into the main path.

@@ -35,6 +35,7 @@ import {
   type CanonicalComposition,
 } from "./resource-composition.ts";
 import { assertSafeOutputOverride, prepareProjectionOutput } from "./projection-output.ts";
+import { buildVSCodePlugin } from "./vscode-plugin.ts";
 import { PI_PROFILE, piAgentContext } from "./pi-profile.ts";
 import { createProjectionPlan, projectionResourceMap, type ProjectionPlan, type ProjectedResource } from "./projection-plan.ts";
 
@@ -50,21 +51,10 @@ interface Config {
   hookMatchers?: Record<string, string>;
 }
 
-interface PluginEntry {
-  path: string;
-}
-
 interface PluginMetadata {
   name: string;
   version: string;
   description: string;
-}
-
-interface PluginJson extends PluginMetadata {
-  skills?: string[];
-  agents?: PluginEntry[];
-  instructions?: PluginEntry[];
-  hooks?: PluginEntry[];
 }
 
 interface CodexPluginJson extends PluginMetadata {
@@ -677,7 +667,7 @@ async function build() {
   ) as PluginMetadata;
 
   const agentResources = projectedResources.filter(
-    (resource) => resource.section === "agents",
+    (resource) => resource.kind === "agent",
   );
   const agentPaths: string[] = [];
   for (const resource of agentResources) {
@@ -714,7 +704,7 @@ async function build() {
   }
 
   for (const { resource, outputPath: outPath, skillMetadata } of plan.resources.filter(
-    ({ resource }) => resource.section === "skills" || resource.section === "stances",
+    ({ resource }) => resource.kind === "workflow" || resource.kind === "stance",
   )) {
     await writeProjectedResource(
       resource,
@@ -725,8 +715,8 @@ async function build() {
     );
   }
 
-  const skillPaths = plan.resources.filter(({ resource }) => resource.section === "skills").map(({ pluginPath }) => pluginPath);
-  const stancePaths = plan.resources.filter(({ resource }) => resource.section === "stances").map(({ pluginPath }) => pluginPath);
+  const skillPaths = plan.resources.filter(({ resource }) => resource.kind === "workflow").map(({ pluginPath }) => pluginPath);
+  const stancePaths = plan.resources.filter(({ resource }) => resource.kind === "stance").map(({ pluginPath }) => pluginPath);
 
   const allSkillPaths = [...skillPaths, ...stancePaths];
 
@@ -750,7 +740,7 @@ async function build() {
         keywords: ["pi-package"],
         engines: { node: ">=24.0.0" },
         pi: {
-          skills: plan.resources.filter(({ resource, exposure }) => resource.section === "skills" && exposure === "public").map(({ pluginPath }) => posix.dirname(pluginPath)),
+          skills: plan.resources.filter(({ resource, exposure }) => resource.kind === "workflow" && exposure === "public").map(({ pluginPath }) => posix.dirname(pluginPath)),
           subagents: { agents: ["./agents"] },
         },
       }
@@ -843,7 +833,7 @@ async function build() {
     console.log(`  manifest:     .codex-plugin/plugin.json`);
   } else {
     // VS Code: copy instructions; generate plugin.json
-    for (const resource of projectedResources.filter((resource) => resource.section === "instructions")) {
+    for (const resource of projectedResources.filter((resource) => resource.kind === "instruction")) {
       const outPath = outputBySourcePath.get(resolve(resource.sourcePath));
       if (!outPath) throw new Error(`Missing output path for ${resource.pluginPath}`);
       await writeProjectedResource(
@@ -853,34 +843,9 @@ async function build() {
         outputBySourcePath,
       );
     }
-    const instructionPaths = plan.resources.filter(({ resource }) => resource.section === "instructions").map(({ pluginPath }) => pluginPath);
+    const instructionPaths = plan.resources.filter(({ resource }) => resource.kind === "instruction").map(({ pluginPath }) => pluginPath);
 
-    const pluginJson: PluginJson = {
-      name: pluginMeta.name,
-      version: pluginMeta.version,
-      description: pluginMeta.description,
-    };
-
-    if (agentPaths.length > 0) {
-      pluginJson.agents = agentPaths.map((p) => ({ path: p }));
-    }
-    if (allSkillPaths.length > 0) {
-      pluginJson.skills = [
-        ...(skillPaths.length > 0 ? ["./skills/"] : []),
-        ...(stancePaths.length > 0 ? ["./stances/"] : []),
-      ];
-    }
-    if (instructionPaths.length > 0) {
-      pluginJson.instructions = instructionPaths.map((p) => ({ path: p }));
-    }
-    if (hookPaths.length > 0) {
-      pluginJson.hooks = hookPaths.map((p) => ({ path: p }));
-    }
-
-    await writeFile(
-      join(outDir, "plugin.json"),
-      JSON.stringify(pluginJson, null, 2) + "\n",
-    );
+    const nativeHookPaths = await buildVSCodePlugin(outDir, pluginMeta, hookPaths, { agentPaths, instructionPaths });
 
     console.log(`Built to ${relative(ROOT, outDir)}/`);
     console.log(`  agents:       ${String(agentPaths.length)}`);
@@ -888,7 +853,7 @@ async function build() {
       `  skills:       ${String(skillPaths.length)} workflow + ${String(stancePaths.length)} stances = ${String(allSkillPaths.length)}`,
     );
     console.log(`  instructions: ${String(instructionPaths.length)}`);
-    console.log(`  hooks:        ${String(hookPaths.length)}`);
+    console.log(`  hooks:        ${String(nativeHookPaths.length)}`);
   }
 }
 

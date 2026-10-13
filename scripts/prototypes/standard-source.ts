@@ -11,7 +11,7 @@ import {
 import {
   isMapping, parseResourceFrontmatter, serializeResourceFrontmatter,
 } from "../resource-frontmatter.ts";
-import { parseSkillActivation } from "../skill-activation.ts";
+import { normalizeSkillSource } from "../skill-activation.ts";
 import { createProjectionPlan } from "../projection-plan.ts";
 import { type BuildTarget } from "../target-output.ts";
 
@@ -33,17 +33,17 @@ async function load(directory: string): Promise<CanonicalComposition> {
 }
 
 function canonicalPath(resource: CanonicalResource): string {
-  return resource.section === "agents" ? `agents/${resource.name}.agent.md`
-    : `${resource.section}/${resource.name}/SKILL.md`;
+  return resource.kind === "agent" ? `agents/${resource.name}.agent.md`
+    : `${resource.kind === "stance" ? "stances" : "skills"}/${resource.name}/SKILL.md`;
 }
 
 function candidatePath(resource: CanonicalResource): string {
-  return resource.section === "agents" ? canonicalPath(resource) : `skills/${resource.name}/SKILL.md`;
+  return resource.kind === "agent" ? canonicalPath(resource) : `skills/${resource.name}/SKILL.md`;
 }
 
 function groupedPath(resource: CanonicalResource): string {
-  if (resource.section === "agents") return canonicalPath(resource);
-  const group = resource.section === "stances" ? "stances" : "workflows";
+  if (resource.kind === "agent") return canonicalPath(resource);
+  const group = resource.kind === "stance" ? "stances" : "workflows";
   return `skills/${group}/${resource.name}/SKILL.md`;
 }
 
@@ -79,7 +79,7 @@ async function relocate(
   for (const resource of composition.resources) {
     const destination = destinations.get(resource.sourcePath);
     assert(destination);
-    if (resource.section !== "agents") {
+    if (resource.kind !== "agent") {
       await cp(dirname(resource.sourcePath), dirname(destination), { recursive: true });
     }
     const projected = projectCompositionLinks(await readFile(resource.sourcePath, "utf8"),
@@ -96,57 +96,17 @@ function encodeMetadata(resource: CanonicalResource): Record<string, unknown> {
   delete data["user-invocable"];
   data.metadata = {
     ...(isMapping(data.metadata) ? data.metadata : {}),
-    [fields.kind]: resource.section === "stances" ? "stance" : "workflow",
+    [fields.kind]: resource.kind === "stance" ? "stance" : "workflow",
     [fields.userInvocable]: String(resource.activation.userInvocable),
     [fields.invocation]: resource.activation.invocation,
   };
   return data;
 }
 
-/** Experimental authoring dialect. These keys are consumed by our bridge, not by hosts. */
-function decodeMetadata(data: Record<string, unknown>) {
-  const metadata = data.metadata;
-  assert(isMapping(metadata), "expected string-valued authoring metadata");
-  assert(Object.values(metadata).every((value) => typeof value === "string"), "metadata values must be strings");
-  assert(!Object.hasOwn(data, "invocation") && !Object.hasOwn(data, "user-invocable"), "duplicate policy ownership");
-  const kind = metadata[fields.kind];
-  assert(kind === "stance" || kind === "workflow", "unknown wycats.kind");
-  const visibility = metadata[fields.userInvocable];
-  assert(visibility === "true" || visibility === "false", "invalid wycats.user-invocable");
-  const section = kind === "stance" ? "stances" : "skills";
-  const ownedFields: string[] = Object.values(fields);
-  const remaining = Object.fromEntries(Object.entries(metadata).filter(([key]) => !ownedFields.includes(key)));
-  const frontmatter: Record<string, unknown> = {
-    ...data, "user-invocable": visibility === "true", invocation: metadata[fields.invocation],
-  };
-  delete frontmatter.metadata;
-  if (Object.keys(remaining).length) frontmatter.metadata = remaining;
-  // The established parser owns valid activation combinations.
-  parseSkillActivation(frontmatter, section);
-  return { section, frontmatter };
-}
-
-async function normalizeCandidate(candidate: string, normalized: string) {
-  // This initial index is for link destinations only. The current reader does not
-  // interpret wycats metadata; the normalized tree is validated again below.
-  const index = await load(candidate);
-  const decoded = new Map(index.resources.filter((resource) => resource.section !== "agents")
-    .map((resource) => [resource.sourcePath, decodeMetadata(resource.frontmatter)]));
-  await relocate(index, normalized,
-    (resource) => {
-      if (resource.section === "agents") return canonicalPath(resource);
-      const policy = decoded.get(resource.sourcePath);
-      assert(policy);
-      return `${policy.section}/${resource.name}/SKILL.md`;
-    },
-    (resource) => decoded.get(resource.sourcePath)?.frontmatter ?? resource.frontmatter);
-  return load(normalized);
-}
-
 function meaning(composition: CanonicalComposition) {
   return {
-    resources: composition.resources.map(({ identity, section, activation }) =>
-      ({ identity, section, activation })).sort((a, b) => a.identity.localeCompare(b.identity)),
+    resources: composition.resources.map(({ identity, kind, activation }) =>
+      ({ identity, kind, activation })).sort((a, b) => a.identity.localeCompare(b.identity)),
     edges: composition.references.map(({ source, target, relation }) =>
       `${source.identity} ${relation} ${target.identity}`).sort(),
   };
@@ -180,15 +140,15 @@ async function verifyBoundary(candidate: string, directory: string) {
   await cp(candidate, broken, { recursive: true });
   const entry = join(broken, relative(candidate, entryResource.sourcePath));
   await write(entry, (await readFile(entry, "utf8")).replace('"composition:reference"', '"composition:load"'));
-  await assert.rejects(normalizeCandidate(broken, join(directory, "load-normalized")), /cannot target explicit-only/);
+  await assert.rejects(load(broken), /cannot target explicit-only/);
 
-  const explicit = explicitResource.frontmatter;
+  const explicit = parseResourceFrontmatter(await readFile(explicitResource.sourcePath, "utf8")).data;
   assert(isMapping(explicit.metadata));
   const withMetadata = (changes: Record<string, unknown>) => ({ ...explicit, metadata: { ...explicit.metadata as Record<string, unknown>, ...changes } });
-  assert.throws(() => decodeMetadata(withMetadata({ [fields.userInvocable]: "false" })), /requires user-invocable/);
-  assert.throws(() => decodeMetadata(withMetadata({ [fields.userInvocable]: true })), /must be strings/);
-  assert.throws(() => decodeMetadata({ ...explicit, invocation: "contextual" }), /duplicate policy/);
-  assert.throws(() => decodeMetadata(withMetadata({ [fields.kind]: "agent" })), /unknown wycats.kind/);
+  assert.throws(() => normalizeSkillSource(withMetadata({ [fields.userInvocable]: "false" })), /requires user-invocable/);
+  assert.throws(() => normalizeSkillSource(withMetadata({ [fields.userInvocable]: true })), /string-to-string/);
+  assert.throws(() => normalizeSkillSource({ ...explicit, invocation: "contextual" }), /duplicates/);
+  assert.throws(() => normalizeSkillSource(withMetadata({ [fields.kind]: "agent" })), /wycats.kind must/);
 }
 
 async function verifyRoundTrip(baseline: CanonicalComposition, normalized: CanonicalComposition) {
@@ -196,7 +156,14 @@ async function verifyRoundTrip(baseline: CanonicalComposition, normalized: Canon
   for (const resource of baseline.resources) {
     const roundTrip = normalized.resources.find((entry) => entry.identity === resource.identity);
     assert(roundTrip);
-    assert.equal(parseResourceFrontmatter(await readFile(roundTrip.sourcePath, "utf8")).body,
+    const destinations = new Map(normalized.resources.map((entry) => {
+      const original = baseline.resources.find((candidate) => candidate.identity === entry.identity);
+      assert(original);
+      return [entry.sourcePath, original.sourcePath];
+    }));
+    const restoredLinks = projectCompositionLinks(await readFile(roundTrip.sourcePath, "utf8"),
+      roundTrip.sourcePath, resource.sourcePath, normalized, destinations);
+    assert.equal(parseResourceFrontmatter(restoredLinks).body,
       parseResourceFrontmatter(await readFile(resource.sourcePath, "utf8")).body);
   }
 }
@@ -254,9 +221,9 @@ for (const layout of [
     await write(join(candidate, "README.md"), "# Grouped authoring candidate\n\n" +
       "This source groups instruction containers by meaning. The prototype reader discovers them recursively.\n" +
       "Agent Plugins 1.0 does not discover these nested skills. No published 1.1 conformance or host support is claimed.\n" +
-      "The experiment normalizes this tree and generates the existing target resource layouts.\n");
+      "The production reader ingests this tree directly and generates target resource layouts.\n");
   }
-  const normalized = await normalizeCandidate(candidate, join(directory, "normalized-source"));
+  const normalized = await load(candidate);
   await verifyRoundTrip(baseline, normalized);
   const projections = [];
   for (const target of targets) {
@@ -285,20 +252,21 @@ const report = {
 await write(join(output, "report.json"), JSON.stringify(report, null, 2) + "\n");
 await write(join(output, "comparison.md"), `# Three source layouts, one resource model
 
-Both candidates preserve the current slice's nine resource identities, kinds,
-activation policies, composition edges, and body bytes after normalization.
+Both candidates load directly through the production source reader and preserve
+the slice's resource identities, kinds, activation policies, composition edges,
+and body bytes after resolving link destinations. No intermediate source tree is reconstructed.
 Both produce equivalent resource projections: nine resources each for VS Code,
 Claude Code, and Codex; seven for the existing Pi profile, which excludes the fixtures.
 
-| Open a resource | Current source | Flat candidate | Grouped candidate |
+| Open a resource | Legacy baseline | Flat candidate | Grouped candidate |
 | --- | --- | --- | --- |
 | Recon | [Workflow](current-source/skills/recon/SKILL.md) | [Workflow](flat/source/skills/recon/SKILL.md) | [Workflow](grouped/source/skills/workflows/recon/SKILL.md) |
 | Diagnostic questioning | [Stance](current-source/stances/diagnostic-questioning/SKILL.md) | [Stance](flat/source/skills/diagnostic-questioning/SKILL.md) | [Stance](grouped/source/skills/stances/diagnostic-questioning/SKILL.md) |
 | Explicit entry | [Fixture](current-source/skills/reconstruction-fixture/SKILL.md) | [Fixture](flat/source/skills/reconstruction-fixture/SKILL.md) | [Fixture](grouped/source/skills/workflows/reconstruction-fixture/SKILL.md) |
 
 The grouped candidate keeps the stance/workflow distinction visible in directories
-and records it in metadata. The bridge reads metadata to determine semantic kind.
-Its reader remains experimental and retains today's globally unique skill names.
+and records it in metadata. The production reader uses metadata to determine semantic kind
+and retains today's globally unique skill names.
 
 The flat candidate's eight instruction containers meet v1's immediate-child layout.
 None of the grouped containers do. The grouped tree is an authoring option that
