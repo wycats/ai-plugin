@@ -106,12 +106,23 @@ qualifies canonical agent names with the manifest name, preserving unambiguous
 name-based delegation across differently named plugins without exposing the
 `.agent` filename suffix. The explicitly named slop-linter is qualified too.
 
+In VS Code 1.141.1 with Copilot 0.69.0, a captured Local-harness model request
+contains the 32 contextual plugin skills, including hidden stances, in its
+automatic skill catalog. The explicit-only reconstruction fixture is absent.
+When explicitly asked to use that fixture, the model reads it, its supporting
+contract, and its linked stance. Native hooks deny `npm --version` and allow
+`pnpm --version`, which returns 10.26.2. These observations establish catalog
+filtering and host-dispatched pnpm enforcement; they do not establish a filesystem
+access boundary or guarantee every future model's behavior.
+
+After a window reload, slash completion uses `/wycats reconstruction-fixture`.
+The subsequent request selected through that completion is blocked by Copilot's
+sign-in/model-availability state; its invocation expansion remains unqualified.
+Copilot Agent Host's distinct hook envelope also remains outside this proof.
 The released plugin was excluded from the probe profile; home-directory skills
 remain discoverable, so the profile is not a hermetic model-context boundary.
-No model request was sent. Contextual-selection filtering and native hook
-execution remain unverified; Copilot Agent Host's distinct hook envelope also
-remains outside this proof. Local receipts live with the durable probe environment
-under `~/Library/Application Support/AIPluginProbe/`.
+Local receipts live with the durable probe environment under
+`~/Library/Application Support/AIPluginProbe/`.
 
 The experiment supports a concrete architectural choice: retain grouping for
 authors, give the reader explicit semantic data, and let adapters choose runtime
