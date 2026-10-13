@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { cp, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, sep } from "node:path";
 import test from "node:test";
 import { parseResourceFrontmatter, serializeResourceFrontmatter } from "./resource-frontmatter.ts";
 import { createProjectionPlan, parseProjectionResourceMap, projectionResourceMap, resolveProjectedResource } from "./projection-plan.ts";
@@ -177,7 +177,7 @@ void test("support copies exclude nested discovered containers for every host", 
       const copies = plan.supportCopies.filter((copy) => copy.source === outer || copy.source === inner);
       assert.equal(copies.length, 2);
       for (const copy of copies) await cp(copy.source, copy.destination, { recursive: true,
-        filter: (source) => !copy.excludedDirectories?.some((directory) => source === directory || source.startsWith(`${directory}/`)),
+        filter: (source) => !copy.excludedDirectories?.some((directory) => source === directory || source.startsWith(`${directory}${sep}`)),
       });
       assert.equal(await readFile(join(root, "out", target, "skills/outer/assets/note.txt"), "utf8"), "outer support");
       assert.equal(await readFile(join(root, "out", target, "skills/inner/assets/note.txt"), "utf8"), "inner support");
