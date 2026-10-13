@@ -185,6 +185,11 @@ events, and scripts; the [hook adapters](../scripts/hook-projection.ts) produce
 each host's final envelope directly. VS Code Local uses flat event handlers and
 host-expanded package roots. Claude Code retains matcher groups and shell-expanded
 roots. Their shared policy does not erase those execution differences.
+Script paths are relative to `scripts/hooks/` and may contain nested directories
+and any Node-supported file extension. Source validation and both adapters require
+portable path characters: letters, digits, underscores, periods, hyphens, and
+forward slashes, with no parent traversal. This lets each host compose the script
+path with its package-root expansion without introducing shell syntax.
 
 This repository is the proving ground for this architecture and owns the
 resources it authors. It does not need to become the permanent home of every

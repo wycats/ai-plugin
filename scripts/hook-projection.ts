@@ -13,13 +13,19 @@ interface HookCommand {
   timeout?: number;
 }
 
+/** Script paths are portable command arguments, shared by both host envelopes. */
+export function validateHookScriptPath(script: unknown): asserts script is string {
+  if (typeof script !== "string" || !/^[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)*$/.test(script) ||
+      script.split("/").includes("..")) {
+    throw new Error("script must be a portable relative path under scripts/hooks/ using letters, digits, underscores, periods, hyphens, and forward slashes");
+  }
+}
+
 /** The Local host expands and shell-quotes PLUGIN_ROOT, including spaces. */
 export function projectVSCodeHooks(manifests: readonly HookManifest[]): Record<string, HookCommand[]> {
   const hooks: Record<string, HookCommand[]> = {};
   for (const manifest of manifests) {
-    if (!/^[a-z0-9-]+\.ts$/.test(manifest.script)) {
-      throw new Error(`Expected a bundled hook script in ${manifest.name}: ${manifest.script}`);
-    }
+    validateHookScriptPath(manifest.script);
     const handler: HookCommand = {
       type: "command",
       command: `node \${PLUGIN_ROOT}/scripts/hooks/${manifest.script}`,
@@ -37,6 +43,7 @@ export function projectClaudeCodeHooks(
 ): Record<string, { matcher?: string; hooks: HookCommand[] }[]> {
   const hooks: Record<string, { matcher?: string; hooks: HookCommand[] }[]> = {};
   for (const manifest of manifests) {
+    validateHookScriptPath(manifest.script);
     const group: { matcher?: string; hooks: HookCommand[] } = {
       hooks: [{
         type: "command",
