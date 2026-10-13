@@ -269,6 +269,7 @@ async function buildAgent(
   outPath: string,
   outDir: string,
   config: Config,
+  pluginName: string,
   composition: CanonicalComposition,
   outputBySourcePath: ReadonlyMap<string, string>,
   profileSkillNames: string[],
@@ -285,8 +286,14 @@ async function buildAgent(
   const isClaudeCode = config.target === "claude-code";
   const isPi = config.target === PI_TARGET;
 
-  // Claude Code and pi-subagents require a name field — insert at the front.
-  if ((isClaudeCode || isPi) && !data.name) {
+  if (config.target === VSCODE_TARGET) {
+    // VS Code resolves delegation and handoffs by name. Explicit frontmatter
+    // replaces its plugin-qualified fallback, so carry the namespace ourselves.
+    const name = composition.bySourcePath.get(resolve(srcPath))?.name;
+    if (!name) throw new Error(`Missing canonical agent name for ${srcPath}`);
+    data.name = `${pluginName}:${name}`;
+  } else if ((isClaudeCode || isPi) && !data.name) {
+    // Claude Code and pi-subagents require this field.
     const name = isPi ? PI_PROFILE.name : deriveAgentName(filename);
     const original = { ...data };
     for (const k of Object.keys(data)) {
@@ -679,6 +686,7 @@ async function build() {
         outPath,
         outDir,
         config,
+        pluginMeta.name,
         composition,
         outputBySourcePath,
         plan.profileResources.map(({ resource }) => resource.name),
@@ -733,7 +741,7 @@ async function build() {
 
   const packageJson = isPi
     ? {
-        name: "wycats-ai-plugin-pi",
+        name: pluginMeta.name,
         version: pluginMeta.version,
         description: `${pluginMeta.description} Pi projection.`,
         private: true,
@@ -801,7 +809,7 @@ async function build() {
       keywords: ["codex", "agents", "skills", "workflow", "review"],
       skills: "./skills/",
       interface: {
-        displayName: "Wycats AI Plugin",
+        displayName: pluginMeta.name,
         shortDescription: "Personal workflow skills for Codex",
         longDescription:
           "A personal agent toolkit for Codex with workflow skills, session lifecycle support, collaborative review patterns, and reusable stances for stronger agent collaboration.",

@@ -97,12 +97,21 @@ installer registration, and generated hook structure. A disposable installation
 also ran the packaged pnpm hook from a different working directory: it denied
 npm and allowed pnpm using the VS Code Local hook envelope.
 
-A separate VS Code profile was launched with a complete generated package plus
-the two workflow fixtures. Native discovery and enforcement remain unverified:
-the UI tool selected an existing user window rather than the isolated instance,
-so no interaction was attempted there. The passing compiler and subprocess checks
-do not establish picker visibility, contextual selection, or runtime enforcement.
-Copilot Agent Host's distinct hook envelope also remains outside this proof.
+A dedicated signed VS Code copy and durable probe profile now load the complete
+package plus both fixtures. Native UI inspection recognizes 33 skills, seven
+agents, one instruction, and all four hook commands. Recon and the explicit-only
+fixture appear in slash completion; diagnostic questioning remains absent there.
+The Recon agent is selectable as `wycats:recon`: the VS Code adapter
+qualifies canonical agent names with the manifest name, preserving unambiguous
+name-based delegation across differently named plugins without exposing the
+`.agent` filename suffix. The explicitly named slop-linter is qualified too.
+
+The released plugin was excluded from the probe profile; home-directory skills
+remain discoverable, so the profile is not a hermetic model-context boundary.
+No model request was sent. Contextual-selection filtering and native hook
+execution remain unverified; Copilot Agent Host's distinct hook envelope also
+remains outside this proof. Local receipts live with the durable probe environment
+under `~/Library/Application Support/AIPluginProbe/`.
 
 The experiment supports a concrete architectural choice: retain grouping for
 authors, give the reader explicit semantic data, and let adapters choose runtime

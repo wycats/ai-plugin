@@ -35,7 +35,7 @@ const suite: EvaluationSuite = {
 
 function testAdapter(): { adapter: ClaudeCodeCliAdapter; root: string } {
   const root = mkdtempSync(join(tmpdir(), "claude-adapter-"));
-  writeFileSync(join(root, "plugin.json"), '{"name":"wycats-ai-plugin"}\n');
+  writeFileSync(join(root, "plugin.json"), '{"name":"wycats"}\n');
   const projection = join(root, "out", "claude-code");
   mkdirSync(projection, { recursive: true });
   writeFileSync(join(projection, "projection-resources.json"), JSON.stringify({
@@ -153,7 +153,7 @@ void test("uses built resource addresses while invoking skills and stances throu
     };
     assert.equal(
       adapter.projectPrompt(stanceSuite, "Canonical request"),
-      "Invoke the wycats-ai-plugin:relational-continuity skill before answering the canonical request below.\n\nCanonical request",
+      "Invoke the wycats:relational-continuity skill before answering the canonical request below.\n\nCanonical request",
     );
     assert.equal(
       adapter.projectedResourcePath(suite.resource),
@@ -177,16 +177,16 @@ void test("runs a projected agent directly through Claude Code's agent surface",
   const result = '{"findings":[],"rewrittenDocument":"Agent result"}';
   const invocation = claudeCodeInvocation(
     suite.resource,
-    "wycats-ai-plugin",
+    "wycats",
     canonicalPrompt,
     "Projected launcher prompt",
   );
   assert.deepEqual(invocation, {
-    resourceArguments: ["--agent", "wycats-ai-plugin:slop-linter"],
+    resourceArguments: ["--agent", "wycats:slop-linter"],
     prompt: canonicalPrompt,
     directInvocation: {
       surface: "cli-agent",
-      resource: "wycats-ai-plugin:slop-linter",
+      resource: "wycats:slop-linter",
     },
   });
   assert.throws(
@@ -194,22 +194,22 @@ void test("runs a projected agent directly through Claude Code's agent surface",
       parseClaudeCodeStream(
         stream({ type: "result", subtype: "success", is_error: false, result }),
         suite.resource,
-        "wycats-ai-plugin",
+        "wycats",
       ),
-    /did not complete a wycats-ai-plugin:slop-linter resource invocation/,
+    /did not complete a wycats:slop-linter resource invocation/,
   );
   assert.deepEqual(
     parseClaudeCodeStream(
       stream({ type: "result", subtype: "success", is_error: false, result }),
       suite.resource,
-      "wycats-ai-plugin",
+      "wycats",
       invocation.directInvocation,
     ),
     {
       result,
       resourceInvocation: {
         surface: "cli-agent",
-        resource: "wycats-ai-plugin:slop-linter",
+        resource: "wycats:slop-linter",
       },
     },
   );
@@ -233,7 +233,7 @@ void test("recognizes a completed invocation through the projected skill surface
                 type: "tool_use",
                 id: "skill-1",
                 name: "Skill",
-                input: { skill: "wycats-ai-plugin:relational-continuity" },
+                input: { skill: "wycats:relational-continuity" },
               },
             ],
           },
@@ -247,14 +247,14 @@ void test("recognizes a completed invocation through the projected skill surface
         { type: "result", subtype: "success", is_error: false, result },
       ),
       resource,
-      "wycats-ai-plugin",
+      "wycats",
     ),
     {
       result,
       resourceInvocation: {
         surface: "tool",
         tool: "Skill",
-        resource: "wycats-ai-plugin:relational-continuity",
+        resource: "wycats:relational-continuity",
         toolUseId: "skill-1",
       },
     },
@@ -278,9 +278,9 @@ void test("rejects a skill response without a successful skill invocation", () =
       parseClaudeCodeStream(
         directResult,
         resource,
-        "wycats-ai-plugin",
+        "wycats",
       ),
-    /did not complete a wycats-ai-plugin:relational-continuity resource invocation/,
+    /did not complete a wycats:relational-continuity resource invocation/,
   );
 
   const failedInvocation = stream(
@@ -292,7 +292,7 @@ void test("rejects a skill response without a successful skill invocation", () =
             type: "tool_use",
             id: "agent-1",
             name: "Skill",
-            input: { skill: "wycats-ai-plugin:relational-continuity" },
+            input: { skill: "wycats:relational-continuity" },
           },
         ],
       },
@@ -310,8 +310,8 @@ void test("rejects a skill response without a successful skill invocation", () =
       parseClaudeCodeStream(
         failedInvocation,
         resource,
-        "wycats-ai-plugin",
+        "wycats",
       ),
-    /did not complete a wycats-ai-plugin:relational-continuity resource invocation/,
+    /did not complete a wycats:relational-continuity resource invocation/,
   );
 });

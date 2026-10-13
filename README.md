@@ -1,4 +1,4 @@
-# vscode-ai-plugin
+# wycats
 
 An agent toolkit for VS Code Copilot, Claude Code, Codex, and Pi, grounded in a theory of how language activates reasoning in language models.
 
@@ -181,36 +181,27 @@ the plugin:
 
 ```sh
 codex plugin marketplace add ./out/codex-marketplace
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
+codex plugin add wycats@wycats
 ```
 
 The published Codex marketplace lives on the generated `codex-plugin` branch:
 
 ```sh
 codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
+codex plugin add wycats@wycats
 ```
 
 To update an installed Codex marketplace snapshot:
 
 ```sh
-codex plugin marketplace upgrade wycats-ai-plugin
+codex plugin marketplace upgrade wycats
 ```
 
 Then restart Codex. If the installed plugin cache appears stale, remove and
 re-add the plugin after upgrading the marketplace.
 
-If you installed the earlier main-branch Codex marketplace, migrate once:
-
-```sh
-codex plugin remove wycats-ai-plugin@wycats-ai-plugin
-codex plugin marketplace remove wycats-ai-plugin
-codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
-```
-
-No VS Code migration is needed; VS Code continues to use `marketplace.json` and
-`dist/wycats/` on `main`.
+For an existing `wycats-ai-plugin` installation, follow the
+[rename migration](docs/setup.md#renaming-an-existing-installation).
 
 ### How the build works
 

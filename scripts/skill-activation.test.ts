@@ -114,6 +114,7 @@ void test("built packages preserve body bytes, move stance assets, and expose su
   try {
     await prepareBuildFixture(root);
     const sidecar = 'interface:\n  display_name: Reader\n  icon_small: ./assets/icon.svg\ndependencies:\n  tools: []\n';
+    await put(root, "agents/reviewer.agent.md", "---\nname: careful-review\ndescription: Review agent\n---\nReview.\n");
     await put(root, "stances/diagnostic-questioning/agents/openai.yaml", sidecar);
     await put(root, "stances/diagnostic-questioning/assets/icon.svg", "<svg/>");
     await put(root, "stances/outer/SKILL.md", skill("outer", "user-invocable: false\n"));
@@ -123,6 +124,14 @@ void test("built packages preserve body bytes, move stance assets, and expose su
     for (const target of ["vscode", "claude-code", "codex", "pi"]) {
       await build(root, target);
       const out = join(root, "out", target === "vscode" ? "wycats" : target);
+      const manifestPath = target === "vscode" ? "plugin.json"
+        : target === "pi" ? "package.json"
+        : `.${target === "claude-code" ? "claude" : "codex"}-plugin/plugin.json`;
+      const packageManifest = parseYamlMapping(await readFile(join(out, manifestPath), "utf8"));
+      assert.equal(packageManifest.name, "activation-fixture");
+      if (target === "codex") {
+        assert.deepEqual((packageManifest.interface as Record<string, unknown>).displayName, "activation-fixture");
+      }
       const generated = parseResourceFrontmatter(await readFile(join(out, "skills/recon/SKILL.md"), "utf8"));
       const relocated = target !== "pi";
       assert.equal(generated.body, relocated
@@ -151,6 +160,15 @@ void test("built packages preserve body bytes, move stance assets, and expose su
       if (target === "vscode") {
         const manifest = JSON.parse(await readFile(join(out, "plugin.json"), "utf8")) as { skills: string[] };
         assert.equal(manifest.skills, undefined);
+        const agent = parseResourceFrontmatter(await readFile(join(out, "com.github.copilot/agents/recon.agent.md"), "utf8"));
+        assert.equal(agent.data.name, "activation-fixture:recon");
+        const namedAgent = parseResourceFrontmatter(await readFile(join(out, "com.github.copilot/agents/reviewer.agent.md"), "utf8"));
+        assert.equal(namedAgent.data.name, "activation-fixture:careful-review");
+      } else if (target === "claude-code") {
+        const agent = parseResourceFrontmatter(await readFile(join(out, "agents/recon.agent.md"), "utf8"));
+        assert.equal(agent.data.name, "recon");
+        const namedAgent = parseResourceFrontmatter(await readFile(join(out, "agents/reviewer.agent.md"), "utf8"));
+        assert.equal(namedAgent.data.name, "careful-review");
       }
     }
   } finally { await rm(root, { recursive: true, force: true }); }

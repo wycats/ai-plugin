@@ -5,7 +5,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { AGENT_PLUGINS_SCHEMA, buildVSCodePlugin, VSCODE_PLUGIN_HOOK_PATH, vscodePluginManifest } from "./vscode-plugin.ts";
 
-const metadata = { name: "wycats-ai-plugin", version: "0.1.0", description: "Toolkit" };
+const metadata = { name: "wycats", version: "0.1.0", description: "Toolkit" };
 
 void test("standard manifest opts into fixed discovery without legacy component fields", () => {
   assert.deepEqual(vscodePluginManifest(metadata), { $schema: AGENT_PLUGINS_SCHEMA, ...metadata });
