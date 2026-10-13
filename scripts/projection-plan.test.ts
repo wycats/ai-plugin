@@ -31,10 +31,10 @@ void test("plans preserve distinct discovery, reference, and private resource su
   const { root, composition } = await fixture();
   try {
     const out = join(root, "output");
-    const vscode = await createProjectionPlan(composition, "vscode", out);
-    const claude = await createProjectionPlan(composition, "claude-code", out);
-    const codex = await createProjectionPlan(composition, "codex", out);
-    const pi = await createProjectionPlan(composition, "pi", out);
+    const vscode = createProjectionPlan(composition, "vscode", out);
+    const claude = createProjectionPlan(composition, "claude-code", out);
+    const codex = createProjectionPlan(composition, "codex", out);
+    const pi = createProjectionPlan(composition, "pi", out);
     assert.equal(vscode.resources.some(({ resource }) => resource.section === "instructions"), true);
     assert.equal(claude.resources.some(({ resource }) => resource.section === "instructions"), false);
     assert.equal(codex.includesHooks, false);
@@ -55,7 +55,7 @@ void test("an incomplete bounded projection fails before touching existing outpu
     const out = join(root, "output");
     await mkdir(out);
     await writeFile(join(out, "sentinel"), "keep");
-    await assert.rejects(createProjectionPlan(composition, "pi", out), /not projected for target 'pi'/);
+    assert.throws(() => createProjectionPlan(composition, "pi", out), /not projected for target 'pi'/);
     assert.equal(await readFile(join(out, "sentinel"), "utf8"), "keep");
   } finally { await rm(root, { recursive: true, force: true }); }
 });
@@ -80,8 +80,9 @@ void test("Pi requires every declared profile resource even without a compositio
     try {
       await rm(join(root, path));
       const result = await loadCanonicalComposition(root, await discoverResourceFiles(root));
-      assert.ok(result.composition);
-      await assert.rejects(createProjectionPlan(result.composition, "pi", join(root, "output")), /Pi profile requires canonical/);
+      const composition = result.composition;
+      assert.ok(composition);
+      assert.throws(() => createProjectionPlan(composition, "pi", join(root, "output")), /Pi profile requires canonical/);
     } finally { await rm(root, { recursive: true, force: true }); }
   }
 });

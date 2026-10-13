@@ -18,7 +18,9 @@ async function fixture(
   for (const [path, content] of Object.entries(files)) {
     const fullPath = join(root, path);
     await mkdir(dirname(fullPath), { recursive: true });
-    await writeFile(fullPath, content);
+    await writeFile(fullPath, path.startsWith("stances/")
+      ? content.replace("description:", "user-invocable: false\ndescription:")
+      : content);
   }
   return { root, dispose: () => rm(root, { recursive: true, force: true }) };
 }

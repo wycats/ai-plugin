@@ -72,7 +72,7 @@ void test("rejects skill and stance names that share a Claude projection", async
   try {
     for (const section of ["skills", "stances"]) {
       mkdirSync(join(root, section, "shared"), { recursive: true });
-      writeFileSync(join(root, section, "shared", "SKILL.md"), "---\nname: shared\ndescription: Fixture\n---\nResource body");
+      writeFileSync(join(root, section, "shared", "SKILL.md"), `---\nname: shared\ndescription: Fixture\n${section === "stances" ? "user-invocable: false\n" : ""}---\nResource body`);
     }
     await assert.rejects(validateClaudeCodeProjection(root), /canonical identity 'skill:shared' collides/);
     rmSync(join(root, "stances", "shared", "SKILL.md"));

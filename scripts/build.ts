@@ -11,9 +11,11 @@
  */
 
 import { readFile, writeFile, mkdir, cp, stat } from "node:fs/promises";
-import { join, relative, dirname, resolve, posix } from "node:path";
+import { join, relative, dirname, resolve, posix, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
+import { stringify } from "yaml";
+import { parseResourceFrontmatter, serializeResourceFrontmatter } from "./resource-frontmatter.ts";
 import { ModuleKind, ScriptTarget, transpileModule } from "typescript";
 import {
   discoverResourceFiles,
@@ -34,7 +36,7 @@ import {
 } from "./resource-composition.ts";
 import { assertSafeOutputOverride, prepareProjectionOutput } from "./projection-output.ts";
 import { PI_PROFILE, piAgentContext } from "./pi-profile.ts";
-import { createProjectionPlan, projectionResourceMap, type ProjectionPlan } from "./projection-plan.ts";
+import { createProjectionPlan, projectionResourceMap, type ProjectionPlan, type ProjectedResource } from "./projection-plan.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DEFAULT_CONFIG_PATH = join(ROOT, "config.json");
@@ -59,7 +61,7 @@ interface PluginMetadata {
 }
 
 interface PluginJson extends PluginMetadata {
-  skills?: PluginEntry[];
+  skills?: string[];
   agents?: PluginEntry[];
   instructions?: PluginEntry[];
   hooks?: PluginEntry[];
@@ -500,16 +502,26 @@ async function writeProjectedResource(
   outPath: string,
   composition: CanonicalComposition,
   outputBySourcePath: ReadonlyMap<string, string>,
+  skillMetadata?: ProjectedResource["skillMetadata"],
 ): Promise<void> {
-  const content = projectCompositionLinks(
+  let content = projectCompositionLinks(
     await readFile(resource.sourcePath, "utf-8"),
     resource.sourcePath,
     outPath,
     composition,
     outputBySourcePath,
   );
+  // Link offsets refer to canonical text. Rewrite them before changing its envelope.
+  if (skillMetadata) {
+    content = serializeResourceFrontmatter(skillMetadata.frontmatter, parseResourceFrontmatter(content).body);
+  }
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, content);
+  if (skillMetadata?.codexSidecar) {
+    const sidecarPath = join(dirname(outPath), "agents", "openai.yaml");
+    await mkdir(dirname(sidecarPath), { recursive: true });
+    await writeFile(sidecarPath, stringify(skillMetadata.codexSidecar));
+  }
 }
 
 async function writeCompositionIndex(
@@ -645,7 +657,7 @@ async function build() {
   const isClaudeCode = config.target === "claude-code";
   const isCodex = config.target === CODEX_TARGET;
   const isPi = config.target === PI_TARGET;
-  const plan = await createProjectionPlan(composition, config.target, outDir);
+  const plan = createProjectionPlan(composition, config.target, outDir);
   const projectedResources = plan.resources.map(({ resource }) => resource);
   const { outputBySourcePath } = plan;
 
@@ -693,23 +705,23 @@ async function build() {
         throw error;
       }
     }
-    await cp(copy.source, copy.destination, { recursive: true });
+    await cp(copy.source, copy.destination, {
+      recursive: true,
+      filter: (source) => !copy.excludedDirectories?.some(
+        (directory) => source === directory || source.startsWith(`${directory}${sep}`),
+      ),
+    });
   }
 
-  const skillResources = projectedResources.filter(
-    (resource) => resource.section === "skills",
-  );
-  const stanceResources = projectedResources.filter(
-    (resource) => resource.section === "stances",
-  );
-  for (const resource of [...skillResources, ...stanceResources]) {
-    const outPath = outputBySourcePath.get(resolve(resource.sourcePath));
-    if (!outPath) throw new Error(`Missing output path for ${resource.pluginPath}`);
+  for (const { resource, outputPath: outPath, skillMetadata } of plan.resources.filter(
+    ({ resource }) => resource.section === "skills" || resource.section === "stances",
+  )) {
     await writeProjectedResource(
       resource,
       outPath,
       composition,
       outputBySourcePath,
+      skillMetadata,
     );
   }
 
@@ -853,7 +865,10 @@ async function build() {
       pluginJson.agents = agentPaths.map((p) => ({ path: p }));
     }
     if (allSkillPaths.length > 0) {
-      pluginJson.skills = allSkillPaths.map((p) => ({ path: p }));
+      pluginJson.skills = [
+        ...(skillPaths.length > 0 ? ["./skills/"] : []),
+        ...(stancePaths.length > 0 ? ["./stances/"] : []),
+      ];
     }
     if (instructionPaths.length > 0) {
       pluginJson.instructions = instructionPaths.map((p) => ({ path: p }));
