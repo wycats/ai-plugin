@@ -215,6 +215,24 @@ void test("uses declared semantic kind and rejects a locator that disagrees with
   );
 });
 
+void test("nested skill containers retain their leaf name and semantic identity", () => {
+  for (const container of ["skills/workflows", "skills/stances", "skills", "stances"]) {
+    const path = `${container}/outer/inner/reader-orientation/SKILL.md`;
+    assert.deepEqual(canonicalResourceDescriptor(path, groupedStanceSource), {
+      kind: "stance",
+      name: "reader-orientation",
+      locator: "stances/reader-orientation",
+    });
+    assert.doesNotThrow(() => {
+      validateCanonicalResource({
+        identity: "wycats-plugin:stances/reader-orientation",
+        name: "reader-orientation",
+        path,
+      }, groupedStanceSource);
+    });
+  }
+});
+
 void test("rejects invalid activation metadata in grouped skill sources", () => {
   const sourceWithInvalidActivation = groupedStanceSource.replace(
     "wycats.invocation: contextual",

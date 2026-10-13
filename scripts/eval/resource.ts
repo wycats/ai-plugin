@@ -44,7 +44,7 @@ function sourceData(source: string | Record<string, unknown>): Record<string, un
 function skillSourceKind(
   path: string,
 ): { name: string; pathKind: SkillKind; legacyKind?: SkillKind } | undefined {
-  const grouped = path.match(/^skills\/(workflows|stances)\/([^/]+)\/SKILL\.md$/);
+  const grouped = path.match(/^skills\/(workflows|stances)\/(?:[^/]+\/)*([^/]+)\/SKILL\.md$/);
   if (grouped) {
     const pathKind = grouped[1] === "workflows" ? "workflow" : "stance";
     return {
@@ -53,10 +53,10 @@ function skillSourceKind(
     };
   }
 
-  const legacyWorkflow = path.match(/^skills\/([^/]+)\/SKILL\.md$/);
+  const legacyWorkflow = path.match(/^skills\/(?:[^/]+\/)*([^/]+)\/SKILL\.md$/);
   if (legacyWorkflow) return { name: legacyWorkflow[1], pathKind: "workflow", legacyKind: "workflow" };
 
-  const legacyStance = path.match(/^stances\/([^/]+)\/SKILL\.md$/);
+  const legacyStance = path.match(/^stances\/(?:[^/]+\/)*([^/]+)\/SKILL\.md$/);
   if (legacyStance) return { name: legacyStance[1], pathKind: "stance", legacyKind: "stance" };
   return undefined;
 }
