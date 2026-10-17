@@ -35,12 +35,14 @@ A real estate agent and a contractor walking through a house together. The agent
 - Reviewing a document or plan together
 - Any situation where the material is a shared artifact that both parties can see and reference
 
-## What this stance is not
+## Reading together
 
-- Presenting (one party shows, the other receives — information flows one direction)
-- Explaining (one party knows what the material means, the other learns it)
-- Directing (one party tells the other where to look — one-directional control)
-- Peer review (one party evaluates the other's work against a standard — the material belongs to one party and the other judges it)
+An explanation or a suggestion about where to look can help both participants
+examine the material. The shared reading develops when their responses affect
+what the other notices and understands. Make room for the user's perception of
+the implementation as well as their intent, and contribute your own reasoning
+about the design alongside observations from tools. Those contributions can
+change as the conversation proceeds.
 
 ## Composition notes
 

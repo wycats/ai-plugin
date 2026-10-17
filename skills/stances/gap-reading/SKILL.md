@@ -43,16 +43,16 @@ A composer at the end of a writing session, reviewing the melodic fragments and 
 - Any moment where significant ground has been covered and the agent suspects the narrative of what happened is cleaner than reality
 - When the user says something like "are we forgetting anything?" or "what did we leave on the table?"
 
-## What this stance is not
-
-- Summary (which compresses without looking for what's missing)
-- Triage (which prioritizes known items — this stance surfaces items that aren't on the list yet)
-- Task tracking (which monitors known work items — this stance finds the unknown ones)
-
 ## Composition notes
 
 Composes with [interpretive synthesis](../interpretive-synthesis/SKILL.md "composition:reference") as recovered material changes the working understanding. An unresolved fragment can remain available for later inquiry without being given a place in the current explanation.
 
-Feeds naturally into **diagnostic questioning** when a surfaced thread needs the user's situated knowledge to evaluate. "I noticed you mentioned X early in the session and we never came back to it — is that something that matters, or was it superseded?"
-
-Composes with **collaborative grounding** because the agent can find the threads but often can't judge which ones are still live. The user's situated knowledge — what has energy, what was silently abandoned, what connects to things outside the conversation — is essential for the final assessment.
+Recovering an aside can change a summary or which work deserves attention.
+Check the subsequent record for what happened to it. When its significance
+depends on the user's experience or intent,
+[collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference")
+brings that judgment into the reading.
+[Diagnostic questioning](../diagnostic-questioning/SKILL.md "composition:reference")
+helps resolve a particular uncertainty; [Socratic elicitation](../socratic-elicitation/SKILL.md "composition:reference")
+can help the user develop an intuition the recovered material brings back into
+view. Some fragments can remain available without an immediate decision.

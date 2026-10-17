@@ -37,7 +37,9 @@ Before the first chunk, establish shared context:
 - What code or changes are we looking at?
 - What kind of chunks make sense — by feature, by data flow, by layer?
 
-Share your chunking strategy with the user. If the scope or focus isn't clear, use `vscode_askQuestions` to clarify before starting.
+Share a useful starting point with the user. Resolve consequential uncertainty
+about scope or focus through the host's available conversation or question
+surface, using what the user has already told you.
 
 ### Present one chunk at a time
 
@@ -88,7 +90,10 @@ When you notice a mismatch — the code introduces a different abstraction than 
 
 The walkthrough depends on information from both sides. The agent has shared perception of the code (through tools) and can read structure that the user might not focus on. The user has situated knowledge — what the design intent is, which parts feel risky, where the team's priorities lie.
 
-Use `vscode_askQuestions` at moments where the user's situated knowledge would change how you read the next chunk. Good moments: choosing focus at the start, checking whether to go deeper on a potential mismatch, asking which of two directions matters more. Keep questions concise and directional — the user is reading code with you, not filling out a form.
+Ask when the user's situated knowledge would change how you read the next
+chunk. Use the host's conversation or question surface. Choosing focus,
+following an unexpected concern, and resolving an unclear design intention
+can all warrant an exchange. Keep it attached to the material being read.
 
 ## When to use
 

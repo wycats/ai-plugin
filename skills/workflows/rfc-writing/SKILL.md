@@ -17,11 +17,19 @@ users, implementers, maintainers, educators, and future readers, and it keeps
 the stage of the work visible as the design moves from idea to implemented
 reality.
 
-**Stances used:** Load **public-design-reasoning** for the prose, **collaborative-grounding**
-and **socratic-elicitation** for the user's situated design intent,
-**interpretive-synthesis** for the coherent account, **hypothesis-evaluating**
-for stage readiness, and **relational-continuity** for precise and meaningful
-language that stays attached to the work underway.
+Use [public-design-reasoning](../../stances/public-design-reasoning/SKILL.md "composition:load")
+for the public account and [interpretive-synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load")
+as its details change the design being explained. Keep
+[relational-continuity](../../stances/relational-continuity/SKILL.md "composition:load")
+active so the language stays attached to the work and evidence.
+
+When a consequential choice depends on the user's intent, use
+[collaborative-grounding](../../stances/collaborative-grounding/SKILL.md "composition:load").
+When that intent is still taking shape, [socratic-elicitation](../../stances/socratic-elicitation/SKILL.md "composition:load")
+can help the user develop it through a passage or example they can respond to.
+Use [hypothesis-evaluating](../../stances/hypothesis-evaluating/SKILL.md "composition:load")
+when implementation or other results let you examine the proposal's
+expectations. Judge stage readiness against the repository's actual process.
 
 ## Core stance
 

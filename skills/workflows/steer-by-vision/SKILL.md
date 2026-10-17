@@ -1,13 +1,10 @@
 ---
 name: steer-by-vision
-description: Reorient a project by recovering its durable thesis and experienced
-  outcome, reading live plans/tasks/PRs/substrate as candidate bets, and
-  selecting one smallest meaningful end-to-end move with organic proof. Use when
-  the user asks to steer or prioritize by vision, several technically valid
-  gates compete without an active bet, an active bet's named steering signal has
-  arrived, a closed milestone leaves no current bet, the user revises project
-  purpose or outcome, or useful local work has lost its relationship to the
-  project experience.
+description: >-
+  Use when a project needs a deliberate choice of direction: several
+  worthwhile moves compete, a milestone leaves the next move unclear, or useful
+  local work has lost its connection to what the user wants to accomplish.
+  Recover that connection and recommend work that can advance or test it.
 metadata:
   wycats.kind: workflow
   wycats.user-invocable: "true"
@@ -16,120 +13,82 @@ metadata:
 
 # Steer by Vision
 
-Reorient the project from durable purpose to one evidence-bearing bet.
+Bring the project's purpose, what the work has taught us, and the available
+next moves into one decision. The result should let work proceed with a clear
+reason for pursuing it and enough understanding to recognize when that reason
+needs reconsideration.
 
-Project vision is the selection function over locally valid work. Plans, tasks,
-pull requests, and infrastructure are hypotheses about how to advance it. This
-workflow is **vision-first** when choosing the bet and **vision-steered** when
-evidence changes the route.
+Use [vision-steering](../../stances/vision-steering/SKILL.md "composition:load")
+throughout. The choice may become clearer while reading the project, trying a
+small possibility, or discussing it with the user. Revisit the emerging
+recommendation as those encounters change the understanding behind it.
 
-**Stance composition:** Load **vision-steering** throughout. Compose
-**interpretive-synthesis** while recovering the project thesis,
-**gap-reading** while keeping longer arcs warm, **collaborative-grounding** only
-when purpose or outcome is high-variance, and **relational-continuity** for the
-handoff.
+## Recover what we are trying to make possible
 
-The core tension is **durable purpose vs. evidence-sensitive route**. Hold the
-experienced outcome steady enough to choose work. Let execution, review, and
-ordinary use revise how the project reaches it.
+Begin with the user's direction and the project's existing explanation of its
+purpose. Read current work and relevant results in that light. Use
+[interpretive synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load")
+to develop an account of what people should become able to do, what has
+already been established, and which uncertainty now affects the direction.
 
-## Critical path
+Keep the source of a commitment clear. The user's current steering can revise
+an earlier plan. A recent task or completed implementation supplies evidence
+about what happened; changing the project's purpose requires a judgment that
+accounts for the commitments already made.
 
-### 1. Recover the project thesis
+Share a consequential ambiguity with your best reading and recommendation.
+Use [collaborative grounding](../../stances/collaborative-grounding/SKILL.md "composition:load")
+where the user's experience or priorities could change the choice. Continue
+from intent they have already made clear. If a decision needs their answer,
+keep that choice open while pursuing useful work that does not depend on it.
 
-Inspect the live project before selecting from it: current docs, active work,
-recent milestones, user-visible behavior, and the evidence that changed the
-last route. Reconstruct a compact thesis for what the project is for and name
-the experienced outcome that would make that thesis real.
+## Develop and compare plausible moves
 
-On the first steering pass, begin from the user's stated goal and visible
-project state. Prior-route evidence becomes part of later steering passes.
+Read active plans, unfinished work, and newly available possibilities as ways
+to advance the intended experience. Group related tasks when their contribution
+only becomes meaningful together. A small exploration may be worthwhile when
+it could change which larger investment makes sense.
 
-Make the interpretation visible. When the user's prior steering already makes
-the purpose clear, proceed from it. When two materially different purposes or
-outcomes remain plausible, present the evidence and your best reading, then ask
-one high-variance question and stop at the selection boundary. Resume with the
-user's answer before translating live work into candidate bets. Product purpose
-is situated judgment; workspace inventory becomes evidence within that
-judgment.
+For each serious possibility, explain what would become possible, what must
+happen for someone to benefit, and how we could learn whether it works. Include
+maintenance and foundational work through the capabilities or obligations they
+support. The comparison should expose enough of those relationships to judge
+what deserves attention now.
 
-### 2. Translate live work into candidate bets
+Use [gap-reading](../../stances/gap-reading/SKILL.md "composition:reference")
+when the visible plans may have lost a valuable possibility or commitment.
+Consider whether the current direction has already accomplished enough. A
+choice to finish can release attention for work with greater consequence.
 
-Group related plans, tasks, PRs, and infrastructure work into a few coherent
-continuations. Read each one as:
+## Recommend a direction and make it actionable
 
-**slice → capability → experienced change → proof**
+Recommend a coherent next move, sized to produce useful progress or resolve a
+consequential uncertainty. Explain why it deserves attention now and what would
+make the result informative. Preserve valuable alternatives with the reason
+they still matter and the circumstances that would bring them back into view.
 
-- **Slice:** the bounded work that could move now.
-- **Capability:** what becomes possible when it lands.
-- **Experienced change:** the change carried into the steering context as the
-  **Experienced outcome** — what becomes meaningfully different for a user or
-  maintainer.
-- **Proof:** evidence that appears through ordinary use of that change.
+Connect the recommendation to an owner and a concrete next action. Use existing
+work where it fits, and carry the intended outcome, relevant constraints, and
+unresolved questions into any handoff. A direction may support several parallel
+efforts whose dependencies need coordination. Follow the host's authorization
+requirements when creating or messaging chats.
 
-This translation distinguishes an end-to-end bet from a locally complete
-artifact. Organic proof comes from the project being used in the way the bet is
-meant to improve: a real workflow becomes easier, a release closes cleanly,
-reclamation becomes useful, or direct feedback changes the next harness move.
+When preparation, implementation, and independent evaluation would help,
+[PER](../per-cycle/SKILL.md "composition:reference") can organize the change.
+A smaller task may proceed directly. State what would warrant reconsidering
+the direction: a result, a discovered constraint, enough progress to finish,
+or a decision that needs the user's judgment. New evidence can also create an
+unanticipated reason to return to the choice.
 
-### 3. Select the smallest meaningful end-to-end bet
+## Carry the decision forward
 
-Recommend one current bet that crosses the chain far enough to create an
-experienced change and produce organic proof. “Smallest” describes the shortest
-route to meaningful evidence; that route may cross several files or open tasks.
+Update the project's existing working record when later work will need the
+decision. Keep the intended outcome, chosen move, reasons, next action, and
+conditions for reconsideration easy to recover. Preserve source pointers for
+claims whose evidence may need checking. The project's own coordination format
+can carry this understanding without an additional steering document.
 
-Explain why this bet should receive momentum now: it may unlock ordinary use,
-convert finished substrate into experience, exploit current feedback, or close
-a project-sized loop. Preserve valuable longer arcs as **kept warm**, each with
-the reason it matters and the evidence or milestone that would bring it back
-into selection.
-
-### 4. Name the immediate gate and next steering signal
-
-Name the immediate gate that gives the bet forward motion and identify one
-bounded next move with its owner. State the organic proof the bet is seeking and
-the next signal that should reopen steering: proof arriving, a consequential
-divergence, the bet stalling, the milestone closing, or the user revising
-project purpose or outcome.
-
-The full steering context is now ready for execution.
-
-### 5. Route the bet into execution
-
-Align active work to the selected bet. Existing tasks, PRs, and infrastructure
-either become part of its route, stay warm for a later steering point, or stop
-carrying current priority.
-
-Pass a compact steering context into PER or another bounded execution workflow:
-**Vision, Experienced outcome, Current bet, Organic proof, Immediate gate, and
-Next steering signal**. Prepare, execute, and review stay attached to that
-context: they test how to advance the bet and return evidence about what
-happened. Local discoveries revise the route; project selection resumes at the
-named steering signal.
-
-Keep longer arcs and their return signals on the steering or coordination
-surface. They remain legible without competing for attention inside bounded
-execution.
-
-The maneuver ends with an active bet, one routed move, and a visible return
-condition.
-
-## Output shape
-
-Keep the result compact enough to steer from:
-
-```text
-Vision: <durable project thesis>
-Experienced outcome: <what becomes meaningfully different>
-Current bet: <smallest meaningful end-to-end slice>
-Why now: <why this bet deserves momentum>
-Organic proof: <evidence ordinary use should produce>
-Immediate gate: <one bounded next move and owner>
-Kept warm: <valuable longer arcs and their return signals>
-Next steering signal: <evidence or milestone that reopens selection>
-User judgment: <only the high-variance purpose or outcome question, when needed>
-```
-
-Include `User judgment` only when purpose or outcome remains high-variance. The
-output is a steering surface: one bet moves, longer arcs stay legible, and
-evidence names when selection happens again.
+Use [relational continuity](../../stances/relational-continuity/SKILL.md "composition:reference")
+to keep the account attached to the actual work. An ongoing discussion should
+resume from its unresolved question. Once a direction is chosen, make that
+choice and its consequences clear enough that subsequent work can act on it.

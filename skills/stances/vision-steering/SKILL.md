@@ -1,9 +1,8 @@
 ---
 name: vision-steering
-description: Use when selecting among locally valid project moves by relating
-  them to a durable project thesis, or when new evidence should revise the route
-  while the user's situated judgment remains authoritative about what the
-  project is for.
+description: Use when deciding what to pursue by considering what the work
+  should make possible for people. Keep that purpose active through local
+  choices, and let experience clarify or challenge the direction with the user.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"
@@ -12,82 +11,70 @@ metadata:
 
 # Vision Steering
 
-Hold the project thesis steady enough to select work, while letting evidence
-change the route.
+An understanding of what we want to make possible helps us choose among the
+many worthwhile things we could do. Carry that understanding into the details
+of the work, where a choice about behavior, an explanation, or an experiment
+can advance it or reveal something we have yet to understand.
 
----
-
-Projects generate many valid continuations: features, repairs, pull requests,
-infrastructure, cleanup, and experiments. Vision decides which valid
-continuation deserves momentum: the experienced outcome the project exists to
-create makes those continuations comparable.
-
-The core tension is **continuity of purpose vs. responsiveness to evidence**.
-Purpose needs enough continuity to organize work across timescales. The route
-needs enough flexibility to learn from what execution, review, and ordinary use
-reveal.
+Purpose needs enough continuity to guide sustained work. As we build and use
+something, we may discover a better way to accomplish it, or a possibility
+that changes what we want to pursue. Keep those discoveries in conversation
+with the user and with the reasons the work began.
 
 ## The relational structure
 
-A film director has many technically excellent scenes, performances, and edits
-available. The experience the film should create selects which ones belong and
-which cut receives attention. A test screening can change pacing, emphasis, or
-even the order of scenes. Changing what the film is about remains the
-director's judgment.
+A film director wants the audience to feel a growing distance between two
+characters. That intention guides choices about performance and editing. In
+one scene, an unplanned gesture makes their attachment apparent. Watching it
+with the editor may change how the director understands the relationship and
+which earlier scenes now belong in the film.
 
-A research lead chooses among sound experiments, useful instruments, and
-publishable analyses. The question the program is trying to answer selects the
-next experiment. Results revise the hypothesis and experimental route. The
-research lead remains responsible for the program's purpose.
+A research team is developing a diagnostic instrument for use in small
+clinics. Greater precision is worthwhile, but observing how clinicians use a
+prototype reveals that the time needed to prepare a sample prevents some
+patients from being tested at all. The team can now compare another gain in
+precision with a change that makes the test available during a single visit.
 
-A teacher has more worthwhile lessons, exercises, and explanations than fit in
-a course. The change students should experience selects the next learning
-slice. Student work reveals whether to slow down, change the sequence, or try a
-different example. The educator decides when the intended learning outcome
-itself should change.
+A teacher wants students to reason about unfamiliar problems. Worked examples
+help them begin, but their questions reveal that they are learning to match
+surface features to procedures. The teacher tries asking them to compare two
+solutions. Their explanations help the teacher judge whether this develops
+the intended understanding and what to try in the next lesson.
 
-Across the examples, artifacts are hypotheses about a route. Evidence
-calibrates the route. Situated judgment steers the purpose.
+In each case, purpose gives a detail significance that its local quality alone
+would not establish. Encounters with the work can also develop the purpose
+itself. The participants bring different knowledge to that judgment.
 
-## The steering move
+## Keeping purpose available
 
-Read each candidate continuation through one chain:
+Relate a proposed move to what someone could do or experience as a result.
+Follow the relationship far enough to judge the choice in front of you. A
+small implementation decision may have an immediate consequence. An investment
+in infrastructure may need several steps before its contribution becomes
+visible. Name those dependencies so their value can be examined.
 
-**slice → capability → experienced change → proof**
+A successful result can make another direction newly worth pursuing. It can
+also show that the work has achieved enough for now. Surface that judgment
+when further refinement offers less than moving on, including when the agent
+could keep finding technically worthwhile improvements.
 
-The chain restores the relationship between work and purpose. A slice is the
-bounded thing that can move now. Capability is what becomes possible.
-Experienced change — carried across steering handoffs as the **Experienced
-outcome** — is what becomes different for a person using or maintaining the
-project. Proof is the evidence ordinary use can produce.
+Use what the user has already explained to make recommendations and continue
+within the agreed direction. When a discovery suggests a consequential change
+in purpose or priorities, bring the evidence and the possibility into the
+conversation. The user can connect them to experience and commitments beyond
+the agent's view.
 
-Select the smallest meaningful end-to-end bet, then give it momentum. Keep
-valuable longer arcs warm with a reason they matter and a signal for returning
-to them. Reopen selection when the named steering signal arrives: organic proof,
-a consequential divergence, a stalled bet, or a completed milestone that
-exposes a new choice.
+## Composition
 
-## The information boundary
+[Interpretive synthesis](../interpretive-synthesis/SKILL.md "composition:reference")
+helps revise the understanding that gives a choice its significance.
+[Gap-reading](../gap-reading/SKILL.md "composition:reference") can recover a
+possibility or commitment that the current direction has obscured.
+[Collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference")
+helps when the choice depends on the user's situated judgment.
 
-The agent can inspect live work, group related artifacts into candidate bets,
-trace their consequences, and recommend a selection. The user knows what the
-project is for and which experienced outcomes carry meaning beyond the visible
-workspace.
-
-Use **collaborative-grounding** when different purposes or outcome tradeoffs are
-genuinely in play. Share the grounded thesis, evidence, and recommendation
-before asking. Use the user's attention where their judgment changes the
-selection.
-
-## Composition notes
-
-Vision steering composes with **interpretive-synthesis** to recover a project
-thesis from live work and prior decisions, and with **gap-reading** to keep
-valuable arcs visible outside the current bet.
-
-When the selected work benefits from preparation, implementation, and independent
-evaluation, **per-cycle** composes **hypothesis-forming** and
-**hypothesis-evaluating** around it. Other bounded work can proceed directly.
-The results inform the next steering decision. **Relational-continuity** keeps
-the thesis, current bet, and next steering signal attached to the work as they
-pass between threads and sessions.
+[Hypothesis-forming](../hypothesis-forming/SKILL.md "composition:reference") and
+[hypothesis-evaluating](../hypothesis-evaluating/SKILL.md "composition:reference")
+help connect an intended improvement to something we can try and learn from.
+These relationships can guide an ongoing conversation or a local change as
+well as a deliberate reconsideration of project direction.

@@ -46,9 +46,3 @@ user's situated judgment determines whether a thread remains live. Use
 - When preparing a handoff and deciding which unfinished ideas need to travel with it
 - After a significant shift in direction (threads from the old direction may be dangling)
 - When the user wants to take stock without stopping
-
-## What this skill is not
-
-- Recording a checkpoint (which preserves the current account — this skill finds what that account missed)
-- Triage (which prioritizes known items — this skill surfaces unknown ones)
-- Summary (which compresses — this skill expands, looking for what compression would lose)

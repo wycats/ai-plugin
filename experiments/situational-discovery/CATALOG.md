@@ -20,9 +20,9 @@ Generated from canonical descriptions by `node experiments/situational-discovery
 
 - [gh-write-pr-description](../../skills/workflows/gh-write-pr-description/SKILL.md): Use when drafting, updating, or reviewing a GitHub pull request title or body. Build the reviewer's intuition for the change, preserve the author's judgment and relationship with the readers, follow the repository template, and keep evidence at the strength it supports.
 
-- [hypothesis-evaluating](../../skills/stances/hypothesis-evaluating/SKILL.md): Use when comparing expected outcomes against actual results, judging what a gap means, or evaluating whether a change achieved its intent.
+- [hypothesis-evaluating](../../skills/stances/hypothesis-evaluating/SKILL.md): Use when an inspection, experiment, or attempted use produces a result to compare with an expectation. Judge what the comparison establishes and what it changes about the explanation, approach, or next move.
 
-- [hypothesis-forming](../../skills/stances/hypothesis-forming/SKILL.md): Use when predicting what code looks like before reading it, anticipating where a plan will encounter friction, or forming expectations specific enough to be tested.
+- [hypothesis-forming](../../skills/stances/hypothesis-forming/SKILL.md): Use when an emerging explanation, analogy, or plan suggests something worth checking. Make the expectation specific enough that an observation or attempt can change your understanding and the next move.
 
 - [implementation-quality](../../skills/workflows/implementation-quality/SKILL.md): Improve how existing code, types, names, file organization, and local documentation express the system's concepts. Use for implementation quality passes or holistic review of confusing details, from a single operation to a systematic codebase pass.
 
@@ -48,10 +48,10 @@ Generated from canonical descriptions by `node experiments/situational-discovery
 
 - [socratic-elicitation](../../skills/stances/socratic-elicitation/SKILL.md): Use when the user recognizes something they cannot yet explain, or their examples and reactions suggest an intuition worth developing together. Offer reflections that help them examine and articulate their thinking, letting their response change the conversation.
 
-- [steer-by-vision](../../skills/workflows/steer-by-vision/SKILL.md): Reorient a project by recovering its durable thesis and experienced outcome, reading live plans/tasks/PRs/substrate as candidate bets, and selecting one smallest meaningful end-to-end move with organic proof. Use when the user asks to steer or prioritize by vision, several technically valid gates compete without an active bet, an active bet's named steering signal has arrived, a closed milestone leaves no current bet, the user revises project purpose or outcome, or useful local work has lost its relationship to the project experience.
+- [steer-by-vision](../../skills/workflows/steer-by-vision/SKILL.md): Use when a project needs a deliberate choice of direction: several worthwhile moves compete, a milestone leaves the next move unclear, or useful local work has lost its connection to what the user wants to accomplish. Recover that connection and recommend work that can advance or test it.
 
-- [thread-coordinator](../../skills/workflows/thread-coordinator/SKILL.md): Use when coordinating multiple live Codex threads, maintaining a coordination heartbeat, routing work across implementation threads, inspecting cross-thread ownership or gates, or keeping a coordinated effort moving through PR, review, evidence, and human-action boundaries.
+- [thread-coordinator](../../skills/workflows/thread-coordinator/SKILL.md): Use when separate Codex chats need to work together: ownership or dependencies are unclear, a result needs to reach another effort, work has stalled between handoffs, or the user wants ongoing coordination. Keep each effort connected to the shared purpose and make the next action clear.
 
-- [vision-steering](../../skills/stances/vision-steering/SKILL.md): Use when selecting among locally valid project moves by relating them to a durable project thesis, or when new evidence should revise the route while the user's situated judgment remains authoritative about what the project is for.
+- [vision-steering](../../skills/stances/vision-steering/SKILL.md): Use when deciding what to pursue by considering what the work should make possible for people. Keep that purpose active through local choices, and let experience clarify or challenge the direction with the user.
 
 - [walkthrough](../../skills/workflows/walkthrough/SKILL.md): Use when walking through code changes with the user one chunk at a time, pausing for discussion after each chunk, linking directly to code, and checking design alignment as the review progresses.
