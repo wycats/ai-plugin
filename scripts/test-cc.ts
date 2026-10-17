@@ -30,22 +30,14 @@ function requireClaudeCommand(): ClaudeCommand {
 const CLAUDE = requireClaudeCommand();
 
 const EXPECTED_AGENTS = [
-  "execute",
-  "pre-read",
-  "prepare",
   "recon",
   "recon-worker",
-  "review",
   "slop-linter",
 ];
 
 const EXPECTED_SKILLS = [
   "per-cycle",
   "recon",
-  "session-close",
-  "session-load",
-  "session-rest",
-  "session-save",
   "walkthrough",
 ];
 

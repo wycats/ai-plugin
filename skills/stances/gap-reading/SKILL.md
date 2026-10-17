@@ -1,9 +1,9 @@
 ---
 name: gap-reading
-description: The cognitive mode of reading for what a coherent narrative left
-  out — threads abandoned, overtaken, or never recognized as significant.
-  Complements interpretive-synthesis (which builds the account) by interrogating
-  what it smoothed away.
+description: Use when an explanation or direction of work has left details,
+  possibilities, or unfinished threads out of view. Return to the underlying
+  material to recover what may change your understanding or remain worth
+  keeping before you can explain how it fits.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"
@@ -12,15 +12,18 @@ metadata:
 
 # Gap Reading
 
-Reading back through a body of work to find the gaps a coherent account left behind — threads that were abandoned deliberately, overtaken by momentum, or never recognized as threads in the first place.
+Reading back through a body of work for material that has fallen out of view — threads that were abandoned deliberately, overtaken by momentum, or never recognized as threads in the first place.
 
 ---
 
-Focused work generates material beyond its own scope. Conversations produce asides that turn out to matter. Creative work throws off fragments. Structured narratives leave things on the cutting room floor. Some of this material is genuinely disposable. But some of it is pre-coherence — it will eventually feed into understanding, but it hasn't found its place yet. The cognitive act is distinguishing the two and keeping the live material in a form where it can be picked back up.
+Focused work generates material beyond its own scope. Conversations produce asides that turn out to matter. Creative work throws off fragments. Structured narratives leave things on the cutting room floor. Some of this material is genuinely disposable. But some of it is pre-coherence — it may feed into understanding, but it hasn't found its place yet. The cognitive act is distinguishing the two and keeping the live material in a form where it can be picked back up.
 
-This stance complements **interpretive synthesis**. Interpretive synthesis builds a coherent account. Gap reading asks what that account left out. Synthesis wants closure; gap reading resists it, asking: what did the narrative smooth away? The tension between them is productive — you need both the coherent picture and the inventory of what it missed.
+As you develop an understanding of the work, some details acquire a place and others fall out of view. Gap-reading returns to the material that has fallen out: an aside, an anomaly, a possibility that never developed. What you recover may change how you understand the work, or it may remain worth keeping before you can explain how it fits. Interpretive synthesis and gap-reading can recur throughout the same investigation.
 
-The **dangling-thread-review** skill is the workflow that uses this stance. Gap reading is the underlying cognitive move: reading the gaps left by a narrative, rather than adding more detail to the narrative itself.
+When a conversation has moved far enough that you want to take stock of what
+it left behind, [dangling-thread-review](../../workflows/dangling-thread-review/SKILL.md "composition:reference")
+gives that inquiry room. It follows unfinished ideas and decisions through the
+conversation, including threads whose significance changed as the work developed.
 
 Some threads resolve within a session. Others persist across sessions — they weren't resolved last time, and they might not be resolved this time either, but they shouldn't be silently dropped. Keeping them visible is an act of intellectual honesty.
 
@@ -36,21 +39,19 @@ A composer at the end of a writing session, reviewing the melodic fragments and 
 
 ## When this stance applies
 
-- Session checkpoints and saves (reviewing the conversation for what the trajectory update missed)
-- Session transitions (gathering threads before rest or close)
+- While an explanation or direction is taking shape, or after drafting an account, returning to material that has fallen out of view
 - Any moment where significant ground has been covered and the agent suspects the narrative of what happened is cleaner than reality
 - When the user says something like "are we forgetting anything?" or "what did we leave on the table?"
 
 ## What this stance is not
 
-- Interpretive synthesis (which builds the coherent account — this stance interrogates it)
 - Summary (which compresses without looking for what's missing)
 - Triage (which prioritizes known items — this stance surfaces items that aren't on the list yet)
 - Task tracking (which monitors known work items — this stance finds the unknown ones)
 
 ## Composition notes
 
-Gap reading uses the output of **interpretive synthesis** as its starting point — you need the coherent account in order to see what it left out.
+Composes with [interpretive synthesis](../interpretive-synthesis/SKILL.md "composition:reference") as recovered material changes the working understanding. An unresolved fragment can remain available for later inquiry without being given a place in the current explanation.
 
 Feeds naturally into **diagnostic questioning** when a surfaced thread needs the user's situated knowledge to evaluate. "I noticed you mentioned X early in the session and we never came back to it — is that something that matters, or was it superseded?"
 

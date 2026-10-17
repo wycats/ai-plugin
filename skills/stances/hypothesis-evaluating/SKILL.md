@@ -2,7 +2,6 @@
 name: hypothesis-evaluating
 description: Use when comparing expected outcomes against actual results,
   judging what a gap means, or evaluating whether a change achieved its intent.
-  The review agent crystallizes this.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"
@@ -31,7 +30,7 @@ A coach reviewing game film against the game plan they drew up before the match.
 
 ## When this stance applies
 
-- Reviewing execution against preparation (the review agent crystallizes this stance)
+- Reviewing execution against preparation
 - Any post-action evaluation where you have both a prediction and an outcome
 - Calibrating confidence in a plan, model, or assumption after seeing evidence
 

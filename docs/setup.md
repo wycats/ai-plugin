@@ -183,9 +183,9 @@ Three roles that agents use, mapped to model strings for your provider:
 
 | Role        | What it's for                   | Which agents use it                   |
 | ----------- | ------------------------------- | ------------------------------------- |
-| `fast`      | Strong reasoning, complex tasks | execute, prepare, recon, recon-worker |
-| `balanced`  | Evaluation and review           | review                                |
-| `auxiliary` | Supporting tasks, lower cost    | pre-read, slop-linter                 |
+| `fast`      | Strong reasoning, complex tasks | recon, recon-worker                   |
+| `balanced`  | Mid-tier model role             | Available for custom agent definitions |
+| `auxiliary` | Supporting tasks, lower cost    | slop-linter                           |
 
 Set a role to `null` to leave the model unspecified — the platform picks its default.
 
@@ -234,7 +234,7 @@ The default groups:
 | `core`             | Basic capabilities: workspace access, file reading, search, web, todos |
 | `agent`            | Dispatching subagents                                                  |
 | `browser`          | Browser interaction                                                    |
-| `edit`             | File editing (only the execute agent needs this)                       |
+| `edit`             | File editing for agents assigned to change artifacts                  |
 | `memory`           | Persistent memory across sessions                                      |
 | `exo`              | Exosuit context tools                                                  |
 | `terminal`         | Full terminal: run commands, await output, kill processes              |

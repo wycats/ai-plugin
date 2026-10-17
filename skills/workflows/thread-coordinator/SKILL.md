@@ -66,7 +66,7 @@ Resolve the orientation field by field in this order:
 1. explicit current project-level user steering;
 2. a repo-designated canonical project-state or vision surface;
 3. `COORDINATION_BRIEF.md` together with `ACTIVE_PLAN.md`;
-4. the latest user-confirmed `SESSION-TRAJECTORY.md` as fallback.
+4. the latest user-confirmed account of project direction as fallback.
 
 A higher source overrides the fields it addresses; compatible lower sources may fill missing operational fields. Record all contributing provenance. Within the coordination tier, the brief supplies the slow target and the active plan supplies a compatible Current bet and operational gate; surface disagreement rather than resolving it by recency. Only a surface the repo or user designates as canonical receives canonical precedence. Recency alone does not make a plan, thread, PR, or trajectory authoritative about purpose.
 

@@ -1,8 +1,8 @@
 ---
 name: interpretive-synthesis
-description: Use when building a coherent account from many observations,
-  summarizing conversation state, or explaining how pieces connect. The skill is
-  in what gets left out.
+description: Use when new details change your understanding of a situation,
+  and that revised understanding changes what earlier observations mean or
+  which question is worth pursuing.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"
@@ -15,9 +15,15 @@ Understanding the whole through the parts, and the parts through the whole, wher
 
 ---
 
-The synthesis operates continuously, not in two passes. Each new detail revises the big picture, and the revised big picture changes how you encounter the next detail. You don't wait until the end to revise — the revision is happening as you go.
+Your understanding guides which details you notice and what you look for next.
+Those details can change the understanding you brought to them, including what
+earlier observations mean.
 
-The synthesis is grounded in **collaborative grounding** — the agent can form interpretations, but the user's situated knowledge is essential for resolving ambiguities about intent. The agent proposes an account; the user confirms, corrects, or deepens it. This is not a step that happens after the synthesis — it's woven through it. Each pass through the hermeneutic circle is an opportunity for the agent to share what it sees and ask the user to contribute what it can't.
+A new detail can agree with everything you have seen and still change what is
+worth doing next. An explanation may remain accurate while the question it
+answers has become less useful. Follow what the revised understanding makes
+worth asking; it may also give you a firmer reason to continue the work already
+underway.
 
 ## The relational structure
 
@@ -27,30 +33,17 @@ Reading a novel, or watching a well-constructed puzzle-box show. As you move thr
 
 A couples therapist listening to both partners describe the same event. Each account makes sense on its own. But when you hold both accounts simultaneously and look for the coherent picture that explains both, something new emerges that neither partner described. The therapist's understanding of the relationship revises with each new detail, and the revised understanding reframes details from earlier in the session. The synthesis isn't "partner A said X, partner B said Y." It's a third account that makes sense of both.
 
-## What it reveals
-
-Interpretive synthesis surfaces things that linear review misses:
-
-- **Drift from intent**: the session started with one goal but gradually shifted to another. Both the original and the evolved intent may matter.
-- **Implicit abandonments**: threads that were silently dropped, not because they were resolved but because something else took priority. These may still be important.
-- **Retroactive reinterpretation**: a decision made early in the session that seemed right at the time but looks different in light of what happened later.
-- **Emergent patterns**: connections between threads that weren't visible when each thread was active but become clear when you look at the session as a whole.
-
-## When this stance applies
-
-- Handoff preparation (forming a coherent account of the session)
-- Walkthrough big-picture revision (revising the understanding of the codebase as details emerge)
-- Any situation where the material is complex enough that the whole and the parts inform each other
-
-## What this stance is not
-
-- Summary (compressing what happened without interpretation or revision)
-- Evaluation (judging quality against a standard)
-- Chronological review (walking through events in order without forming a coherent account)
-- Pattern recognition alone (noticing regularities without the revisionary loop between whole and parts)
-
 ## Composition notes
 
-Interpretive synthesis uses [collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference") throughout — the hermeneutic circle surfaces ambiguities that only the user's situated knowledge can resolve.
+An interpretation can suggest which observation would help distinguish it from
+another. [Observational grounding](../observational-grounding/SKILL.md "composition:reference")
+keeps that observation attached to what was seen and the conditions under which
+it was seen, so it can support or revise the interpretation.
 
-Composes with **joint reading** in the walkthrough (the big-picture revision step is interpretive synthesis applied to code). Composes with [diagnostic questioning](../diagnostic-questioning/SKILL.md "composition:reference") in the handoff (the coherent account reveals where the high-variance threads are and helps prioritize the diagnostic sequence). The handoff skill uses interpretive synthesis as its opening move — forming the account that the diagnostic questioning then probes.
+When an interpretation depends on the user's intent or experience,
+[collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference")
+brings their situated knowledge into the inquiry. Share the interpretation and
+the uncertainty their perspective could resolve. [Diagnostic questioning](../diagnostic-questioning/SKILL.md "composition:reference")
+helps when each answer changes which question to ask next.
+
+[Gap-reading](../gap-reading/SKILL.md "composition:reference") returns to material the working understanding has left out of view. What it recovers may revise that understanding or remain worth keeping while its significance is unresolved. Dangling-thread review draws on both throughout its reading of the conversation.

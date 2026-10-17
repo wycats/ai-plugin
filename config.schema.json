@@ -24,15 +24,15 @@
       "properties": {
         "fast": {
           "type": ["string", "null"],
-          "description": "High-capability model for agents that need strong reasoning (execute, prepare, recon, recon-worker). Examples: 'Claude Opus 4.6 Fast (vercel)', 'opus', null (platform default)."
+          "description": "High-capability model for agents that need strong reasoning (recon, recon-worker). Examples: 'Claude Opus 4.6 Fast (vercel)', 'opus', null (platform default)."
         },
         "balanced": {
           "type": ["string", "null"],
-          "description": "Mid-tier model for evaluation tasks (review). Examples: 'Gemini 3.1 Pro Preview (vercel)', 'sonnet', null (platform default)."
+          "description": "Mid-tier model role available to agent definitions. Examples: 'Gemini 3.1 Pro Preview (vercel)', 'sonnet', null (platform default)."
         },
         "auxiliary": {
           "type": ["string", "null"],
-          "description": "Cost-effective model for supporting tasks (pre-read, slop-linter). Examples: 'GPT 5.4 (vercel)', 'haiku', null (platform default)."
+          "description": "Cost-effective model for supporting tasks (slop-linter). Examples: 'GPT 5.4 (vercel)', 'haiku', null (platform default)."
         }
       }
     },
@@ -73,7 +73,7 @@
           "items": { "type": "string" }
         },
         "edit": {
-          "description": "File editing tools (only execute agent needs this).",
+          "description": "File editing tools for agents whose assignments include changing artifacts.",
           "type": "array",
           "items": { "type": "string" }
         },

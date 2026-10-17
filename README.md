@@ -71,24 +71,13 @@ types, organization, and documentation.
 
 **Joint reading** is what happens when two people examine code or a document together. The agent sees structural patterns; the user sees design intent. The walkthrough skill uses this stance.
 
-**Diagnostic questioning** is asking the right question at the right time. The one that maximally reduces uncertainty about the user's priorities. High-variance questions (where the agent genuinely can't predict the answer) come first, because their answers often resolve lower-variance questions implicitly. The session-rest skill uses this during triage.
+**Diagnostic questioning** is asking the right question at the right time. The one that maximally reduces uncertainty about the user's priorities. High-variance questions (where the agent genuinely can't predict the answer) come first, because their answers often resolve lower-variance questions implicitly. Dangling-thread review uses this when only the user can determine whether a thread remains live.
 
 **Socratic elicitation** shapes *how* to ask: reflecting back the agent's understanding so the user can refine it, naming tensions to make them concrete, offering interpretations and inviting correction. The goal is to draw out what the user already knows but hasn't articulated, with minimal cognitive load.
 
-**Interpretive synthesis** is Gadamer's hermeneutic circle: understanding the whole through the parts and the parts through the whole. Each pass through the details revises the big picture, and the revised big picture changes how the details look. The session lifecycle skills use this when forming a coherent account of a session's trajectory.
+**Interpretive synthesis** is Gadamer's hermeneutic circle: understanding the whole through the parts and the parts through the whole. Each pass through the details revises the big picture, and the revised big picture changes how the details look. Recon uses this to revise its account as evidence arrives; walkthrough uses it as the parts change the shared understanding of the whole.
 
 ## What's in the plugin
-
-### Session lifecycle
-
-Sessions deplete context the way a day in Stardew Valley depletes energy. The returns on continued work diminish as context gets crowded. Transitions between sessions should feel natural, not forced.
-
-The session skills form a gradient based on how much the user serves as a bridge to the next session:
-
-- **`/session-save`**: ongoing tidiness, like mise en place in a kitchen. Keeps a sourced Project Orientation and the evidence around its current bet warm as significant work happens.
-- **`/session-rest`**: the natural end of a work cycle. Interprets the session inside the active bet and carries its Immediate gate forward without routinely reopening selection.
-- **`/session-close`**: end of day. Adds full triage, working-style reflection, and cold-start framing while preserving the same bet boundary.
-- **`/session-load`**: start a new cycle. Reconciles orientation sources, resumes the Immediate gate when the bet remains active, and invokes vision steering only when selection is genuinely open.
 
 ### Collaborative review
 
@@ -114,7 +103,7 @@ The session skills form a gradient based on how much the user serves as a bridge
 ### Workflow orchestration
 
 - **`/steer-by-vision`**: explicit project reorientation that recovers the experienced outcome, selects one smallest meaningful end-to-end bet, keeps longer arcs warm, and names the evidence that will reopen steering.
-- **`/per-cycle`**: prepare-execute-review workflow for testing a selected bet and returning calibrated evidence.
+- **`/per-cycle`**: prepare, execute, and independently review a consequential change. The coordinator shapes assignments around what the work needs and carries what each phase learns into the next.
 - **`/thread-coordinator`**: cross-thread coordination that preserves the current bet, routes one immediate gate, and returns to vision steering when its named signal arrives.
 - **`/recon`**: adaptive codebase investigation that follows leads and synthesizes findings.
 
@@ -124,7 +113,9 @@ The session skills form a gradient based on how much the user serves as a bridge
 
 ### Agents
 
-Most agents are subagents, invoked by skills rather than by the user directly. The PER agents (`prepare`, `execute`, `review`) are implementation details of the PER workflow. `pre-read` maps codebase terrain for the active bet's Immediate gate and flags orientation-source disagreements during session transitions. `recon-worker` supports the recon skill.
+`recon-worker` supports delegated investigation from the recon skill. PER describes
+the responsibilities of preparation, execution, and review in its workflow;
+the coordinator chooses suitable workers from the host's available agents.
 
 Two agents are user-facing: `recon` (codebase investigation) and `slop-linter` (identifies and removes slop from documents).
 

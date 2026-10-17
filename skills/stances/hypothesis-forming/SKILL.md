@@ -2,7 +2,7 @@
 name: hypothesis-forming
 description: Use when predicting what code looks like before reading it,
   anticipating where a plan will encounter friction, or forming expectations
-  specific enough to be tested. The prepare agent crystallizes this.
+  specific enough to be tested.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"
@@ -29,14 +29,14 @@ A doctor forming a differential diagnosis before ordering tests. Multiple possib
 
 ## When this stance applies
 
-- Preparing for execution (the prepare agent crystallizes this stance)
+- Preparing for execution
 - Any situation where examining material before acting reveals where assumptions are vulnerable
 - Planning that benefits from making the plan's assumptions explicit and testable
 
 ## What this stance is not
 
 - Prediction as commitment (the predictions aren't promises — they're tools)
-- Auditing or verification (which checks against a standard — this stance forms the standard that will later be checked against)
+- Auditing or verification (which checks against a standard — this stance develops expectations that evidence can revise)
 - Speculation (which generates possibilities without specificity or falsifiability)
 
 ## Composition notes

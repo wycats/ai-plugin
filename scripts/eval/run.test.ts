@@ -64,7 +64,7 @@ void test("refuses output paths that overwrite evaluation inputs", () => {
   for (const path of [
     "config.claude-code.example.json",
     "plugin.json",
-    "agents/review.agent.md",
+    "agents/recon.agent.md",
   ]) {
     const result = runEval(["--adapter", "claude-code-cli", "--output", path]);
     assert.equal(result.status, 1);

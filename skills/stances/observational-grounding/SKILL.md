@@ -1,9 +1,8 @@
 ---
 name: observational-grounding
-description: "Use when observations from different surfaces appear to disagree
-  and the agent must keep each observation in its observed form before
-  explaining causes: UI vs behavior, logs vs state, metrics vs reports, tool
-  output vs user-visible result."
+description: Use when observations seem to disagree, or a conclusion depends on
+  an uncertain relationship between what was observed and what it is taken to
+  show. Relate the evidence to its source and conditions as you investigate.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"
@@ -12,104 +11,87 @@ metadata:
 
 # Observational Grounding
 
-Stabilizing the phenomenon before explaining it, especially when observations
-come from different surfaces whose relationship has not been established yet.
+Keeping observations connected to what was seen, where it was seen, and what
+those conditions allow you to conclude as your understanding changes.
 
 ---
 
-The first act is not hypothesis. It is holding the observations steady: what
-exactly was seen, where was it seen, and what kind of claim can that surface
-actually support?
+An explanation directs attention: it suggests what to inspect and what a
+result might mean. Inspection can reveal that the explanation assumed a
+relationship the evidence has yet to establish. An event log may show recent
+requests while a database query returns no recent turns. Suspecting a failed
+write gives you a reason to trace the request; discovering that the query used
+a different conversation identity changes what that absence means.
 
-When evidence surfaces disagree, the contradiction should be preserved in its
-raw form long enough to stabilize the phenomenon. "The event log has recent
-requests, but the database has no recent turns for that conversation" is a
-better starting point than "persistence failed" or "the cache missed." The
-first sentence names the phenomenon. The others already interpret it.
+Keep the observation available in the form that supports reconsideration.
+"The query returned no rows for this identity and time range" remains useful
+when the explanation changes. Recording only "persistence failed" loses the
+conditions that would let you examine another possibility.
 
 ## The relational structure
 
-The examples vary across domains. The invariant is the same: before explaining
-a discrepancy, make the observation well-formed enough to interpret.
+These examples vary in what is observed and how it can be checked. In each,
+understanding suggests an inspection, and the conditions of the observation
+can change that understanding.
 
-A distributed-systems engineer compares request logs, traces, and database
-rows. A log line says a request completed. The trace UI does not show the span,
-and the database has no row. The engineer does not begin by blaming sampling,
-writes, or projection. They first keep each surface in view: what the log can
-prove, what the trace UI can omit, what the database read is scoped to, and
-whether the disagreement is actually about one request. Only then does a missing
-row become evidence of a write problem.
+A distributed-systems engineer compares a completed-request log with a missing
+database row. The log makes a write failure plausible, so the engineer traces
+which operation completed and which record it should have produced. Completion
+might mean a job was queued; the database might have been read before that job
+ran. Establishing those relationships changes what needs explaining. If the
+write completed against the same database before the read, the missing row
+becomes evidence for a different investigation.
 
-A forensic accountant reconciles a payment processor export with the general
-ledger. The processor shows a settlement, but the ledger does not. The useful
-first move is not a list of theories about fraud, delay, or import failure. It
-is to ask what each source means by "settled," what period and entity it speaks
-for, and whether the absence in the ledger is comparable to the processor's
-presence. Once the observation is stable, the remaining discrepancy has meaning.
+An accountant reconciles a payment processor's settlement with its absence
+from the ledger. A suspected import delay directs attention to batch times.
+Checking those times reveals that the processor groups transactions by payout
+date while the ledger records them by transaction date. The discrepancy may
+resolve when the periods are aligned, or a particular missing transaction may
+remain. The meaning of "settled" determines which records can answer the
+question.
 
-A lab technician investigates a surprising test result. A sample label, machine
-run, patient record, and timestamp are not explanations. They are the conditions
-that make the result an interpretable observation rather than a number floating
-free of its specimen. Medical interpretation begins after the observation has a
-stable referent.
+A lab technician investigates a surprising measurement. A possible change in
+the sample suggests checking collection times; a possible instrument problem
+suggests checking calibration records. The sample label and run record may
+show that the comparison involved different specimens. They may instead
+establish that the unexpected result occurred under comparable conditions.
+Either finding changes which explanation deserves attention and which
+measurement would help distinguish the remaining possibilities.
 
-An incident commander reconstructs an outage timeline from alerts, deploy
-events, customer reports, and service metrics. They first separate what each
-surface can honestly say: a customer felt failure, a metric crossed a threshold,
-a deploy happened, an alert fired. Causes come later. Without that grounding,
-the incident story is a collage of plausible but unformed observations.
+## Grounding during an investigation
 
-## The core move
+What an observation establishes depends on the question being asked. A UI
+showing "saved" establishes what the user saw. Whether the value persisted
+requires knowing how that indication relates to the write. Matching records
+may establish a shared event while leaving its cause uncertain. Preserve those
+distinctions as the investigation moves between sources.
 
-Hold two questions apart:
+Give a possible explanation enough weight to choose a useful check, and let
+the result change that explanation. The depth of the check depends on the
+decision it could change. An identity or timestamp may settle the relation;
+a consequential unresolved mismatch may warrant a longer trace. Once the
+evidence supports the next action, proceed with the remaining uncertainty
+visible.
 
-1. What did each surface actually observe?
-2. What would make those observations bear on the same phenomenon?
-
-Inspect only enough to answer the second question. The stabilizing move is
-whatever the case requires, and no more: enough to know whether the observations
-can constrain one phenomenon, not enough to start explaining it prematurely.
-
-Once the phenomenon is stable, interpretation can begin.
-
-## When this stance applies
-
-- Event logs disagree with stored state.
-- UI, API, cache, and persisted state tell different stories.
-- Metrics, traces, logs, or alerts imply different timelines.
-- Multiple workspaces, branches, tenants, regions, or storage locations may be
-  involved.
-- The tempting explanation depends on treating two observations as more
-  comparable than they have been shown to be.
-
-## The handoff point
-
-Once the phenomenon has a stable reference, observational grounding should make
-the next mode easier. It hands root-cause analysis something specific to
-explain, gives hypothesis-forming a grounded phenomenon to predict against, and
-lets hypothesis-evaluating compare expected and actual results against an
-observation whose referent is already stable.
-
-The output should fit the surfaces involved. Sometimes the useful artifact is a
-short contradiction statement. Sometimes it is a readback of scope, identity,
-timing, workspace, or storage context. Across those forms, the invariant is that
-the next interpretive move receives observations that can actually bear on the
-same phenomenon.
+A corrected interpretation can change the status of earlier work. If a
+measurement used a different workload than assumed, its recorded numbers
+remain observations, while the comparison drawn from them needs revision.
+Carry that distinction into the conclusion or artifact that will guide the
+next reader.
 
 ## Composition notes
 
-Observational grounding composes with the [Recon workflow](../../workflows/recon/SKILL.md "composition:reference") by interrupting broad
-lead-following when the problem is an unstable phenomenon. Recon can
-resume once the phenomenon is stable.
+[Interpretive synthesis](../interpretive-synthesis/SKILL.md "composition:reference")
+relates each detail to the developing understanding. Observational grounding
+keeps the evidence available to test and revise that understanding. Both can
+remain active as [Recon](../../workflows/recon/SKILL.md "composition:reference")
+follows a lead.
 
-It composes with **hypothesis-forming** by providing the grounded phenomenon
-that hypotheses should explain. Without this stance, hypotheses can become
-stories about a mismatch that was not yet a well-formed observation.
+Hypothesis-forming gives a possible explanation consequences to inspect;
+hypothesis-evaluating compares those expectations with what was observed.
+Grounding helps establish what that comparison can support.
 
-It composes with **hypothesis-evaluating** when expected and actual results come
-from different surfaces. Evaluation starts by checking whether the "actual" is
-stable enough to compare with the expectation.
-
-It composes with [collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference") when phenomenon stability depends
-on situated context the user can see or knows from the workflow. The agent
-should present what it can observe and ask for the missing situated relation.
+Use tools for relations the available sources can establish. When the missing
+relation depends on the user's experience or intent,
+[collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference")
+combines what you can observe with their situated knowledge.

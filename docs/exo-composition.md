@@ -102,7 +102,7 @@ This plugin should treat Exo as an available workflow substrate when Exo tools
 exist, and as a design influence when they do not.
 
 In the VS Code target, serious agents already include the `exo` tool group. That
-means prepare, execute, review, recon, recon-worker, and pre-read can ground
+means recon and recon-worker can ground
 their work in Exo state when the host exposes `exosuit.exosuit-context/exo-run`.
 
 In the Claude Code target, the `exo` tool group is currently empty. Until that

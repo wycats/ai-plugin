@@ -1,8 +1,9 @@
 ---
 name: diagnostic-questioning
-description: Use when investigating unfamiliar territory, narrowing
-  possibilities through targeted questions, or diagnosing a problem by updating
-  your own model of the situation.
+description: Use when the next move depends on another person's intent,
+  priorities, or experience, and each answer will help you choose what to ask
+  next. Ground questions in what you already know; inspect observable system
+  behavior through tools.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"
@@ -64,4 +65,4 @@ Resolve this in context. When the user's energy is revealing something the diagn
 
 Diagnostic questioning is [collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference") structured around uncertainty reduction. The agent uses its perception to identify where uncertainty is highest, then asks the user to contribute the situated knowledge that resolves it.
 
-Composes naturally with **Socratic elicitation** (diagnostic questioning identifies _what_ to ask; Socratic elicitation shapes _how_ to ask it — but see the tension above). Composes with [interpretive synthesis](../interpretive-synthesis/SKILL.md "composition:reference") (the coherent account of the session reveals where the high-variance threads are). The handoff skill uses diagnostic questioning to triage dangling threads.
+Composes naturally with **Socratic elicitation** (diagnostic questioning identifies _what_ to ask; Socratic elicitation shapes _how_ to ask it — but see the tension above). Composes with [interpretive synthesis](../interpretive-synthesis/SKILL.md "composition:reference") (the coherent account of the session reveals where the high-variance threads are). Dangling-thread review uses diagnostic questioning when a thread's status depends on the user's situated knowledge.

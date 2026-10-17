@@ -1,8 +1,9 @@
 ---
 name: per-cycle
-description: Use when running a prepare-execute-review (PER) cycle, doing a PER
-  workflow, or coordinating work through `prepare`, `execute`, and `review`
-  subagents with explicit gates.
+description: Use when organizing a consequential change into preparation,
+  implementation, and independent evaluation, or when the user asks for PER.
+  Preserve expectations so the result can revise the understanding that guided
+  the work.
 metadata:
   wycats.kind: workflow
   wycats.user-invocable: "true"
@@ -11,180 +12,129 @@ metadata:
 
 # PER Cycle
 
-A hypothesis → experiment → evaluation cycle for non-trivial work. Prepare forms predictions about what the codebase will encounter. Execute tests those predictions against reality. Review reads the distance between prediction and result.
+Prepare makes consequential expectations explicit. Execute works from them and
+records what the work reveals. Review examines the resulting artifacts and
+asks what the comparison teaches us about the change we wanted to make.
 
-The value of the cycle isn't in the gates between phases. It's in the cognitive separation: each phase thinks differently, and the handoff between them is where the interesting findings emerge. Prepare's predictions tell execute where to look. Execute's encounters with reality tell review what to evaluate. Review's calibration tells you whether to proceed, iterate, or revise the approach.
+The handoffs preserve different perspectives on the same work. A prediction
+gives execution something worth checking; an unexpected result may change the
+approach; review can discover that preparation and implementation shared an
+assumption that deserves another look. Each phase can investigate enough to
+understand its findings. Its responsibility determines what it brings back.
 
-PER begins after project selection. It tests how a bounded move advances the
-selected bet and returns evidence to the next steering decision.
+## Arrange the work
 
-**Stances used:** Load the **hypothesis-forming** stance for prepare, **hypothesis-evaluating** stance for review, **collaborative-grounding** when user intent changes the cycle, and **relational-continuity** for phase handoffs.
+As coordinator, keep the intended change and the reasoning across phases in
+view. Choose where delegation adds useful attention or independence. You may
+prepare a well-understood task yourself, delegate a difficult uncertainty, or
+keep implementation with an agent that already understands the code. Give
+review a fresh reader of the resulting artifacts so the implementation's
+explanation can itself be examined. When a separate reader is unavailable,
+make the limits of the review clear.
 
-## When to use
+Choose workers from the host's available agents and capabilities. Shape their
+assignments around the phase's purpose and the actual task; give them the
+relevant stance to read. Choose model, tools, and context according to the
+judgment and access the assignment needs. An existing specialist is useful when
+its responsibilities fit. A general agent with a situated assignment can also
+carry a phase.
 
-The overhead of three phases is justified when the task has enough complexity or risk that you'd benefit from separating prediction from action from evaluation. Tasks that change behavior across multiple files, have ambiguity about the right approach, or benefit from independent verification of the result.
+Give each worker the intended outcome, relevant sources, constraints, and the
+question its work should resolve. Carry forward settled decisions with their
+reasons and keep assumptions recognizable as assumptions. A worker should be
+able to recognize when a discovery changes its assignment. Agree on the files
+or other effects it owns and which consequential changes need to return to you.
 
-The overhead is not justified for trivial fixes, purely exploratory research, or tasks where the three phases would be slower than just doing the work. Use judgment.
+Balance the cost of another handoff against what a different perspective can
+reveal. Existing preparation may already supply useful expectations; a small
+correction may need only implementation and renewed review. Preserve what the
+earlier work established as you choose where to resume.
 
-## Vision boundary
+## Prepare: make expectations testable
 
-Enter the cycle with a selected bet and the experienced outcome it is meant to
-produce. If several locally valid bets still compete, use **steer-by-vision**
-before dispatching prepare.
+Use [hypothesis-forming](../../stances/hypothesis-forming/SKILL.md "composition:load")
+to identify the expectations whose failure would change the approach. Ground
+them in the available evidence: what do we expect to encounter, what supports
+that expectation, and what would we need to inspect or try? Keep confidence
+and consequence distinct. A doubtful assumption can deserve an inexpensive
+check when being wrong would redirect substantial work.
 
-Within a cycle, prepare, execute, and review stay attached to that bet. A local
-divergence revises the implementation route or loops a bounded correction.
-Project selection resumes when the bet's named steering signal arrives,
-relationship-breaking evidence shows the bet no longer plausibly leads to its
-experienced outcome, or the user revises what the project is for.
+Include how the result will become observable. A test may exercise the changed
+code directly, or depend on a launcher, account, service, or fixture. Identify
+which dependencies must work for the observation to bear on the claim, and
+choose the shortest adequate way to establish that. Preparation is sufficient
+when execution can act on the expectations and recognize evidence that would
+change them.
 
-## Steering context
+## Execute: let the work inform the approach
 
-Carry one compact purpose boundary through every phase:
+Work from the intended outcome and the prepared expectations. Choose advances
+and checks that keep consequential decisions in contact with the actual
+workspace. Local discoveries can guide the next edit or inspection. Return a
+finding to the coordinator when it changes the assignment, affects another
+worker, or calls for a different approach to the whole task.
 
-- **Vision:** the durable project thesis.
-- **Experienced outcome:** what the current bet should make meaningfully
-  different.
-- **Current bet:** the selected evidence-bearing route.
-- **Organic proof:** what ordinary use should reveal if the bet works.
-- **Immediate gate:** the bounded move this cycle advances.
-- **Next steering signal:** the evidence or milestone that returns project
-  selection to **steer-by-vision**.
+Preserve discoveries that change how the result should be understood, including
+cases where an expected observation acquires a different significance. When
+it becomes unclear what an observation establishes, use
+[observational-grounding](../../stances/observational-grounding/SKILL.md "composition:load")
+to inspect that uncertainty while continuing to develop the explanation.
 
-Keep valuable longer arcs and their return signals on the steering or
-coordination surface. They should remain visible without entering phase prompts
-and competing with the current bet.
+Report the changed artifacts, checks actually performed, and consequential
+revisions to the approach. If an attempt stops before reaching the behavior
+under test, record where it stopped and what that establishes about the
+dependency. For actions with external effects, preserve whether the action
+occurred so a retry can account for what the previous attempt already did.
+Repeated setup failures may warrant a bounded investigation of that dependency
+before returning to the original experiment.
 
-## The shortest honest evidence path
+## Review: examine the result and its explanation
 
-A cycle chooses the smallest experiment that can honestly support its claim.
-The observation path is part of the hypothesis: prepare predicts both the
-capability result and how execute will reach and observe it.
+Give the reviewer the intended change, the original expectations, execution's
+account, and access to the resulting artifacts. Evaluate whether the result
+achieves the intended change, including consequences the predictions omitted.
+Within that review, use
+[hypothesis-evaluating](../../stances/hypothesis-evaluating/SKILL.md "composition:load")
+to understand what comparing expectations with outcomes reveals about the
+assumptions that guided the work. Inspect the artifacts and check consequential
+claims in the account.
 
-The tension is **evidence sufficiency vs. path expansion**. Qualify only the
-substrate properties on which the claim depends. Each added qualification earns
-its place by making the result more interpretable and stays bounded to the
-depended-on property.
+Agreement with the predictions provides evidence while leaving the shared
+assumptions open to examination. Investigate consequential uncertainties far
+enough to judge the result; preserve that assessment before returning fixes to
+implementation. The host's review conventions govern how findings are reported.
 
-## The arc
+Distinguish evidence about the behavior from evidence about the setup needed
+to observe it. A successful build may establish implementation readiness while
+the intended improvement in ordinary use remains unobserved. Explain what the
+available evidence supports and what remains to be established. Bring back the
+findings that affect whether to proceed or how to continue.
 
-### Prepare: form the hypothesis
+## Continue from what was learned
 
-Dispatch the `prepare` subagent with the steering context, relevant file paths,
-constraints, and what success looks like for the immediate gate. Prepare forms
-predictions about what the codebase looks like, where that move will encounter
-friction, and how it is expected to advance the current bet. Vision and the
-current bet remain the purpose boundary; prepare forms its predictions within
-them.
+Connect the findings to the task as a whole. Resolve consequential
+disagreements against the artifacts and evidence without repeating every
+worker's investigation.
 
-What comes back is a pre-execution hypothesis: specific, falsifiable predictions organized by confidence and consequence. The most valuable predictions are the ones where being wrong would change the approach.
+```text
+repeat as needed:
+  prepare the expectations still needed to act
+  execute and let discoveries guide the next advance
+  review the result against the intended change and earlier expectations
+  continue with a local correction, reconsider the approach, or finish
+```
 
-The hypothesis also gives the experiment five anchors:
+A local correction can return to execution and then receive focused review.
+A finding that changes the approach calls for revised preparation. When the
+work no longer appears to serve the intended outcome, return to that choice
+with the evidence that changed it. Use
+[steer-by-vision](../steer-by-vision/SKILL.md "composition:reference") when this
+becomes a choice among project directions. If steering already supplied a
+purpose and a condition for reconsidering the work, keep them attached to the
+cycle and recognize when that condition arrives.
 
-- **Claim:** the bounded conclusion the result could support.
-- **Relationship to Organic proof:** how this claim would produce the current
-  bet's Organic proof, qualify a necessary path toward that proof, or leave that
-  proof pending.
-- **Capability assumptions:** what the behavior itself is expected to do.
-- **Substrate assumptions:** what the observation path must provide for the
-  attempt to reach that behavior.
-- **Next effect boundary:** the next consequential transition inside the
-  Immediate gate that the experiment may cross, such as a launch, mutation,
-  spend, or external communication.
-
-Before proceeding: check whether the high-consequence predictions are grounded in evidence (file paths that exist, symbols that are real, assumptions verified against the workspace). If a critical prediction is unverified or vague, send it back to prepare with what's missing. The hypothesis needs to be specific enough that execute can test it and review can evaluate it.
-
-### Execute: run the experiment
-
-Dispatch the `execute` subagent with the same steering context and prepare's
-hypothesis. Execute advances the immediate gate through the codebase, making
-bounded changes and reading how reality responds. Local discoveries can revise
-the route inside the current bet. When any of the following happens, execute
-surfaces it and returns control: a named steering signal arrives; local
-evidence shows the current bet no longer plausibly advances the experienced
-outcome; or the user revises project purpose or experienced outcome. Then
-**steer-by-vision** owns subsequent project selection.
-
-What comes back is changed files, executed commands, and an honest account of what happened — including where prepare's predictions were wrong and where reality surprised.
-
-Execute attempts to cross one named effect boundary at a time, then reports the
-boundary and whether it was crossed. It also declares whether and how any
-precondition miss before the boundary will be retried.
-
-Before proceeding: spot-check the account against the workspace. Did the reported changes actually happen? Are the reported test results consistent with what the commands would produce? Execute maintains contact with reality, but the coordinating agent verifies that the reporting is accurate too.
-
-### Review: evaluate the hypothesis
-
-Dispatch the `review` subagent with the steering context, prepare's predictions,
-and execute's account. Review compares prediction against outcome, judges what
-the divergences mean, and evaluates how the result bears on the current bet and
-its experienced outcome.
-
-What comes back is a calibration report: what matched, what diverged, what the
-divergences mean, and whether the immediate result and the current bet's route
-warrant confidence.
-
-Review records attempt disposition for every result and, when evidence exists,
-its evidence layer. It keeps the dimensions separate before judging what the
-result means for the claim:
-
-- **Evidence layer:** capability, substrate, or both.
-- **Attempt disposition:** effect boundary crossed, or precondition miss before
-  the boundary.
-
-**Capability evidence** directly bears on the claimed behavior. **Substrate
-evidence** qualifies a dependency of the observation path. A **precondition
-miss** means the required effect boundary was not crossed. It provides no
-capability evidence but may provide substrate evidence.
-
-The report also records how the cycle's result bears on the selected bet:
-whether it produced the bet's Organic proof, strengthened or qualified a
-necessary path toward that proof, or left that proof pending; which assumption
-changed; and whether the next steering signal has been reached. Keep implementation
-validation distinct from Organic proof. Tests, checks, and PR readiness do not
-establish Organic proof unless that release or maintenance experience is itself
-the experienced outcome being tested. When ordinary use was not observed,
-report **Implementation validated; Organic proof pending**. Review surfaces a
-reached steering signal; it also surfaces relationship-breaking evidence —
-signs that the result no longer plausibly advances the experienced outcome — or
-an explicit user revision of project purpose or experienced outcome. Selection
-at that boundary belongs to **steer-by-vision**.
-
-When the user wants a collaborative review rather than a one-shot report, use the `walkthrough` skill to conduct the review phase interactively — examining the changes together, one chunk at a time.
-
-## When phases loop
-
-The cycle is not always linear. Reality creates branches.
-
-**Prepare discovers something that blocks the plan.** The prediction is: "this won't work as described." Don't proceed to execute. Resolve the blocker in conversation with the user, then re-enter prepare with the revised understanding.
-
-**Execute encounters something prepare didn't predict.** The mismatch between prediction and reality is itself a finding. Execute surfaces it rather than absorbing it. If the mismatch changes the approach, return to prepare. If it's local and manageable, execute continues and documents the divergence for review.
-
-**The substrate repeatedly diverges from the hypothesis.** Return to prepare
-and make the depended-on substrate property its own bounded qualification
-cycle. Carry its result back into the capability experiment instead of
-accumulating local patches along the observation path.
-
-**Review finds a consequential problem.** When the problem remains inside the
-current bet, it becomes a new bounded task. Re-enter execute with the specific
-fix, then review the fix. When it reaches the named steering signal, return the
-evidence to **steer-by-vision**.
-
-**Review finds the hypothesis was wrong in an interesting way.** Prepare's model of the codebase was incorrect, and the incorrectness reveals something about the system that nobody anticipated. This is the most valuable outcome of the cycle — not a failure but a discovery. Surface it to the user.
-
-## The coordinating agent's role
-
-You — the agent using this skill — are not one of the three subagents. You're the scientist running the experiment. You design the dispatch prompts, verify the outputs, manage the transitions, and decide when to loop vs. proceed.
-
-You are also the single owner of the steering transition. Phase agents surface
-evidence and reached signals to you. A reached steering signal, evidence that
-calls the bet's relationship to its experienced outcome into question, or an
-explicit user revision of project purpose or experienced outcome takes
-precedence. Invoke **steer-by-vision** once with the cycle's evidence. While
-organic proof remains pending and none of those conditions applies, route the
-next bounded evidence move inside the current bet. Phase agents do not invoke
-**steer-by-vision** independently.
-
-The tension to navigate: trust vs. verification. The subagents are generally reliable, but they operate in isolation. Each one can only see what you give it. Verify consequential claims against the workspace, but don't re-do each subagent's work. The verification is about catching the occasional fabrication or gap, not about distrust.
-
-The other tension: ceremony vs. momentum. The cycle adds overhead. Use it when the overhead pays for itself in clarity and confidence. Skip phases when they'd be pure ceremony — if the task is clear enough that prepare would just confirm what everyone already knows, go straight to execute.
+Use [collaborative-grounding](../../stances/collaborative-grounding/SKILL.md "composition:load")
+when the consequential choice depends on the user's intent or experience.
+Finish when the intended change has adequate support, or explain the specific
+evidence or decision still needed. Across repeated cycles, a short working
+record can preserve what was learned and what it changes about the next move.

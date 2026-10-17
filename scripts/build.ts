@@ -730,13 +730,13 @@ async function build() {
         displayName: pluginMeta.name,
         shortDescription: "Personal workflow skills for Codex",
         longDescription:
-          "A personal agent toolkit for Codex with workflow skills, session lifecycle support, collaborative review patterns, and reusable stances for stronger agent collaboration.",
+          "A personal agent toolkit for Codex with workflow skills, architectural and implementation quality practices, collaborative review patterns, and reusable stances for stronger agent collaboration.",
         developerName: "wycats",
         category: "Developer Tools",
         capabilities: ["Interactive", "Write"],
         websiteURL: "https://github.com/wycats/vscode-ai-plugin",
         defaultPrompt: [
-          "Use the session lifecycle skills for this repo",
+          "Improve implementation quality in this codebase",
           "Walk me through this code with the walkthrough skill",
           "Run a recon pass over this project",
         ],

@@ -1,9 +1,8 @@
 ---
 name: recon
-description: Use when investigating unfamiliar code, tracing data flows, mapping
-  architecture, or answering questions that require adaptive exploration — where
-  the agent needs to follow leads, use tools interactively, and synthesize
-  findings rather than just search for known terms.
+description: Investigate code or system behavior when developing an explanation
+  requires following discoveries that can change your understanding and the
+  question you need to answer.
 metadata:
   wycats.kind: workflow
   wycats.user-invocable: "true"
@@ -12,48 +11,49 @@ metadata:
 
 # Recon
 
-Adaptive investigation where each result changes what you look for next. Unlike search (which executes a known plan), recon follows leads, makes judgment calls about what's worth pursuing, and synthesizes findings into a grounded account.
+Begin with your best understanding of what the caller needs to resolve. Let
+what you discover refine that understanding, including what would count as a
+useful answer. Each result can change how you understand the system, what
+earlier observations mean, and which question is worth pursuing next.
 
-**Stances used:** Load the [diagnostic-questioning](../../stances/diagnostic-questioning/SKILL.md "composition:load") and [interpretive-synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load") stances for investigation, load [observational-grounding](../../stances/observational-grounding/SKILL.md "composition:load") when surfaces conflict, and keep [relational-continuity](../../stances/relational-continuity/SKILL.md "composition:load") active throughout for keeping findings attached to the work underway.
-
-## When to use
-
-Use recon when understanding the answer requires following a trail — tracing data flows, reading git history for intent, exploring how modules connect across layers. The question can't be reduced to a single search query, and what you find at each step determines where to look next.
-
-| Instead of recon... | Use... | Because... |
-|---------------------|--------|------------|
-| Known search plan | Explore | Each result won't change what you search next |
-| Parallel search during recon | Explore (as fan-out) | Explore gathers; recon synthesizes |
-| Parallel bounded investigation | Recon-worker (as fan-out) | Needs tools and judgment, but scoped |
-| Code changes | Execute or PER | Recon investigates; it doesn't implement |
-| "Where is X?" | Explore | Don't bring a detective to a dictionary lookup |
+Keep [relational-continuity](../../stances/relational-continuity/SKILL.md "composition:load") active throughout so findings stay attached to the work underway.
+Use [interpretive-synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load")
+throughout the investigation. As your understanding of the system and the
+question changes, revisit the evidence and decisions that depended on your
+earlier understanding.
 
 ## How investigation works
 
-Start by understanding the question: what needs to be understood, what's the scope, what's the purpose (planning, debugging, understanding, auditing). If ambiguous, ask.
+Start with the question and what answering it would let the caller do. Resolve
+uncertainties from the available context and tools. When the answer depends on
+the user's intent or experience, ask about that uncertainty. Load
+[diagnostic-questioning](../../stances/diagnostic-questioning/SKILL.md "composition:load")
+when each answer needs to reshape your understanding and determine the next
+question.
 
 Then explore adaptively. Start broad, follow leads. Each search result, file read, or command output either opens new directions or closes them. Use tools beyond search — git history, terminal commands, project tooling — when they help trace intent or verify structure. When a direction dead-ends, note what you tried and pivot.
 
-The investigation has a natural shape: broad orientation, then focused pursuit of the most promising leads, then synthesis. But the shape adapts to what you find. Sometimes you converge quickly. Sometimes sources conflict and you need to trace the conflict itself.
+Following a promising lead can expose a problem with the question itself.
+You might explain an expensive operation and find ways to improve it, then
+discover that the application repeats it far more often than its purpose
+requires. The measurements still hold; their significance changes. Return to
+the behavior the caller needs and investigate what work would produce it.
 
-## Stabilize the phenomenon
+Let discoveries change the scope of your attention within the assignment.
+Sometimes a local explanation settles the question. Sometimes it changes how
+you read several earlier findings. Share that change when it affects a decision
+the caller is making, so they can correct your understanding of the purpose
+while you continue investigating the mechanism.
 
-When observations appear to disagree, preserve the contradiction before
-explaining it. Name what each surface actually shows, and ask what would make
-those observations bear on the same phenomenon.
+## Relate observations to the question
 
-This is a pause inside recon, not a separate procedure. Inspect only enough to
-stabilize the observation. Sometimes that means checking scope, identity,
-timing, workspace, or storage context. Sometimes it means discovering that the
-two observations are not yet comparable.
-
-For example, if an event log shows recent requests but a database read shows no
-recent turns, the stable starting point is not "persistence failed" or "the
-cache missed." It is the observed contradiction: the log surface reports recent
-activity, while the storage surface does not show the corresponding persisted
-state. Once the surfaces are known to be comparable, causal recon can resume.
-Consult the full [observational-grounding](../../stances/observational-grounding/SKILL.md "composition:reference")
-stance when this compact guidance leaves comparability ambiguous.
+When a lead depends on what an observation establishes or whether two sources
+refer to the same thing, load
+[observational-grounding](../../stances/observational-grounding/SKILL.md "composition:load").
+Use the possible explanation to choose what to inspect, and let the inspection
+change how you understand the evidence. Establishing that two records describe
+different events may dissolve a contradiction and change which question is
+worth following.
 
 ## Fan-out
 

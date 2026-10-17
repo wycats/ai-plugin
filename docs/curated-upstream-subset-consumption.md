@@ -1850,7 +1850,7 @@ directory copies with copies derived from the resolved resources' locked input
 boundaries. An adapter that still emits the two unselected hook scripts must list
 them as support outputs and would still fail the exact-subset responsibility.
 Generated metadata is part of the same proof. The current full-corpus Codex
-manifest legitimately advertises session lifecycle, walkthrough, and recon
+manifest legitimately advertises implementation-quality, walkthrough, and recon
 workflows. Reusing those descriptions and default prompts unchanged for this
 subset would advertise skills outside its active projection. A selection-aware
 packager must derive the fields from the resolved active set or reject the

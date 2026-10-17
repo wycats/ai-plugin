@@ -64,9 +64,11 @@ pnpm build:codex
 pnpm build:pi
 ```
 
-The full source migration covers 17 workflows and 14 stances. Skill prose is
-preserved; relative links and frontmatter change to express the new locations
-and metadata. `CanonicalResource.kind` separates meaning from source `section`.
+The canonical source now contains 13 workflows and 14 stances. The layout
+migration preserves skill prose while changing relative links and frontmatter
+to express the new locations and metadata. Subsequent authoring review retired
+the four session workflows and their pre-read agent. `CanonicalResource.kind`
+separates meaning from source `section`.
 Names remain globally unique across workflows and stances. Legacy flat input
 remains accepted by the reader for compatibility and comparison.
 

@@ -123,6 +123,14 @@ right well active, and an agent may embody the same relational structure in
 its own voice. The test is whether the restatement reinforces the canonical
 invariant or establishes a definition that could drift independently.
 
+When an agent uses a workflow, the workflow owns its supporting stance links
+and investigation or execution mechanics. The agent loads that workflow and
+establishes the role's identity and responsibility to its caller and workers.
+Ask: when we improve the workflow's method, should the agent file need a
+matching edit? Usually it should not. A change to the delegated role's
+responsibility should change the agent. Short restatements can make that role
+vivid while leaving the method's decisions with the workflow.
+
 ## Negative instructions cluster with poor work
 
 Dense blocks of "don't do X" instructions are correlated in the training data with corrective feedback, low-trust delegation, and defensive documentation. The model has learned that this pattern surrounds contexts where expected output quality is low.
@@ -147,6 +155,13 @@ Agents read skills front-to-back with highest attention at the beginning. This m
 ## Triangulate stances with cross-domain examples
 
 When defining a stance, choose 3-4 examples from unrelated domains whose overlap is precisely the relational structure you want. The examples do two jobs: they activate the right well (through their shared structure) and they exclude nearby attractors (through their differences). A fourth example is needed when the first three accidentally include an attractor that the variation doesn't carve out. A framing sentence that marks which axis is variation and which is invariant helps the model read the examples correctly.
+
+Preserve that variation when revising examples, including compact examples in
+an agent's role description. Different professions alone may leave the same
+incidental assumptions in place; show differences in evidence, relationships,
+or opportunities to act while keeping the intended structure shared. If the
+examples feel repetitive, examine which distinctions the wording has lost
+before collapsing them into one.
 
 ## Collaboration over inference for situated decisions
 
