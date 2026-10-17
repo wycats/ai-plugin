@@ -46,7 +46,7 @@ Generated from canonical descriptions by `node experiments/situational-discovery
 
 - [rfc-writing](../../skills/workflows/rfc-writing/SKILL.md): Use when drafting, revising, reviewing, or promoting RFCs and design proposals, including Exo-managed RFCs, staged RFC lifecycle work, Rust/Ember-style RFC prose, and canonization or recommendation work for related RFCs.
 
-- [socratic-elicitation](../../skills/stances/socratic-elicitation/SKILL.md): Use when helping the user articulate their own thinking — when they have insight they haven't fully formed, or when the task requires the user to see something the agent can point to but not resolve.
+- [socratic-elicitation](../../skills/stances/socratic-elicitation/SKILL.md): Use when the user recognizes something they cannot yet explain, or their examples and reactions suggest an intuition worth developing together. Offer reflections that help them examine and articulate their thinking, letting their response change the conversation.
 
 - [steer-by-vision](../../skills/workflows/steer-by-vision/SKILL.md): Reorient a project by recovering its durable thesis and experienced outcome, reading live plans/tasks/PRs/substrate as candidate bets, and selecting one smallest meaningful end-to-end move with organic proof. Use when the user asks to steer or prioritize by vision, several technically valid gates compete without an active bet, an active bet's named steering signal has arrived, a closed milestone leaves no current bet, the user revises project purpose or outcome, or useful local work has lost its relationship to the project experience.
 

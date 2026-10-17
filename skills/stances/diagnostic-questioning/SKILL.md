@@ -16,9 +16,15 @@ Adaptive sequential questioning where each answer reshapes the questioner's mode
 
 ---
 
-The questioner has done their homework — they have a preliminary model of the space. The questions test that model against the other party's knowledge, targeting the specific places where the questioner's understanding is most likely to be wrong.
+The questioner has done their homework. They have a preliminary understanding
+and a consequential uncertainty that the other person's experience or intent
+can help resolve. Each answer changes that understanding and what becomes
+worth asking next. Use tools for questions the available evidence can settle.
 
-The sequence matters. Early questions establish the frame — the broad shape of what matters. Later questions probe within that frame. The questioner doesn't ask about details before understanding the big picture, and doesn't ask about the big picture after the details have already revealed it.
+A question about a detail can reveal that the larger question was mistaken.
+An answer that seemed to settle the direction can acquire a different meaning
+after a later example. Keep revising both the uncertainty and the questions
+that could resolve it. The order develops through the exchange.
 
 ## The relational structure
 
@@ -32,37 +38,34 @@ A therapist in a session. They have a clinical model. Each question tests it. Bu
 
 A parent sensing their teenager is struggling. "How did the presentation go today?" is specific, grounded, and safe. The answer — or the way it's deflected — reshapes the model. Ask too directly and the teenager retreats. Ask too indirectly and the window passes. Unlike the therapist, the parent and teenager live together — a question that lands wrong at dinner changes the relational context for every interaction after.
 
-## The key property
+## Ask from what you know
 
-Each question is designed to be easy to answer but hard to predict. "Do you want to continue the refactor?" is easy to predict (probably yes) and wastes the collaboration budget. "The refactor touched the request builder but stopped before the response handler — was that a natural boundary or did you run out of time?" is easy to answer but reveals something the agent couldn't know.
+Make the uncertainty concrete enough that the user can contribute without
+reconstructing the investigation. If the implementation permits two behaviors,
+show the difference and ask about the experience each would support. Their
+answer may select one, reveal a third, or change what the implementation should
+make possible.
 
-## Relationship to pregnant tensions
-
-High-variance threads often arise from pregnant tensions — situations where competing concerns create a real decision point. These are the most important threads to ask about, because they represent genuine choices the user needs to make. The diagnostic sequence should prioritize pregnant tensions over simple information gaps.
-
-## When this stance applies
-
-- Triaging dangling threads during a handoff
-- Understanding the user's priorities before starting work
-- Any situation where the agent needs to elicit the user's intent and the intent isn't obvious from the observable context
-
-## What this stance is not
-
-- A survey (presenting all questions at once)
-- A checklist (confirming known items)
-- Open-ended exploration (the agent has a specific uncertainty to resolve)
-- Investigation of systems (that's recon — adaptive investigation of code, not questioning of people)
-
-## Tension with Socratic elicitation
-
-Diagnostic questioning is efficient — it wants to maximize information gain per question. Socratic elicitation is generative — it wants to help the user discover what they think, which sometimes means following a thread that isn't the highest-variance one but is the one the user's energy is on.
-
-In practice, the user may respond to a high-variance question by going somewhere unexpected. The diagnostic stance says to get back to the highest-variance thread. The Socratic stance says to follow the user's energy. This is a real tension in interview practice — do you follow the interviewee's energy or stick to your diagnostic sequence?
-
-Resolve this in context. When the user's energy is revealing something the diagnostic sequence wouldn't have found, follow it. When the user is drifting away from a decision that needs to be made, gently return to the diagnostic thread.
+Choose questions whose answers could change the work. Several plausible
+interpretations of the user's intent may deserve a question; an observable
+detail may need inspection. An answer already given should inform the next
+move. Once the uncertainty is sufficiently resolved, act on what we have
+learned and let further work expose the next useful question.
 
 ## Composition notes
 
 Diagnostic questioning is [collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference") structured around uncertainty reduction. The agent uses its perception to identify where uncertainty is highest, then asks the user to contribute the situated knowledge that resolves it.
 
-Composes naturally with **Socratic elicitation** (diagnostic questioning identifies _what_ to ask; Socratic elicitation shapes _how_ to ask it — but see the tension above). Composes with [interpretive synthesis](../interpretive-synthesis/SKILL.md "composition:reference") (the coherent account of the session reveals where the high-variance threads are). Dangling-thread review uses diagnostic questioning when a thread's status depends on the user's situated knowledge.
+[Socratic elicitation](../socratic-elicitation/SKILL.md "composition:reference")
+helps when the question surfaces an intuition the user wants to develop. Give
+that emerging understanding room while keeping the concrete decision in view;
+it may change which decision needs to be made. A more precise uncertainty may
+in turn emerge from the reflective conversation.
+
+[Interpretive synthesis](../interpretive-synthesis/SKILL.md "composition:reference")
+relates each answer to the larger understanding, including when an answer
+changes how we understand something the user said earlier.
+[Joint reading](../joint-reading/SKILL.md "composition:reference") can make the
+question concrete through a shared artifact. Dangling-thread review uses
+diagnostic questioning when a thread's status depends on the user's situated
+knowledge.
