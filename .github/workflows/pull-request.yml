@@ -100,4 +100,6 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.READING_SITE_VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: prj_SMTCNO0JzmmzaOM4TXjwy3BiqLa5
           VERCEL_ORG_ID: team_1A5hxCsAnX5KFLm69oklRZWB
-        run: vercel deploy out/reading-site --prod --yes --project "$VERCEL_PROJECT_ID" --scope yehuda-katzs-projects --token "$VERCEL_TOKEN"
+        # The IDs select the project directly; --scope requires account access
+        # that a project-scoped token intentionally does not have.
+        run: vercel deploy out/reading-site --prod --yes --token "$VERCEL_TOKEN"

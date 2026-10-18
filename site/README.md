@@ -41,6 +41,10 @@ generated plugin output alone do not trigger the workflow.
 Deployment credentials live in the GitHub environment `reading-site-production`,
 restricted to `main`. Its `READING_SITE_VERCEL_TOKEN` secret is scoped to this
 Vercel project. Pull request validation does not use the environment or token.
+The token expires October 18, 2027. Before then, create a replacement with the
+same project scope and update that environment secret. The deployment supplies
+`VERCEL_PROJECT_ID` and `VERCEL_ORG_ID` directly: the CLI's `--scope` lookup needs
+account access unavailable to a project-scoped token.
 
 To publish a reviewed build manually:
 
