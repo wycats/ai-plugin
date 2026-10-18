@@ -27,7 +27,8 @@
     "validate": "node scripts/validate.ts",
     "lint": "eslint scripts/",
     "check": "tsc --noEmit && eslint scripts/ && pnpm test:eval && pnpm test:composition && pnpm test:publication",
-    "generate:config-schema": "node scripts/generate-config-schema.ts"
+    "generate:config-schema": "node scripts/generate-config-schema.ts",
+    "build:site": "node site/build.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -35,6 +36,7 @@
     "esbuild": "^0.28.2",
     "eslint": "^10.0.3",
     "jiti": "^2.6.1",
+    "marked": "17.0.5",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.0"
   },
