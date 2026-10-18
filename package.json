@@ -28,7 +28,9 @@
     "lint": "eslint scripts/",
     "check": "tsc --noEmit && eslint scripts/ && pnpm test:eval && pnpm test:composition && pnpm test:publication",
     "generate:config-schema": "node scripts/generate-config-schema.ts",
-    "build:site": "node site/build.mjs"
+    "build:site": "node site/build.mjs",
+    "check:site": "node site/check.mjs",
+    "test:site": "node --test site/check.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -37,6 +39,7 @@
     "eslint": "^10.0.3",
     "jiti": "^2.6.1",
     "marked": "17.0.5",
+    "parse5": "8.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.0"
   },
