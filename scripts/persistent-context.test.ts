@@ -29,7 +29,9 @@ void test("persistent context is explicit and cannot also have file-scoped activ
 
 for (const target of ["codex", "claude-code", "vscode"]) {
   void test(`${target} delivers the complete story with working links after package relocation`, async () => {
-    const temporary = await mkdtemp(join(tmpdir(), "persistent-context-"));
+    // Windows temp paths may use 8.3 aliases. Give child processes the same
+    // resolved root that the expected Markdown destinations use.
+    const temporary = await realpath(await mkdtemp(join(tmpdir(), "persistent-context-")));
     try {
       const built = join(temporary, "built");
       await exec(process.execPath, [join(ROOT, "scripts/build.ts"), "--config",
@@ -141,7 +143,7 @@ for (const target of ["codex", "claude-code", "vscode"]) {
         await writeFile(claudePath, withImport + userAddition);
         await command("install", [], moved);
         assert.equal(await readFile(claudePath, "utf8"), withImport + userAddition);
-        const refreshed = expected.replaceAll(installed, await realpath(moved));
+        const refreshed = expected.replaceAll(installed.replaceAll("\\", "/"), (await realpath(moved)).replaceAll("\\", "/"));
         assert.equal(await readFile(prosePath, "utf8"), refreshed);
 
         // An edited export or import must never be silently replaced or removed.
@@ -195,7 +197,7 @@ for (const target of ["codex", "claude-code", "vscode"]) {
 }
 
 void test("persistent delivery collects multiple instruction resources without a story-specific source", async () => {
-  const temporary = await mkdtemp(join(tmpdir(), "persistent-instructions-"));
+  const temporary = await realpath(await mkdtemp(join(tmpdir(), "persistent-instructions-")));
   try {
     const source = join(temporary, "source");
     await mkdir(join(source, "instructions"), { recursive: true });
@@ -233,7 +235,7 @@ void test("persistent delivery collects multiple instruction resources without a
       await writeFile(join(output, packagePath), "Reference");
       await writeFile(join(output, "scripts/persistent-context.json"),
         JSON.stringify([["Read [this](<", { packagePath }, ">)."]]));
-      assert.equal(await deliver(), `Read [this](<${join(await realpath(output), packagePath)}>).`);
+      assert.equal(await deliver(), `Read [this](<${join(await realpath(output), packagePath).replaceAll("\\", "/")}>).`);
       // The hook budget belongs to hook delivery. Rendering itself preserves
       // the complete prose even when it exceeds that particular transport.
       const large = "Instruction. ".repeat(5000);
