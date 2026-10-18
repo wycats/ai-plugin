@@ -1,133 +1,180 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Plugin Config",
-  "description": "Configuration for building the agent plugin. Maps abstract role names to concrete model strings and tool identifiers for your environment.",
   "type": "object",
-  "required": ["target", "models", "toolGroups"],
-  "additionalProperties": false,
   "properties": {
     "$schema": {
-      "type": "string",
-      "description": "Path to this schema file. Enables editor validation and autocomplete."
+      "description": "Path to this schema file. Enables editor validation and autocomplete.",
+      "type": "string"
     },
     "target": {
       "type": "string",
-      "description": "Build target platform. VS Code builds to out/wycats/; Claude Code builds to out/claude-code/; Codex builds to out/codex/; Pi builds to out/pi/.",
-      "enum": ["vscode", "claude-code", "codex", "pi"],
-      "default": "vscode"
+      "enum": [
+        "vscode",
+        "claude-code",
+        "codex",
+        "pi"
+      ],
+      "description": "Build target platform. VS Code builds to out/wycats/; Claude Code builds to out/claude-code/; Codex builds to out/codex/; Pi builds to out/pi/."
     },
     "models": {
       "type": "object",
-      "description": "Maps model role names used in agent source files to concrete model strings for your provider. Set a value to null to omit the model field (uses the platform default).",
-      "required": ["fast", "balanced", "auxiliary"],
-      "additionalProperties": false,
       "properties": {
         "fast": {
-          "type": ["string", "null"],
-          "description": "High-capability model for agents that need strong reasoning (recon, recon-worker). Examples: 'Claude Opus 4.6 Fast (vercel)', 'opus', null (platform default)."
+          "description": "High-capability model for agents that need strong reasoning (recon, recon-worker). Examples: 'Claude Opus 4.6 Fast (vercel)', 'opus', null (platform default).",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "balanced": {
-          "type": ["string", "null"],
-          "description": "Mid-tier model role available to agent definitions. Examples: 'Gemini 3.1 Pro Preview (vercel)', 'sonnet', null (platform default)."
+          "description": "Mid-tier model role available to agent definitions. Examples: 'Gemini 3.1 Pro Preview (vercel)', 'sonnet', null (platform default).",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "auxiliary": {
-          "type": ["string", "null"],
-          "description": "Cost-effective model for supporting tasks (slop-linter). Examples: 'GPT 5.4 (vercel)', 'haiku', null (platform default)."
+          "description": "Cost-effective model for supporting tasks (slop-linter). Examples: 'GPT 5.4 (vercel)', 'haiku', null (platform default).",
+          "type": [
+            "string",
+            "null"
+          ]
         }
-      }
+      },
+      "additionalProperties": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "description": "Maps authored model roles to provider model names. Null or an omitted role uses the host default."
     },
     "thinkingLevels": {
-      "type": "object",
       "description": "Optional target-specific thinking levels keyed by abstract model role. Pi projects these into pi-subagents agent profiles.",
-      "additionalProperties": false,
-      "properties": {
-        "fast": { "type": ["string", "null"] },
-        "balanced": { "type": ["string", "null"] },
-        "auxiliary": { "type": ["string", "null"] }
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": [
+          "string",
+          "null"
+        ]
       }
     },
     "toolGroups": {
       "type": "object",
-      "description": "Named groups of tool identifiers. Agent source files reference group names, and the build expands them to concrete tool lists. Any name in an agent's tools array that doesn't match a group key passes through as a literal.",
-      "additionalProperties": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "description": "Array of concrete tool identifiers for this group."
-      },
       "properties": {
         "core": {
           "description": "Base tools available to most agents (search, read, etc.).",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "agent": {
           "description": "Ability to dispatch subagents.",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "browser": {
           "description": "Browser interaction tools.",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "edit": {
           "description": "File editing tools for agents whose assignments include changing artifacts.",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "memory": {
           "description": "Persistent memory read/write.",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "exo": {
           "description": "Exosuit context tools.",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "terminal": {
           "description": "Full terminal access (run, await, kill, get output).",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "terminal-minimal": {
           "description": "Limited terminal access (run and get output only).",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "testing": {
           "description": "Test execution and failure inspection.",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "tasks": {
           "description": "VS Code task creation and execution.",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "github": {
           "description": "GitHub API tools (PRs, issues, search).",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         }
-      }
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "Named groups of tool identifiers. Agent source files reference group names, and the build expands them to concrete tool lists. Any name in an agent's tools array that doesn't match a group key passes through as a literal."
     },
     "hookMatchers": {
-      "type": "object",
       "description": "Claude Code hook matcher strings keyed by neutral hook tool name. Used when building consolidated hooks.json.",
-      "additionalProperties": { "type": "string" },
+      "type": "object",
       "properties": {
         "terminal": {
-          "type": "string",
-          "description": "Matcher for terminal hooks, e.g. Bash."
+          "description": "Matcher for terminal hooks, e.g. Bash.",
+          "type": "string"
         },
         "edit": {
-          "type": "string",
-          "description": "Matcher for edit hooks, e.g. Write|Edit|MultiEdit."
+          "description": "Matcher for edit hooks, e.g. Write|Edit|MultiEdit.",
+          "type": "string"
         }
+      },
+      "additionalProperties": {
+        "type": "string"
       }
     }
-  }
+  },
+  "required": [
+    "target",
+    "models",
+    "toolGroups"
+  ],
+  "additionalProperties": false,
+  "title": "Plugin Config",
+  "description": "Configuration for building the agent plugin. Maps abstract role names to concrete model strings and tool identifiers for your environment."
 }

@@ -97,8 +97,7 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
     // Generated metadata belongs to the host, so inspect links without applying
     // canonical source-policy validation to the generated package.
     const projectedEdges: string[][] = [];
-    const generatedResources = await discoverResourceFiles(out);
-    for (const resource of [...generatedResources.agents, ...generatedResources.skills, ...generatedResources.stances]) {
+    for (const resource of plan.resources.map(({ resource, outputPath, pluginPath }) => ({ ...resource, sourcePath: outputPath, pluginPath }))) {
       const links = parseCompositionLinks(await readFile(resource.sourcePath, "utf8"));
       assert.deepEqual(links.diagnostics, []);
       for (const link of links.links) {
@@ -108,9 +107,10 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
       }
     }
 
-    // Pi carries all stances privately, but only Recon's workflow and agent.
+    assert.ok(plan.resources.some(({ resource, exposure, pluginPath }) => resource.name === "dangling-thread-review" && exposure === "reference" && pluginPath.startsWith("./references/")));
+    // Private references preserve navigation without joining the public catalog.
     const expectedReferences = canonical.composition.references.filter(
-      ({ source }) => source.kind === "stance" || source.name === "recon",
+      ({ source }) => plan.outputBySourcePath.has(source.sourcePath),
     );
     assert.equal(projectedEdges.length, expectedReferences.length);
 

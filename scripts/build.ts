@@ -10,6 +10,7 @@
  * (vscode → out/wycats/, claude-code → out/claude-code/, codex → out/codex/).
  */
 
+import { parseBuildConfig, type BuildConfig as Config } from "./build-config.ts";
 import { readFile, writeFile, mkdir, cp, stat } from "node:fs/promises";
 import { join, relative, dirname, resolve, posix, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,22 +36,16 @@ import {
   type CanonicalComposition,
 } from "./resource-composition.ts";
 import { assertSafeOutputOverride, prepareProjectionOutput } from "./projection-output.ts";
-import { VSCODE_PLUGIN_HOOK_PATH, vscodePluginManifest } from "./vscode-plugin.ts";
-import { projectVSCodeHooks, projectClaudeCodeHooks, type HookManifest } from "./hook-projection.ts";
+import { vscodePluginManifest } from "./vscode-plugin.ts";
+import { projectPluginHooks } from "./hook-projection.ts";
+import { parseHookManifest, type HookManifest } from "./hook-manifest.ts";
 import { PI_PROFILE, piAgentContext } from "./pi-profile.ts";
 import { createProjectionPlan, projectionResourceMap, type ProjectionPlan, type ProjectedResource } from "./projection-plan.ts";
+import { writePersistentContext } from "./persistent-context.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DEFAULT_CONFIG_PATH = join(ROOT, "config.json");
 const CONFIG_ENV_VAR = "VSCODE_AI_PLUGIN_CONFIG_PATH";
-
-interface Config {
-  target: string;
-  models: Record<string, string | null>;
-  thinkingLevels?: Record<string, string | null>;
-  toolGroups: Record<string, string[]>;
-  hookMatchers?: Record<string, string>;
-}
 
 interface PluginMetadata {
   name: string;
@@ -158,7 +153,7 @@ const CONFIG_PATH = BUILD_OPTIONS.configPath;
 
 async function loadConfig(): Promise<Config> {
   try {
-    return JSON.parse(await readFile(CONFIG_PATH, "utf-8")) as Config;
+    return parseBuildConfig(JSON.parse(await readFile(CONFIG_PATH, "utf-8")) as unknown);
   } catch (err: unknown) {
     const displayPath = displayConfigPath(CONFIG_PATH);
     const error = err as NodeJS.ErrnoException;
@@ -343,37 +338,38 @@ async function buildAgent(
   return `./${relative(outDir, outPath).split("\\").join("/")}`;
 }
 
+async function readHookManifests(files: string[]): Promise<HookManifest[]> {
+  return Promise.all(files.map(async file => {
+    try {
+      const manifest = parseHookManifest(JSON.parse(await readFile(file, "utf8")) as unknown);
+      const scriptPath = join(ROOT, "scripts", "hooks", manifest.script);
+      if (!(await stat(scriptPath)).isFile()) throw new Error(`Hook script is not a file: ${scriptPath}`);
+      return manifest;
+    } catch (error) {
+      throw new Error(`${file}: ${error instanceof Error ? error.message : String(error)}`, { cause: error });
+    }
+  }));
+}
+
 /**
- * Build hooks for the target platform from neutral manifests.
- *
- * Reads manifests from hooks/*.json, copies scripts + lib to output,
- * then delegates to a platform-specific adapter.
+ * Assemble authored hooks and generated persistent delivery into one manifest.
+ * Copy the authored runtime only when that target includes authored hooks.
  */
 async function buildHooks(
   outDir: string,
   config: Config,
-  hookFiles: string[],
+  plan: ProjectionPlan,
+  manifests: HookManifest[],
 ): Promise<string[]> {
-  if (hookFiles.length === 0) return [];
+  const projected = projectPluginHooks(plan.target, manifests,
+    plan.persistentInstructions?.delivery, config.hookMatchers);
+  if (!projected) return [];
 
-  // Load all manifests
-  const manifests: HookManifest[] = [];
-  for (const file of hookFiles) {
-    manifests.push(JSON.parse(await readFile(file, "utf-8")) as HookManifest);
+  if (manifests.length) {
+    await cp(join(ROOT, "scripts", "hooks"), join(outDir, "scripts", "hooks"), { recursive: true });
+    await copyAgentHooksPackage(outDir);
   }
-
-  // Copy hook scripts and agent-hooks package to output
-  await cp(join(ROOT, "scripts", "hooks"), join(outDir, "scripts", "hooks"), {
-    recursive: true,
-  }).catch(() => {});
-  // Copy the package so hook imports resolve in the output
-  await copyAgentHooksPackage(outDir);
-
-  const isClaudeCode = config.target === "claude-code";
-  const pluginPath = isClaudeCode ? "./hooks/hooks.json" : VSCODE_PLUGIN_HOOK_PATH;
-  const hooks = isClaudeCode
-    ? projectClaudeCodeHooks(manifests, config.hookMatchers)
-    : projectVSCodeHooks(manifests);
+  const { pluginPath, hooks } = projected;
   const destination = join(outDir, pluginPath);
   await mkdir(dirname(destination), { recursive: true });
   await writeFile(destination, JSON.stringify({ hooks }, null, 2) + "\n");
@@ -538,6 +534,7 @@ async function writePiCapabilityReport(
           "local filesystem reads, search, and shell commands",
         ],
         omitted: [
+          "persistent instructions (outside the bounded Recon profile)",
           "browser tools",
           "persistent memory",
           "Exo context tools",
@@ -575,6 +572,10 @@ async function build() {
   const plan = createProjectionPlan(composition, config.target, outDir);
   const projectedResources = plan.resources.map(({ resource }) => resource);
   const { outputBySourcePath } = plan;
+
+  const hookManifests = await readHookManifests(
+    plan.includesSourceHooks ? resources.hooks.map(resource => resource.sourcePath) : [],
+  );
 
   // Source and target preflight intentionally complete before generated output changes.
   await prepareProjectionOutput({
@@ -623,7 +624,7 @@ async function build() {
     }
     await cp(copy.source, copy.destination, {
       recursive: true,
-      filter: (source) => !copy.excludedDirectories?.some(
+      filter: (source) => !copy.excludedFiles?.includes(source) && !copy.excludedDirectories?.some(
         (directory) => source === directory || source.startsWith(`${directory}${sep}`),
       ),
     });
@@ -646,13 +647,11 @@ async function build() {
 
   const allSkillPaths = [...skillPaths, ...stancePaths];
 
-  const hookPaths = !plan.includesHooks
-    ? []
-    : await buildHooks(
-        outDir,
-        config,
-        resources.hooks.map((resource) => resource.sourcePath),
-      );
+  for (const { resource, outputPath } of plan.resources.filter(({ resource }) => resource.kind === "instruction")) {
+    await writeProjectedResource(resource, outputPath, composition, outputBySourcePath);
+  }
+  await writePersistentContext(outDir, plan, composition);
+  const hookPaths = await buildHooks(outDir, config, plan, hookManifests);
 
   await writeCompositionIndex(outDir, composition, outputBySourcePath);
   await writeFile(join(outDir, "projection-resources.json"), JSON.stringify(projectionResourceMap(plan), null, 2) + "\n");
@@ -680,7 +679,7 @@ async function build() {
     await writePiCapabilityReport(outDir, plan);
     console.log(`Built to ${relative(ROOT, outDir)}/`);
     console.log(`  agents:       ${String(agentPaths.length)} pi-subagents profile`);
-    console.log(`  skills:       ${String(skillPaths.length)} public workflow`);
+    console.log(`  skills:       ${String(plan.resources.filter(({ resource, exposure }) => resource.kind === "workflow" && exposure === "public").length)} public workflow`);
     console.log(`  stances:      ${String(stancePaths.length)} private canonical resources`);
     console.log("  manifest:     package.json");
     console.log("  capabilities: projection-capabilities.json");
@@ -711,8 +710,8 @@ async function build() {
     console.log(`  hooks:        ${String(hookPaths.length)}`);
     console.log(`  manifest:     .claude-plugin/plugin.json`);
   } else if (isCodex) {
-    // Codex: generate .codex-plugin/plugin.json. Codex discovers skills from
-    // skills/; agents and hooks are copied only as source/reference material.
+    // Codex discovers skills and the generated context hook from fixed paths.
+    // Agents remain reference material; authored policy hooks are omitted.
     const codexManifest: CodexPluginJson = {
       name: pluginMeta.name,
       version: pluginMeta.version,
@@ -759,17 +758,7 @@ async function build() {
     console.log(`  manifest:     .codex-plugin/plugin.json`);
   } else {
     // VS Code: copy instructions; generate plugin.json
-    for (const resource of projectedResources.filter((resource) => resource.kind === "instruction")) {
-      const outPath = outputBySourcePath.get(resolve(resource.sourcePath));
-      if (!outPath) throw new Error(`Missing output path for ${resource.pluginPath}`);
-      await writeProjectedResource(
-        resource,
-        outPath,
-        composition,
-        outputBySourcePath,
-      );
-    }
-    const instructionPaths = plan.resources.filter(({ resource }) => resource.kind === "instruction").map(({ pluginPath }) => pluginPath);
+    const instructionPaths = plan.resources.filter(({ resource }) => resource.kind === "instruction" && !resource.persistentContext).map(({ pluginPath }) => pluginPath);
 
     const manifest = vscodePluginManifest(pluginMeta, { agentPaths, instructionPaths });
     await writeFile(join(outDir, "plugin.json"), JSON.stringify(manifest, null, 2) + "\n");

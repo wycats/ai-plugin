@@ -39,7 +39,7 @@ void test("plans preserve distinct discovery, reference, and private resource su
     const pi = createProjectionPlan(composition, "pi", out);
     assert.equal(vscode.resources.some(({ resource }) => resource.kind === "instruction"), true);
     assert.equal(claude.resources.some(({ resource }) => resource.kind === "instruction"), false);
-    assert.equal(codex.includesHooks, false);
+    assert.equal(codex.includesSourceHooks, false);
     assert.ok(codex.resources.filter(({ resource }) => resource.kind === "agent").every(({ exposure }) => exposure === "reference"));
     assert.ok(claude.resources.filter(({ resource }) => resource.kind === "stance").every(({ pluginPath, exposure }) => pluginPath.startsWith("./skills/") && exposure === "private"));
     assert.equal(pi.resources.filter(({ resource }) => resource.kind === "workflow").length, 1);
@@ -66,6 +66,11 @@ void test("artifact addresses require the expected target and an unambiguous con
   const map = parseProjectionResourceMap({ schemaVersion: 1, target: "claude-code", resources: [
     { canonicalSource: "./agents/review.agent.md", generatedSource: "./agents/custom.agent.md", identity: "agent:review", exposure: "public" },
   ] }, "claude-code");
+  for (const change of [
+    { schemaVersion: 2 }, { resources: {} },
+    { resources: [{ ...map.resources[0], exposure: "hidden" }] },
+    { resources: [{ ...map.resources[0], generatedSource: 42 }] },
+  ]) assert.throws(() => parseProjectionResourceMap({ ...map, ...change }, "claude-code"), /Invalid projection/);
   const out = join(tmpdir(), "artifact");
   assert.equal(resolveProjectedResource(out, map, "agents/review.agent.md"), join(out, "agents", "custom.agent.md"));
   assert.throws(() => parseProjectionResourceMap(map, "codex"), /Invalid projection/);
@@ -228,4 +233,49 @@ void test("native resource discovery preserves nested paths and keeps support Ma
     assert.equal(await readFile(join(dirname(instruction.outputPath), "note.md"), "utf8"), "Team-local support");
     await assert.rejects(readFile(join(out, "com.github.copilot/rules/extra.instructions.md")), { code: "ENOENT" });
   } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+void test("plans select persistent delivery independently of authored hooks", async () => {
+  const { root, composition: before } = await fixture();
+  try {
+    for (const target of ["vscode", "claude-code", "codex", "pi"]) {
+      assert.equal(createProjectionPlan(before, target, join(root, "output")).persistentInstructions, undefined);
+    }
+    await writeFile(join(root, "instructions/collaboration.instructions.md"),
+      "---\ndescription: Shared work\nmetadata:\n  wycats.context: persistent\n---\nCollaborate.\n");
+    const { composition } = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.ok(composition);
+    const expected = [
+      ["vscode", true, "session-start"],
+      ["claude-code", true, "claude-project-import"],
+      ["codex", false, "session-start"],
+      ["pi", false, undefined],
+    ] as const;
+    for (const [target, sourceHooks, delivery] of expected) {
+      const plan = createProjectionPlan(composition, target, join(root, "output"));
+      assert.equal(plan.includesSourceHooks, sourceHooks);
+      assert.equal(plan.persistentInstructions?.delivery, delivery);
+      assert.deepEqual(plan.persistentInstructions?.resources.map(({ resource }) => resource.identity),
+        delivery ? ["instruction:collaboration"] : undefined);
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+void test("Claude reserves its setup command only when persistent delivery is selected", async () => {
+  const { root } = await fixture();
+  try {
+    await mkdir(join(root, "skills/setup-guidance"));
+    await writeFile(join(root, "skills/setup-guidance/SKILL.md"), "---\nname: setup-guidance\ndescription: Authored command\n---\nBody.");
+    let result = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.ok(result.composition);
+    createProjectionPlan(result.composition, "claude-code", join(root, "output"));
+    await writeFile(join(root, "instructions/persistent.instructions.md"), "---\ndescription: Persistent\nmetadata:\n  wycats.context: persistent\n---\nBody.");
+    result = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.ok(result.composition);
+    const composition = result.composition;
+    assert.throws(() => createProjectionPlan(composition, "claude-code", join(root, "output")), /reserves the skill name/);
+    createProjectionPlan(result.composition, "codex", join(root, "output"));
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });

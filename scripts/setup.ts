@@ -3,6 +3,7 @@
  * runs the build, and (for VS Code) registers the plugin.
  */
 
+import { parseBuildConfig } from "./build-config.ts";
 import { readFile, writeFile, appendFile, access } from "node:fs/promises";
 import { join } from "node:path";
 import { execFileSync, type ExecFileSyncOptionsWithBufferEncoding } from "node:child_process";
@@ -21,14 +22,6 @@ const CONFIG_PATH = join(ROOT, "config.json");
 const VSCODE_EXAMPLE_PATH = join(ROOT, "config.example.json");
 const CC_EXAMPLE_PATH = join(ROOT, "config.claude-code.example.json");
 const CODEX_EXAMPLE_PATH = join(ROOT, "config.codex.example.json");
-
-interface Config {
-  $schema: string;
-  target: string;
-  models: Record<string, string | null>;
-  toolGroups: Record<string, string[]>;
-  hookMatchers?: Record<string, string>;
-}
 
 type VSCodeRegistrationOutcome =
   | { status: "registered"; label: string }
@@ -334,15 +327,15 @@ async function setup() {
       : target === CODEX_TARGET
         ? CODEX_EXAMPLE_PATH
         : VSCODE_EXAMPLE_PATH;
-  const example = JSON.parse(await readFile(examplePath, "utf-8")) as Config;
+  const example = parseBuildConfig(JSON.parse(await readFile(examplePath, "utf-8")) as unknown);
 
-  const config: Config = {
+  const config = parseBuildConfig({
     $schema: "./config.schema.json",
-    target: target as string,
+    target,
     models,
     toolGroups: example.toolGroups,
     ...(example.hookMatchers ? { hookMatchers: example.hookMatchers } : {}),
-  };
+  });
 
   await writeFile(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n");
 

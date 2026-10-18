@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { buildConfigSchema } from "../../build-config.ts";
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
@@ -35,24 +37,27 @@ export async function withConfigSnapshot<T>(source: string, use: (path: string) 
   }
 }
 
-export function parseClaudeCodeConfig(value: unknown): { models: Record<string, string | null> } {
-  if (!isRecord(value) || value.target !== "claude-code") {
-    throw new Error("The evaluation adapter config must target claude-code.");
-  }
-  if (!isRecord(value.models)) {
-    throw new Error("The evaluation adapter config must declare a models object.");
-  }
-  const models: Record<string, string | null> = {};
-  for (const [role, target] of Object.entries(value.models)) {
-    if (target !== null && (typeof target !== "string" || !target.trim())) {
-      throw new Error(`The evaluation adapter model '${role}' must be a non-empty string or null.`);
+// Evaluation reads the same model mappings as the build, but needs a pinned
+// launcher model so runs can be reproduced. Other build fields are irrelevant here.
+const claudeCodeConfigSchema = buildConfigSchema.pick({ target: true, models: true }).strip().extend({
+  target: z.literal("claude-code", { error: "The evaluation adapter config must target claude-code." }),
+}).superRefine(({ models }, context) => {
+  for (const [role, model] of Object.entries(models)) {
+    if (typeof model === "string" && !model.trim()) {
+      context.addIssue({ code: "custom", path: ["models", role], message: "Expected a non-empty string or null." });
     }
-    models[role] = target;
   }
   if (!models.balanced) {
-    throw new Error("The evaluation adapter requires a concrete balanced model mapping.");
+    context.addIssue({ code: "custom", path: ["models", "balanced"], message: "The evaluation adapter requires a concrete balanced model mapping." });
   }
-  return { models };
+});
+
+export function parseClaudeCodeConfig(value: unknown) {
+  const result = claudeCodeConfigSchema.safeParse(value);
+  if (!result.success) {
+    throw new Error(`Invalid evaluation adapter config:\n${z.prettifyError(result.error)}`);
+  }
+  return { models: result.data.models };
 }
 
 export async function validateClaudeCodeProjection(root: string): Promise<void> {

@@ -37,6 +37,12 @@ is not a separate workflow entity.
 
 ## Concept map
 
+[Building together](instructions/building-together.instructions.md) describes how
+shared understanding develops through conversation, implementation, and use. It
+connects the skills and stances through the work they support. The
+[persistent guidance contract](docs/persistent-guidance.md) explains how each
+host receives it and the current delivery limits.
+
 The repo has two kinds of documentation: foundational theory that explains why the plugin is written this way, and design notes that explore emerging workflow concepts before they become skills.
 
 - [FOUNDATIONS.md](https://github.com/wycats/vscode-ai-plugin/blob/main/FOUNDATIONS.md) — distributional mechanics: probability landscapes, stances, information boundaries, generation vs. evaluation, and selection across timescales.
@@ -121,7 +127,7 @@ Two agents are user-facing: `recon` (codebase investigation) and `slop-linter` (
 
 ### Hooks and instructions
 
-Hooks enforce mechanical constraints that don't require judgment: blocking `npm` in a pnpm environment, blocking `tsx` when Node runs TypeScript natively. The environment instruction provides always-on context about the development environment (proto-managed toolchains, pnpm, strict typing).
+Hooks enforce mechanical constraints that don't require judgment: blocking `npm` in a pnpm environment, blocking `tsx` when Node runs TypeScript natively. The VS Code environment instruction supplies development conventions for matching files. A generated session-start hook delivers Building together in Codex and VS Code Local sessions. Claude Code loads the full story through an [explicit project import](docs/setup.md#claude-code-persistent-guidance); see [delivery and limits](docs/persistent-guidance.md).
 
 A tool-call logging hook records every tool invocation as JSONL, providing an audit trail of what the agent actually did.
 
@@ -207,7 +213,7 @@ writes runtime projections to `out/wycats/` for VS Code,
 | ----------- | --------------------------- |
 | VS Code     | Agents, workflow skills, hidden stances, instructions, and hooks |
 | Claude Code | Agents, workflow skills, stances materialized as hidden skills, and hooks |
-| Codex       | Workflow skills and stances materialized as hidden skills; agents are packaged as reference material |
+| Codex       | Workflow skills and stances, plus the persistent-context hook; agents are packaged as reference material |
 | Pi          | Public Recon workflow, private canonical stances, and the `wycats-recon` pi-subagents profile |
 
 The first Pi package is intentionally bounded to Recon. Its delegated profile
@@ -260,10 +266,12 @@ resources are loaded only once. Keep model preferences in user/project
 pi-subagents overrides; edits inside a managed Git package checkout can be
 replaced by an update.
 
-Codex does not currently activate this plugin's agents, instructions, or
-hooks. Claude Code does not consume the VS Code instruction format. These are
-visible host capability boundaries, not alternate definitions of the shared
-resources.
+Codex's generated hook delivers persistent instructions after the user trusts
+it. The agents remain reference material, and the other targets' policy and
+logging hooks are not enabled in Codex. Claude Code uses an explicit project
+CLAUDE.md import that is refreshed alongside plugin updates. Pi's Recon
+profile currently omits the story. See the [persistent guidance contract](docs/persistent-guidance.md)
+for lifecycle and qualification limits.
 
 See [docs/setup.md](https://github.com/wycats/vscode-ai-plugin/blob/main/docs/setup.md) for full configuration details, including model presets by provider and tool group reference.
 

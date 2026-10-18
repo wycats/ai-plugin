@@ -70,8 +70,8 @@ void test("supplies captured config bytes and cleans up after build failure", as
 
 void test("requires a Claude Code build target and concrete model mapping", () => {
   assert.throws(() => parseClaudeCodeConfig({ target: "codex", models: { balanced: "sonnet" } }), /must target claude-code/);
-  assert.throws(() => parseClaudeCodeConfig({ target: "claude-code" }), /models object/);
-  assert.throws(() => parseClaudeCodeConfig({ target: "claude-code", models: { balanced: 42 } }), /non-empty string or null/);
+  assert.throws(() => parseClaudeCodeConfig({ target: "claude-code" }), /models/);
+  assert.throws(() => parseClaudeCodeConfig({ target: "claude-code", models: { balanced: 42 } }), /models.balanced/);
   assert.throws(() => parseClaudeCodeConfig({ target: "claude-code", models: { balanced: null } }), /concrete balanced/);
   assert.deepEqual(parseClaudeCodeConfig({ target: "claude-code", models: { balanced: "sonnet", auxiliary: null } }), { models: { balanced: "sonnet", auxiliary: null } });
 });

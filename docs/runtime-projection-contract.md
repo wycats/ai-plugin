@@ -8,6 +8,7 @@ The [architecture guide](canonical-resources-and-runtime-projections.md)
 explains the ownership model. This specification owns exact activation fields,
 composition rules, target mappings, and conformance requirements. Agent roles,
 tool mappings, hooks, and publication protocols remain outside its scope.
+Persistent instruction delivery is specified in [persistent guidance](persistent-guidance.md).
 “Must” and “must not” state requirements; examples illustrate them.
 
 ## 1. Canonical activation policy
@@ -149,7 +150,10 @@ internal paths.
 
 Workflows and stances are projected to `skills/<name>/SKILL.md` for VS Code,
 Claude Code, and Codex. Pi uses `skills/<name>/SKILL.md` for workflows and
-`stances/<name>/SKILL.md` for stances. These paths are chosen from semantic kind
+`stances/<name>/SKILL.md` for stances. Additional workflow references in the Pi profile use
+`references/workflows/<name>/SKILL.md`; they remain outside native skill discovery.
+Reference links can include further workflow references, while a load edge to an
+omitted workflow still fails preflight. These paths are chosen from semantic kind
 and identity, independently of the source directory. Native VS Code agents,
 rules, and hooks use `com.github.copilot/agents/`, `com.github.copilot/rules/`,
 and `com.github.copilot/hooks/hooks.json` respectively. Agents and rules retain

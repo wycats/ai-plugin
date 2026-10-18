@@ -17,6 +17,18 @@ If you prefer to configure manually, copy `config.example.json` to `config.json`
 
 ## How it works
 
+[Building together](../instructions/building-together.instructions.md) is delivered
+through a generated session-start hook in the Codex and VS Code Local packages.
+Claude Code uses the [explicit project import](#claude-code-persistent-guidance)
+below. Codex requires reviewing and trusting the hook before it runs;
+use `/hooks` in the CLI to inspect its status. Installation alone does not grant
+that trust. Start a fresh chat after installing or updating the plugin and
+trusting its hook. Existing Codex chats retain their earlier guidance until cleared
+or compacted.
+
+See [persistent guidance](persistent-guidance.md) for context priority,
+compaction behavior, and the Pi profile's current limitation.
+
 Agent source files (in `agents/`) use abstract names for models and tools instead of hardcoded provider-specific values. For example, an agent says `model: fast` rather than naming a specific model.
 
 Your `config.json` maps those abstract names to concrete values for your environment. The build reads the source files and your config, resolves the names, and writes ready-to-use files to the platform output directory: `out/wycats/` for VS Code, `out/claude-code/` for Claude Code, or `out/codex/` for Codex.
@@ -64,6 +76,66 @@ pnpm install-local -- --dry-run --settings /tmp/vscode-settings.json
 ```
 
 Running `pnpm install-local` with no explicit target exits with a helpful error instead of guessing.
+
+## Claude Code persistent guidance
+
+After installing the plugin, run `/wycats:setup-guidance` in the project to
+install or refresh its persistent instructions. The command previews the change
+and then runs the packaged installer. Use `/wycats:setup-guidance remove` before
+uninstalling, or `/wycats:setup-guidance repair` to preserve edited generated
+files and refresh the installation. You can also supply a project directory.
+The command is available only through explicit invocation.
+
+For direct terminal use, a local build is:
+
+```sh
+node scripts/build.ts --config config.claude-code.example.json
+node out/claude-code/scripts/claude-guidance.mjs install --project /path/to/project --dry-run
+node out/claude-code/scripts/claude-guidance.mjs install --project /path/to/project
+```
+
+For a marketplace installation, run `scripts/claude-guidance.mjs` from the
+installed plugin directory instead of `out/claude-code`. Choose the package
+version you intend to use; the command resolves links against its own location.
+It requires an explicit project directory and does not change user-wide settings.
+
+The command appends a marked import to the project's `CLAUDE.md`, preserving
+existing text, and writes the complete prose to
+`.claude/wycats/persistent-instructions.md`. An adjacent `installation.json` records
+ownership so updates and removal can detect edits. Treat `.claude/wycats/` as
+local installation state and exclude it from version control according to your
+project's conventions. It may also contain a pending
+operation or recovery copies. Their contents include local installation paths.
+The command does not edit Git ignore rules. A shared `CLAUDE.md` import requires
+each collaborator to install the corresponding generated file.
+
+Restart or resume Claude with project instructions enabled. The story loads as
+persistent instruction context and leaves the selected output style intact.
+Creating `CLAUDE.md` can change automatic `AGENTS.md` discovery in newer Claude
+versions; if the project relies on `AGENTS.md`, retain it through Claude's
+[documented import or instruction-selection configuration](https://code.claude.com/docs/en/memory#agentsmd).
+
+After every plugin update or relocation, rerun `install` from the current package.
+This refreshes the generated prose and its links without changing the import or
+surrounding instructions. An already running Claude process is not guaranteed to
+reload it; restart or resume after refreshing. `pnpm launch-claude` loads the
+plugin but does not opt projects into persistent guidance or refresh their files.
+
+Before removing the plugin, remove its companion instructions:
+
+```sh
+node /path/to/installed/plugin/scripts/claude-guidance.mjs remove --project /path/to/project --dry-run
+node /path/to/installed/plugin/scripts/claude-guidance.mjs remove --project /path/to/project
+```
+
+Removal deletes the managed import and generated files. It preserves later user
+additions, unrelated files, and any preexisting `CLAUDE.md`. If the command created
+`CLAUDE.md` and nothing else was added, it removes that file too. Both operations
+refuse edited imports, edited exports, and unowned destination files. Use `repair`
+to preserve recovery copies before refreshing those files. Incomplete or duplicate
+import markers require reconciliation in `CLAUDE.md` before repair. All operations
+refuse symlinks at managed paths. Disabling the plugin alone leaves this
+independent import active.
 
 ## Codex local marketplace
 
@@ -167,7 +239,9 @@ manifest.
 
 ## Configuring `config.json`
 
-The file has a JSON Schema (`config.schema.json`) that provides validation and autocomplete in VS Code and other editors. The `$schema` line at the top enables this.
+The file has a JSON Schema (`config.schema.json`) that provides validation and autocomplete in VS Code and other editors. The `$schema` line at the top enables this. The build uses the same contract at runtime: edit `scripts/build-config.ts` and run `pnpm generate:config-schema` to update the editor schema. Checks detect a stale generated schema.
+
+Model and thinking-level mappings accept custom role names. The familiar roles are editor suggestions; an omitted model mapping or `null` uses the host default. Unknown top-level configuration fields are rejected so misspelled settings are caught before building.
 
 ### `target`
 

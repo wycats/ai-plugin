@@ -120,7 +120,8 @@ describe the intended discovery surface; they do not prove runtime activation.
 
 The bounded Pi profile lives in `scripts/pi-profile.ts`. Its delegated catalog
 contains the public Recon workflow and four constituent stances. The package
-also carries the larger private stance collection for navigation. Packaging
+also carries the larger private stance collection and referenced workflows for
+navigation. Those additional workflows live outside native discovery. Packaging
 availability and the delegated catalog remain separate decisions.
 
 Every target emits `projection-resources.json` with `schemaVersion: 1`, the
