@@ -125,13 +125,13 @@ repeat as needed:
 ```
 
 A local correction can return to execution and then receive focused review.
-A finding that changes the approach calls for revised preparation. When the
-work no longer appears to serve the intended outcome, return to that choice
-with the evidence that changed it. Use
-[steer-by-vision](../steer-by-vision/SKILL.md "composition:reference") when this
-becomes a choice among project directions. If steering already supplied a
-purpose and a condition for reconsidering the work, keep them attached to the
-cycle and recognize when that condition arrives.
+A finding that changes the approach calls for revised preparation. Use
+[steer-by-vision](../steer-by-vision/SKILL.md "composition:reference") when the
+findings create a choice among project directions. This can happen when work
+no longer appears to serve the intended outcome, or when a successful result
+makes a further capability practical. If steering already supplied a purpose
+and a condition for reconsidering the work, keep them attached to the cycle
+and recognize when that condition arrives.
 
 Use [collaborative-grounding](../../stances/collaborative-grounding/SKILL.md "composition:load")
 when the consequential choice depends on the user's intent or experience.

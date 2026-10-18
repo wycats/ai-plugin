@@ -19,11 +19,18 @@ reason for pursuing it and enough understanding to recognize when that reason
 needs reconsideration.
 
 Use [vision-steering](../../stances/vision-steering/SKILL.md "composition:load")
-throughout. The choice may become clearer while reading the project, trying a
-small possibility, or discussing it with the user. Revisit the emerging
-recommendation as those encounters change the understanding behind it.
+throughout. Developing a possible next move can clarify the purpose it would
+serve. That revised understanding can change which possibilities deserve
+further exploration.
 
-## Recover what we are trying to make possible
+```text
+while the direction needs clarification:
+  read the work in light of what we are trying to make possible
+  develop a plausible move far enough to examine its consequences
+  use what it reveals to revise the purpose or the moves under consideration
+```
+
+## Begin from the current understanding
 
 Begin with the user's direction and the project's existing explanation of its
 purpose. Read current work and relevant results in that light. Use
@@ -52,8 +59,13 @@ it could change which larger investment makes sense.
 For each serious possibility, explain what would become possible, what must
 happen for someone to benefit, and how we could learn whether it works. Include
 maintenance and foundational work through the capabilities or obligations they
-support. The comparison should expose enough of those relationships to judge
-what deserves attention now.
+support.
+
+An option may expose an ambiguity in the purpose that was invisible while it
+remained abstract. Bring the concrete consequence back to the earlier
+understanding: does it express what we meant, reveal a different possibility,
+or show that we have yet to resolve the choice? The answer can change which
+options to develop next.
 
 Use [gap-reading](../../stances/gap-reading/SKILL.md "composition:reference")
 when the visible plans may have lost a valuable possibility or commitment.
@@ -68,10 +80,11 @@ make the result informative. Preserve valuable alternatives with the reason
 they still matter and the circumstances that would bring them back into view.
 
 Connect the recommendation to an owner and a concrete next action. Use existing
-work where it fits, and carry the intended outcome, relevant constraints, and
-unresolved questions into any handoff. A direction may support several parallel
-efforts whose dependencies need coordination. Follow the host's authorization
-requirements when creating or messaging chats.
+work where it fits. Give whoever continues the work enough context to act:
+what their contribution should make possible, the constraints they must preserve,
+and which discoveries would change the assignment. A direction may support
+several parallel efforts whose dependencies need coordination. Follow the host's
+authorization requirements when creating or messaging chats.
 
 When preparation, implementation, and independent evaluation would help,
 [PER](../per-cycle/SKILL.md "composition:reference") can organize the change.
@@ -80,15 +93,16 @@ the direction: a result, a discovered constraint, enough progress to finish,
 or a decision that needs the user's judgment. New evidence can also create an
 unanticipated reason to return to the choice.
 
-## Carry the decision forward
+## Preserve the reasoning for later work
 
-Update the project's existing working record when later work will need the
-decision. Keep the intended outcome, chosen move, reasons, next action, and
-conditions for reconsideration easy to recover. Preserve source pointers for
-claims whose evidence may need checking. The project's own coordination format
-can carry this understanding without an additional steering document.
+When later work will depend on this decision, use the project's existing
+record to preserve what would be hard to reconstruct: why the chosen move
+serves the purpose, which evidence changed the choice, and which alternatives
+remain worth returning to. Link to the sources behind consequential claims so
+a future reader can reexamine them as circumstances change.
 
-Use [relational continuity](../../stances/relational-continuity/SKILL.md "composition:reference")
-to keep the account attached to the actual work. An ongoing discussion should
-resume from its unresolved question. Once a direction is chosen, make that
-choice and its consequences clear enough that subsequent work can act on it.
+[Relational continuity](../../stances/relational-continuity/SKILL.md "composition:reference")
+helps keep that account useful beyond this exchange. If the decision remains
+open, record the unresolved question and the possibility that brought it into
+focus. The next conversation can then continue the inquiry from where it
+became difficult.
