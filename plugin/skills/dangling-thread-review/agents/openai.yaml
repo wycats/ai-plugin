@@ -1,0 +1,8 @@
+interface:
+  display_name: dangling-thread-review
+  short_description: Use when taking stock of a conversation for ideas, questions,
+    or decisions the work has left behind, especially after a change of
+    direction. Recover what deserves renewed attention and what remains
+    unresolved.
+policy:
+  allow_implicit_invocation: true

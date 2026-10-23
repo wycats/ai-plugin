@@ -1,0 +1,7 @@
+interface:
+  display_name: pause-and-ground
+  short_description: Use when an investigation keeps building on an uncertain
+    reading of the evidence. Pause to inspect the assumption carrying the next
+    decision and use the result to choose how to continue.
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,8 @@
+interface:
+  display_name: socratic-elicitation
+  short_description: Use when the user recognizes something they cannot yet
+    explain, or their examples and reactions suggest an intuition worth
+    developing together. Offer reflections that help them examine and articulate
+    their thinking, letting their response change the conversation.
+policy:
+  allow_implicit_invocation: true

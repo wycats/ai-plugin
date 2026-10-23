@@ -1,0 +1,8 @@
+interface:
+  display_name: hypothesis-evaluating
+  short_description: Use when an inspection, experiment, or attempted use produces
+    a result to compare with an expectation. Judge what the comparison
+    establishes and what it changes about the explanation, approach, or next
+    move.
+policy:
+  allow_implicit_invocation: true

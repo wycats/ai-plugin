@@ -1,0 +1,7 @@
+interface:
+  display_name: collaborative-grounding
+  short_description: Use when the user's priorities, experience, or intent could
+    change how the work should proceed. Bring what you have learned into the
+    conversation so their judgment can shape the next move.
+policy:
+  allow_implicit_invocation: true

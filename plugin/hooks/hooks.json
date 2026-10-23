@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^(startup|clear|compact)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"import(require('node:url').pathToFileURL(require('node:path').join(process.env.PLUGIN_ROOT, 'scripts/persistent-context-hook.mjs')).href)\"",
+            "timeout": 10,
+            "additionalContextLimit": 16000
+          }
+        ]
+      }
+    ]
+  }
+}

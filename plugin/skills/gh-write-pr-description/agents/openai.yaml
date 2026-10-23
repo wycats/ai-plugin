@@ -1,0 +1,8 @@
+interface:
+  display_name: gh-write-pr-description
+  short_description: Use when drafting, updating, or reviewing a GitHub pull
+    request title or body. Build the reviewer's intuition for the change,
+    preserve the author's judgment and relationship with the readers, follow the
+    repository template, and keep evidence at the strength it supports.
+policy:
+  allow_implicit_invocation: true

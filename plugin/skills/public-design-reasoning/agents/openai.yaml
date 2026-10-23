@@ -1,0 +1,8 @@
+interface:
+  display_name: public-design-reasoning
+  short_description: Use when an RFC, proposal, or architecture account needs to
+    explain a design to people outside the originating conversation. Carry its
+    reasoning, consequences, and commitments into an account they can build on
+    and revisit.
+policy:
+  allow_implicit_invocation: true
