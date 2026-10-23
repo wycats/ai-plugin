@@ -13,3 +13,13 @@ When adding or editing repo artifacts:
 - Keep platform-specific packaging generated through the build system when possible.
 - Use `pnpm validate` for resource/frontmatter checks.
 - Use target builds such as `pnpm build:codex` or `pnpm package-codex` when changing packaged output.
+
+## Repository workflows
+
+For the ongoing plugin revision and reading-site work, start with
+[WORK-STACK.md](WORK-STACK.md). It records the current work, deliberate deferrals,
+the outer plugin-review frame, and where the local studies can be resumed.
+
+Contributor skills live in `.agents/skills/`, separately from the published
+plugin resources in `skills/`. For generated reading-site artwork and visual
+experiments, read [Illustration studies](.agents/skills/illustration-studies/SKILL.md).
