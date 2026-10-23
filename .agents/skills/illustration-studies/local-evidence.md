@@ -31,10 +31,10 @@ not the full range of manuscript composition.
 The repository-local study records preserve the inputs, exact prompts, candidates,
 assembly scripts, masks, and review notes:
 
-- [Lettering review](../../../../.runtime/manuscript-font-rebuild/refinements/batch-three/idea-map-study/lettering-experiment/REVIEW.md), especially “Authorized composite study” and “Drawing after compositing.”
-- [Selected drawing observations](../../../../.runtime/manuscript-font-rebuild/refinements/batch-three/idea-map-study/lettering-experiment/penwork-focus-v3.notes.md).
-- [Full-map and detail comparison](../../../../.runtime/manuscript-font-rebuild/refinements/batch-three/idea-map-study/lettering-experiment/index.html#penwork-refinement).
-- [Reading integration](../../../../.runtime/manuscript-font-rebuild/refinements/batch-three/reading-experience/README.txt).
+- [Lettering review](../../../.runtime/manuscript-font-rebuild/refinements/batch-three/idea-map-study/lettering-experiment/REVIEW.md), especially “Authorized composite study” and “Drawing after compositing.”
+- [Selected drawing observations](../../../.runtime/manuscript-font-rebuild/refinements/batch-three/idea-map-study/lettering-experiment/penwork-focus-v3.notes.md).
+- [Full-map and detail comparison](../../../.runtime/manuscript-font-rebuild/refinements/batch-three/idea-map-study/lettering-experiment/index.html#penwork-refinement).
+- [Reading integration](../../../.runtime/manuscript-font-rebuild/refinements/batch-three/reading-experience/README.txt).
 
 These `.runtime` artifacts belong to the local study and are outside the published
 plugin. Some earlier review entries retain “awaiting user encounter” as the state
