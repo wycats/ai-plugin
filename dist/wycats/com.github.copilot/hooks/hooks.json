@@ -1,0 +1,35 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "node ${PLUGIN_ROOT}/scripts/hooks/enforce-native-ts.ts",
+        "timeout": 5
+      },
+      {
+        "type": "command",
+        "command": "node ${PLUGIN_ROOT}/scripts/hooks/enforce-pnpm.ts",
+        "timeout": 5
+      },
+      {
+        "type": "command",
+        "command": "node ${PLUGIN_ROOT}/scripts/hooks/log-tool-calls.ts",
+        "timeout": 5
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "node ${PLUGIN_ROOT}/scripts/hooks/log-tool-calls.ts",
+        "timeout": 5
+      }
+    ],
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "node ${PLUGIN_ROOT}/scripts/persistent-context-hook.mjs",
+        "timeout": 10
+      }
+    ]
+  }
+}

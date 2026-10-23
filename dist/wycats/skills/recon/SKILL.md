@@ -1,99 +1,117 @@
 ---
 name: recon
-description: Use when investigating unfamiliar code, tracing data flows, mapping
-  architecture, or answering questions that require adaptive exploration — where
-  the agent needs to follow leads, use tools interactively, and synthesize
-  findings rather than just search for known terms.
+description: Investigate a question through code, documents, history, or other
+  available evidence when discoveries can change your explanation and the
+  question you need to answer.
 user-invocable: true
 disable-model-invocation: false
 ---
 
 # Recon
 
-Adaptive investigation where each result changes what you look for next. Unlike search (which executes a known plan), recon follows leads, makes judgment calls about what's worth pursuing, and synthesizes findings into a grounded account.
+Begin with your best understanding of what the caller needs to resolve. Let
+what you discover refine that understanding, including what would count as a
+useful answer.
 
-**Stances used:** Load the [diagnostic-questioning](../../stances/diagnostic-questioning/SKILL.md "composition:load") and [interpretive-synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load") stances for investigation, load [observational-grounding](../../stances/observational-grounding/SKILL.md "composition:load") when surfaces conflict, and keep [relational-continuity](../../stances/relational-continuity/SKILL.md "composition:load") active throughout for keeping findings attached to the work underway.
+[Keep the account attached to the work and evidence](../relational-continuity/SKILL.md "composition:load context=activity").
+As discoveries change your understanding,
+[revisit the observations and questions that depended on it](../interpretive-synthesis/SKILL.md "composition:load"). When several participants investigate, their developing
+accounts can change one another's questions while the work is underway.
 
-## When to use
+## Establish what the investigation is for
 
-Use recon when understanding the answer requires following a trail — tracing data flows, reading git history for intent, exploring how modules connect across layers. The question can't be reduced to a single search query, and what you find at each step determines where to look next.
+Relate the question to what answering it would let the caller do. Use the
+available context to develop an initial explanation and identify uncertainties
+worth investigating. When the explanation depends on the user's intent or
+experience, [share the interpretation for them to correct or develop](../collaborative-grounding/SKILL.md "composition:load").
 
-| Instead of recon... | Use... | Because... |
-|---------------------|--------|------------|
-| Known search plan | Explore | Each result won't change what you search next |
-| Parallel search during recon | Explore (as fan-out) | Explore gathers; recon synthesizes |
-| Parallel bounded investigation | Recon-worker (as fan-out) | Needs tools and judgment, but scoped |
-| Code changes | Execute or PER | Recon investigates; it doesn't implement |
-| "Where is X?" | Explore | Don't bring a detective to a dictionary lookup |
+The initial question gives the investigation direction. A discovery may make
+another question more useful to the same purpose. Keep the reason for that
+change visible, especially when it affects work the caller is doing alongside
+the investigation.
 
-## How investigation works
+## Choose what to examine next
 
-Start by understanding the question: what needs to be understood, what's the scope, what's the purpose (planning, debugging, understanding, auditing). If ambiguous, ask.
+Use what you currently understand to decide where to look. If you have competing
+explanations, seek evidence that could distinguish them. If you cannot yet
+explain a detail, inspect its circumstances or discuss it with someone whose
+understanding could help you find a question worth following. In an unfamiliar
+system, this may require tracing the broader flow before a local observation makes sense. A reproducible failure
+may already give you a place to begin. Choose searches, history, reproductions
+or authorized experiments according to what they could help you learn.
 
-Then explore adaptively. Start broad, follow leads. Each search result, file read, or command output either opens new directions or closes them. Use tools beyond search — git history, terminal commands, project tooling — when they help trace intent or verify structure. When a direction dead-ends, note what you tried and pivot.
+When the next judgment depends on what an observation establishes,
+[examine its source and conditions](../observational-grounding/SKILL.md "composition:load"). Two records
+that seemed contradictory may concern different events. Discovering that can
+resolve the apparent contradiction. Preserve the source and
+conditions of consequential observations, and the scope of searches that found
+nothing, so another participant can reason from them.
 
-The investigation has a natural shape: broad orientation, then focused pursuit of the most promising leads, then synthesis. But the shape adapts to what you find. Sometimes you converge quickly. Sometimes sources conflict and you need to trace the conflict itself.
+## Let inquiries inform one another
 
-## Stabilize the phenomenon
+Delegate where another participant can develop a useful line of inquiry or
+bring an independent interpretation. Give them the larger question, the evidence
+and assumptions their work starts from, and the effects they own. Choose tools,
+context and agent capabilities to fit that inquiry. A short lookup and an
+investigation that may need further conversation call for different choices.
 
-When observations appear to disagree, preserve the contradiction before
-explaining it. Name what each surface actually shows, and ask what would make
-those observations bear on the same phenomenon.
+A worker can notice something relevant before understanding its consequence.
+Bring the observation to the participant whose work may help explain it, along
+with what seems puzzling. A response may change the sender's question as much
+as the recipient's. Ask what the evidence establishes and what to examine
+next, leaving room for the recipient's account to remain different.
 
-This is a pause inside recon, not a separate procedure. Inspect only enough to
-stabilize the observation. Sometimes that means checking scope, identity,
-timing, workspace, or storage context. Sometimes it means discovering that the
-two observations are not yet comparable.
+An investigator tracing an expensive calculation might find several calls for
+one edit. Someone examining the update mechanism may recognize distinct
+consumers that all need its result. Together those observations suggest a new
+question: can the consumers share the calculation? The repeated calls alone
+did not establish that notifications should be removed.
 
-For example, if an event log shows recent requests but a database read shows no
-recent turns, the stable starting point is not "persistence failed" or "the
-cache missed." It is the observed contradiction: the log surface reports recent
-activity, while the storage surface does not show the corresponding persisted
-state. Once the surfaces are known to be comparable, causal recon can resume.
-Consult the full [observational-grounding](../../stances/observational-grounding/SKILL.md "composition:reference")
-stance when this compact guidance leaves comparability ambiguous.
+Keep an investigator involved when their accumulated understanding can help
+interpret a new observation. Invite a fresh reading when an account needs to
+be examined from outside its assumptions. Share enough purpose and evidence for
+that reading to be informed. Agreement between participants who inherited the
+same explanation provides different evidence from independent findings.
 
-## Fan-out
+As coordinator, test the explanations participants offer against evidence from
+the other inquiries and what the caller needs to resolve. A worker's local
+finding may change your account of the whole investigation. Help affected
+participants reconsider work that depended on that account. They can investigate
+questions together directly, bringing you changes that affect the shared
+approach so you can follow their implications across the work.
 
-When a question is broad enough to benefit from parallel work, dispatch subagents. The choice depends on what the sub-task needs:
+Use the available messaging and continuation tools for these exchanges.
+When a worker cannot continue, give a new assignment the relevant findings,
+open question and reasons for the revised approach.
 
-**Explore** (the default for parallel gathering): when the sub-task is expressible as a single search prompt and the results are independent. Treat results as leads, not conclusions — verify the important ones before building on them.
+## Reconsider what is worth pursuing
 
-**Recon-worker** (for bounded investigation): when the sub-question needs tools and judgment that Explore can't provide. Brief the worker on the overall question, not just "find X." Ask it to report surprises. Its findings carry more trust than raw search results because it applied judgment, but verify claims that are critical to your conclusions.
+```text
+while a consequential question remains:
+  choose what to inspect from the current understanding
+  examine the result, with another participant where that helps
+  revisit the explanations and assignments it bears on
+  continue locally, change the inquiry, or bring a decision to the caller
+```
 
-Default to Explore. Most fan-out is mechanical gathering.
+Follow implications within the authorized investigation. A change in what needs
+attention can be necessary to answer the original question. When the evidence
+suggests a different outcome worth pursuing, explain that possibility and the
+decision it requires. Preserve the return point when a detour leaves another
+question pending.
 
-## Evidence discipline
+## Leave an account the caller can use
 
-The primary failure mode of recon is confident-sounding claims with no evidence trail. Every finding must be traceable — file path, commit hash, command output, or explicitly marked as inference.
+Finish when the caller has a supported answer for the intended decision, or
+when further authorized investigation cannot settle a consequential uncertainty.
+Distinguish unresolved intent from questions that more inspection can answer.
+Reconcile differences between sources through their provenance and circumstances
+where possible, and explain what remains unresolved.
 
-The principles:
-
-**Separate observation from inference.** A file at a path containing specific content is an observation. "This module is responsible for X" is an inference — it might be wrong. Grounded reports distinguish the two so the reader can evaluate your reasoning.
-
-**Record negative results.** What you searched for and didn't find is evidence. "Searched for X across Y — not found" is a finding that prevents the reader from re-exploring the same ground.
-
-**Surface source conflicts.** Committed code, working tree, documentation, and config files may disagree. Don't silently pick a winner. Surface the conflict, state which source you're treating as current and why, and let the caller resolve it.
-
-**State what would change your mind.** For non-trivial findings, include the falsification condition. If you claim "module X handles all auth token refresh," what evidence would contradict that? If you can't articulate it, your confidence is lower than you think.
-
-## When to stop
-
-The right stopping point depends on the purpose:
-
-- **Planning work**: you can identify the files, boundaries, and risks
-- **Debugging**: you've traced to a root cause or narrowed to candidates
-- **Understanding**: you can explain the mechanism to someone unfamiliar
-- **Auditing**: you've enumerated the relevant instances and their states
-
-The default test: could the caller make a decision based on what you've found?
-
-Stop early and report when: sources of truth conflict and you can't resolve them, the question requires design intent the code can't answer, or the scope is expanding beyond the original question. These aren't failures. Reporting "I can't determine X because Y and Z disagree" is more valuable than guessing.
-
-## What you produce
-
-Scale the output to the investigation's complexity. A focused question gets a conversational answer with inline citations. A complex investigation gets a structured report that separates findings (with evidence) from inferences, surfaces conflicts and negative results, and lists open questions the code can't answer.
-
-When invoked by another agent, always use a structured report — the caller needs parseable findings, not prose.
-
-The tension to navigate: thoroughness vs. actionability. You could document everything you found, but most of it confirms what everyone expected. Spend your reporting depth on the findings that would change decisions: where your expectations were wrong, where sources conflict, where the codebase does something nobody anticipated.
+Shape the result around what the caller needs next: what you understand, what
+changed that understanding, its evidence and limits, and the implications for
+continuing. Keep interpretations recognizable as interpretations. Explain what
+could overturn a consequential conclusion when that helps the caller judge it.
+A short answer may settle a focused inquiry. When someone will continue the
+investigation, leave enough of its reasoning and open questions for them to pick
+up the work without reconstructing why the current leads matter.

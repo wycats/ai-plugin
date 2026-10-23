@@ -9,11 +9,7 @@ disable-model-invocation: false
 
 # Walkthrough
 
-A walkthrough is two people reading code together. The agent sees the code structure — what functions call what, how data flows, where the complexity lives. The user sees the design intent — what the code is supposed to accomplish, what tradeoffs matter, whether the direction feels right. Neither has the full picture. The walkthrough works when both perspectives combine.
-
-The agent's contribution is what it can see that the user might not — structural patterns, data flow, subtle inconsistencies. The user's contribution is what the agent can't access — design intent, priorities, whether the direction feels right. The walkthrough is valuable because it combines both.
-
-**Stances used:** Load the **joint-reading** stance as the primary stance, **interpretive-synthesis** for big-picture revision, **collaborative-grounding** for user context, and **relational-continuity** for carrying language across chunks.
+A walkthrough is [two people reading code together](../joint-reading/SKILL.md "composition:load"). Each person can notice a detail, explain a constraint, or question the design. Showing the code gives those contributions a shared object. What one reader notices can change how the other understands it.
 
 ## The core tension
 
@@ -35,7 +31,10 @@ Before the first chunk, establish shared context:
 - What code or changes are we looking at?
 - What kind of chunks make sense — by feature, by data flow, by layer?
 
-Share your chunking strategy with the user. If the scope or focus isn't clear, use `vscode_askQuestions` to clarify before starting.
+Share a useful starting point with the user.
+[Work through consequential uncertainty about scope or focus with them](../collaborative-grounding/SKILL.md "composition:load"),
+using the host's available conversation or question surface and what the user
+has already told you.
 
 ### Present one chunk at a time
 
@@ -63,9 +62,9 @@ Do not continue through the whole walkthrough in one response unless the user ex
 
 ### Carry forward and revise
 
-Each new chunk should reflect the concerns, priorities, and unresolved questions from earlier chunks. If the user raised a concern in chunk 2, chunk 4 should note whether that concern is still relevant. If a design priority emerged from discussion, later chunks should be read through that lens.
+Each new chunk should [carry forward the concerns, priorities, and unresolved questions from earlier chunks](../relational-continuity/SKILL.md "composition:load"). If the user raised a concern in chunk 2, chunk 4 should note whether that concern is still relevant. If a design priority emerged from discussion, later chunks should be read through that lens.
 
-But carrying forward isn't just accumulation. Sometimes the details reveal that the big picture needs updating — a pattern across chunks suggests the architecture is different from what the plan assumed, or the user realizes from the details that their design intent needs revising. When this happens, pause the chunk-by-chunk flow and revise the big picture together before continuing.
+But carrying forward isn't just accumulation. Sometimes the details reveal that the big picture needs updating — a pattern across chunks suggests the architecture is different from what the plan assumed, or the user realizes from the details that their design intent needs revising. When this happens, pause the chunk-by-chunk flow and [revise the big picture together before continuing](../interpretive-synthesis/SKILL.md "composition:load").
 
 Good moments for a big-picture revision:
 
@@ -84,15 +83,22 @@ When you notice a mismatch — the code introduces a different abstraction than 
 
 ## Collaboration
 
-The walkthrough depends on information from both sides. The agent has shared perception of the code (through tools) and can read structure that the user might not focus on. The user has situated knowledge — what the design intent is, which parts feel risky, where the team's priorities lie.
+Use tools to trace behavior and bring the relevant code into view. Explain how you understand it and invite the user to examine that account. They may supply project context, notice an implementation detail, or challenge an assumption you both carried into the reading.
 
-Use `vscode_askQuestions` at moments where the user's situated knowledge would change how you read the next chunk. Good moments: choosing focus at the start, checking whether to go deeper on a potential mismatch, asking which of two directions matters more. Keep questions concise and directional — the user is reading code with you, not filling out a form.
+Ask when the user's situated knowledge would change how you read the next
+chunk. Use the host's conversation or question surface. Choosing focus,
+following an unexpected concern, and resolving an unclear design intention
+can all warrant an exchange. Keep it attached to the material being read.
 
 ## When to use
 
 Use this skill when the user wants to read code together — reviewing changes in stages, comparing implementation against a plan, or building up a shared sense of what matters through discussion.
 
-This skill is general-purpose. It can be used inside PER for the review phase, or independently for any collaborative code reading.
+A walkthrough can be part of PER review or a collaborative code reading on its
+own. [Colleague Review](../colleague-review/SKILL.md "composition:reference")
+organizes developing an artifact through another participant's encounter,
+discussion, and attempted application. A code walkthrough can provide the
+shared reading within that work.
 
 ## Example prompts
 

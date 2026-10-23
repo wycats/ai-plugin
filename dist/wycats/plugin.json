@@ -1,48 +1,24 @@
 {
-  "name": "wycats-ai-plugin",
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "wycats",
   "version": "0.1.0",
   "description": "Personal agent toolkit: workflow agents, skills, instructions, and hooks.",
-  "agents": [
-    {
-      "path": "./agents/execute.agent.md"
-    },
-    {
-      "path": "./agents/pre-read.agent.md"
-    },
-    {
-      "path": "./agents/prepare.agent.md"
-    },
-    {
-      "path": "./agents/recon-worker.agent.md"
-    },
-    {
-      "path": "./agents/recon.agent.md"
-    },
-    {
-      "path": "./agents/review.agent.md"
-    },
-    {
-      "path": "./agents/slop-linter.agent.md"
+  "extensions": {
+    "com.github.copilot": {
+      "agents": {
+        "paths": [
+          "./agents/editorial-reader.agent.md",
+          "./agents/recon-worker.agent.md",
+          "./agents/recon.agent.md"
+        ],
+        "exclusive": true
+      },
+      "rules": {
+        "paths": [
+          "./rules/environment.instructions.md"
+        ],
+        "exclusive": true
+      }
     }
-  ],
-  "skills": [
-    "./skills/",
-    "./stances/"
-  ],
-  "instructions": [
-    {
-      "path": "./instructions/environment.instructions.md"
-    }
-  ],
-  "hooks": [
-    {
-      "path": "./hooks/native-ts-enforcement.json"
-    },
-    {
-      "path": "./hooks/pnpm-enforcement.json"
-    },
-    {
-      "path": "./hooks/tool-call-logging.json"
-    }
-  ]
+  }
 }

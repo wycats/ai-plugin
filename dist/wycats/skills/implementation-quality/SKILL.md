@@ -18,9 +18,8 @@ scope, then check the assembled result.
 For review-only requests, investigate and propose the coherent change without
 editing. Include source locations and validation needs in the resulting plan.
 
-Load [reader-orientation](../../stances/reader-orientation/SKILL.md "composition:load")
-for the central judgment: what can someone understand where they encounter the
-work, and what becomes available when they investigate further?
+The central judgment is [what someone can understand where they encounter the work](../reader-orientation/SKILL.md "composition:load"),
+and what becomes available when they investigate further.
 
 An improvement may add documentation, remove an abstraction, strengthen a type,
 or leave complicated internals alone. A clear contract can contain imperfect
@@ -42,11 +41,10 @@ relationships often cross file boundaries. Scale this work to the selected scope
 
 Read annotations as observations and design constraints whose combined thrust
 needs interpretation. When the user wants discussion, bring back a concrete
-reading and the consequential choices before editing. Use
-[joint reading](../../stances/joint-reading/SKILL.md "composition:reference")
-to examine the material together and
-[collaborative grounding](../../stances/collaborative-grounding/SKILL.md "composition:reference")
-where the right direction depends on the user's intent.
+reading and the consequential choices before editing.
+[Examine the material together](../joint-reading/SKILL.md "composition:reference") and
+[develop the direction with the user](../collaborative-grounding/SKILL.md "composition:reference")
+where it depends on their intent.
 
 ## Express the relationship the reader has to reconstruct
 
@@ -60,10 +58,8 @@ Where there is a gap, ask:
 
 Determine whether that relationship is already represented elsewhere, exists
 only as a convention people maintain, or becomes obscured by the detail around
-it. This determines what needs to change. Use
-[interpretive synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:reference")
-as each detail revises the larger model and that model changes what nearby
-details mean.
+it. Let those details revise your account of the relationship, then
+[reconsider nearby details as the larger model changes](../interpretive-synthesis/SKILL.md "composition:reference").
 
 ### Let the caller rely on a meaningful operation
 
@@ -114,11 +110,11 @@ useful reasoning and references from intermediate plans as documentation that
 stands without the originating chat. Editorial reminders belong on the authoring
 surface where they guide the work.
 
-For substantial public prose, compose
-[public design reasoning](../../stances/public-design-reasoning/SKILL.md "composition:reference").
-When writing in the user's voice, compose
-[authorial continuity](../../stances/authorial-continuity/SKILL.md "composition:reference")
-and establish a representative passage before carrying its approach across a
+For substantial public prose,
+[explain the design for people outside the originating conversation](../public-design-reasoning/SKILL.md "composition:reference").
+When writing in the user's voice,
+[develop the words with them so the explanation carries their judgment](../authorial-continuity/SKILL.md "composition:reference").
+Establish a representative passage before carrying its approach across a
 larger body of text.
 
 ## Carry a coherent change through its dependents
@@ -151,9 +147,8 @@ repository's local working area; publish the explanations future work needs.
 ## Review the assembled result
 
 Switch from producing the change to testing its claims. Follow the same path
-through callers, types, implementation, and documentation. Use
-[hypothesis evaluating](../../stances/hypothesis-evaluating/SKILL.md "composition:reference")
-to compare the promised improvement with what the result actually supports.
+through callers, types, implementation, and documentation.
+[Compare the promised improvement with what the result actually supports](../hypothesis-evaluating/SKILL.md "composition:reference").
 
 Use relevant checks to verify behavior, concrete authoring examples to verify
 inference, and rendered documentation to verify claims about its presentation.

@@ -1,57 +1,118 @@
 ---
 name: gh-resolve-review-threads
-description: Use when PR review or diff comments are supplied as actionable
-  feedback to implement, including UI flows that send comments without an
-  explicit typed request. Completing this work includes verifying the fix and
-  resolving matching GitHub/Copilot review threads; observation-only requests
-  should leave threads open.
+description: Use when asked to address PR review or diff comments, including
+  comments supplied through a review UI. Investigate the concern, establish what
+  the published PR supports, and resolve threads when the evidence and project
+  conventions support closure. Read-only review leaves threads open.
 user-invocable: true
 disable-model-invocation: false
 ---
 
 # GH Resolve Review Threads
 
-PR review feedback has two surfaces: the code and the review thread. When the user or UI asks you to act on review comments, the work is complete only when the code addresses the concern and the review surface reflects that state. Resolve the matching thread after verification; leave it open when the task is only to observe, explain, plan, or when the fix is ambiguous.
+A review thread records a concern about a proposed change. Addressing it means
+understanding what the reviewer noticed, correcting the work where needed, and
+establishing what the published PR now supports. Resolution tells other readers
+that this concern no longer needs attention.
 
-**Stances used:** Load the **relational-continuity** stance for keeping review-thread language attached to the work, and **collaborative-grounding** when reviewer or user intent is ambiguous.
+[Keep evidence connected to the revision and conditions it describes](../observational-grounding/SKILL.md "composition:load context=activity")
+as work moves from a local checkout to the PR. A local test can
+support a correction while the reviewer still sees the earlier code.
 
-## Default stance
+## Recover the concern
 
-When the user or UI supplies PR review comments as work to perform, treat thread resolution as part of finishing that work. Fix the concern, verify the fix landed, then resolve the matching review thread unless there is a concrete reason to leave it open.
+Read the thread and its replies alongside the relevant code and diff. Identify
+the PR, thread ID, author, current resolution state, and the behavior or design
+judgment under discussion. Use the thread's URL and location to distinguish it
+from nearby comments on the same code.
 
-The important boundary is not whether the user said the word "resolve." The boundary is whether the user or UI asked you to act on PR review feedback. Observation-only requests leave the review surface unchanged.
+Treat the reviewer's explanation as something to investigate. A suggested edit
+may reveal a broader problem, or the current code may already address the
+concern. When a finding changes your understanding of the problem,
+[revisit earlier comments whose meaning depended on the explanation being revised](../interpretive-synthesis/SKILL.md "composition:load"). An outdated
+diff location still needs examination if the underlying behavior remains.
+Apply the same scrutiny to automated and human findings.
 
-## Workflow
+## Work out what addresses the concern
 
-1. Identify the PR and review comments the user or UI supplied.
-   - Prefer thread-aware GitHub reads over flattened comment lists.
-   - If the available GitHub connector does not expose review-thread IDs, use `gh api graphql` to read `pullRequest.reviewThreads`.
-   - Collect enough context to distinguish sibling comments on the same file and line: thread ID, resolved state, file path, line or diff position, author, body, URL, and any replies.
+Trace the behavior the reviewer is concerned about and establish what would
+address it. That may require changing the behavior, clarifying its contract,
+or bringing a design choice back for discussion. When review points conflict,
+examine the assumptions behind them.
+[Work through the choice with the user](../collaborative-grounding/SKILL.md "composition:load")
+when it depends on their intended behavior or accepted tradeoffs.
 
-2. Verify the fix landed.
-   - Inspect the local diff, pushed commit, PR diff, or relevant test evidence.
-   - Match the fix to the review thread's actual concern, not only to the file or line.
-   - Treat Copilot comments like any other review comments: useful signal, but still verify the code behavior.
+For work that benefits from collaborating agents, give each participant the
+thread, the relevant revision, and a question to investigate. Let findings
+reach whoever can help interpret them as the work develops. The coordinator
+brings the contributions back to the original concern and evaluates the result.
+[PER](../per-cycle/SKILL.md "composition:reference") provides a
+fuller approach when a correction needs preparation and independent review.
 
-3. Resolve clear matches.
-   - Use the thread ID, not a comment ID, when resolving review threads.
-   - Prefer the GitHub connector when it supports review-thread resolution.
-   - Otherwise use GitHub GraphQL, for example the `resolveReviewThread` mutation via `gh api graphql`.
+When a change is needed, implement it and check the affected behavior.
+[Judge whether the evidence supports the expected behavior](../hypothesis-evaluating/SKILL.md "composition:load"),
+including when the existing implementation appears to satisfy the requirement. Explain how
+the evidence supports that conclusion and which cases it leaves unexamined.
 
-4. Leave threads open when resolution would be misleading.
-   - The requested thread is ambiguous or you cannot map it to a specific review thread.
-   - The fix is not actually present in the PR branch.
-   - The thread conflicts with another review point or the code changed in a way that needs reviewer judgment.
-   - Resolving would hide a meaningful human-review decision, design tradeoff, or unresolved product question.
-   - The thread is already resolved; record it as already resolved instead of resolving it again.
+[Examine what the reviewer could understand](../reader-orientation/SKILL.md "composition:load")
+where they encountered the code.
+A correct implementation may depend on a guarantee visible only elsewhere.
+Identify what the code or documentation should explain at that point so the
+next reader can reason about the behavior.
 
-5. Report the outcome.
-   - Summarize resolved threads with enough identifying context: file, reviewer, short concern, and URL when available.
-   - Summarize left-open threads separately with the concrete reason each remains open.
-   - Mention the evidence used to verify the fix, including tests or PR diff checks when relevant.
+## Establish what the PR contains
 
-## Practical notes
+Record which revision and conditions the checks covered. When you have made a
+correction, publish it within the user's authorization. Read the PR's current
+head and inspect the relevant published code or diff to establish that it
+contains the correction you verified. A successful push alone leaves this
+comparison unfinished if it went to a different branch or the PR changed
+meanwhile.
 
-GitHub's REST review-comment APIs often lose the thread boundary that matters for resolution. When in doubt, query the PR's GraphQL `reviewThreads` connection and resolve by `PullRequestReviewThread` ID.
+When the published revision differs from the one checked, examine the intervening
+changes. Reuse evidence that still applies and repeat checks where those changes
+could affect the conclusion. If publication is outside the task's scope, report
+the correction as locally verified and leave the thread open for that step.
+When no change is needed, check that your explanation applies to the code
+currently in the PR.
 
-Avoid resolving a thread merely because the changed line moved, the thread is outdated, or a bot comment looks low-risk. Outdated or bot-authored threads can still represent live feedback if the underlying concern remains.
+## Decide whether the concern is resolved
+
+Return to the concern and any questions developed in the replies. Compare them
+with what the published PR and its verification now establish. A correction may
+be present while the reviewer still needs to judge the tradeoff it introduces.
+Keep that decision visible when assessing whether the thread is ready to close.
+
+Acting on supplied review feedback normally includes resolving a thread once
+the concern is addressed. Apply the repository's conventions and the user's
+authorization for resolution. When a design choice, missing check, or reviewer
+judgment remains, leave the
+thread open and identify what is needed to continue.
+
+If investigation shows that no code change is needed, bring the explanation
+and evidence through the project's review process. The reviewer may have
+noticed a consequence your account has yet to explain.
+
+## Update the review conversation
+
+Replies attributed to the user are communications on their behalf.
+[Draft any necessary explanation with them in words that carry their judgment](../authorial-continuity/SKILL.md "composition:load")
+and obtain the required approval before posting. Permission to edit code or resolve a thread does not itself
+authorize a reply.
+
+Before resolving, refresh the thread and PR state. Reconsider closure if new
+replies or code changes affect the concern. Resolve by thread ID, then verify
+the resulting state. An already-resolved thread needs no further mutation.
+Report which threads were resolved, which remain open, and the evidence or
+decision behind each outcome, with links for the user to inspect.
+
+## Reading and updating GitHub threads
+
+Prefer a connector that preserves review-thread identity and replies. When that
+surface is unavailable, GitHub GraphQL's `pullRequest.reviewThreads` connection
+provides the threads. Follow pagination through the relevant results.
+
+The `resolveReviewThread` mutation takes a `PullRequestReviewThread` ID.
+Individual review-comment IDs identify comments within the conversation and
+cannot substitute for the thread ID. `gh api graphql` can perform these reads
+and authorized mutations when the connector lacks them.
