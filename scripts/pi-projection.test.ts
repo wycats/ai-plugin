@@ -6,8 +6,9 @@ import { dirname, join, relative, resolve } from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
 import matter from "gray-matter";
+import { createProjectionPlan } from "./projection-plan.ts";
 import { discoverResourceFiles } from "./resource-discovery.ts";
-import { loadCanonicalComposition, parseCompositionLinks } from "./resource-composition.ts";
+import { loadCanonicalComposition, parseCompositionLinks, projectCompositionLinks } from "./resource-composition.ts";
 
 const execFileAsync = promisify(execFile);
 const ROOT = resolve(import.meta.dirname, "..");
@@ -32,14 +33,24 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
     assert.deepEqual(manifest.pi.skills, ["./skills/recon"]);
     assert.deepEqual(manifest.pi.subagents.agents, ["./agents"]);
 
+    const canonical = await loadCanonicalComposition(ROOT, await discoverResourceFiles(ROOT));
+    assert.deepEqual(canonical.diagnostics, []);
+    assert.ok(canonical.composition);
+    const composition = canonical.composition;
+    const plan = createProjectionPlan(composition, "pi", out);
+    const projectedCanonical = async (identity: string) => {
+      const entry = plan.resources.find(({ resource }) => resource.identity === identity);
+      assert.ok(entry);
+      return matter(projectCompositionLinks(await readFile(entry.resource.sourcePath, "utf8"),
+        entry.resource.sourcePath, entry.outputPath, composition, plan.outputBySourcePath));
+    };
+
     const generatedAgentText = await readFile(
       join(out, "agents", "wycats-recon.agent.md"),
       "utf-8",
     );
     const generatedAgent = matter(generatedAgentText);
-    const canonicalAgent = matter(
-      await readFile(join(ROOT, "agents", "recon.agent.md"), "utf-8"),
-    );
+    const canonicalAgent = await projectedCanonical("agent:recon");
     assert.equal(generatedAgent.content, canonicalAgent.content);
     assert.equal(generatedAgent.data.name, "wycats-recon");
     assert.equal(generatedAgent.data.model, "openai-codex/gpt-5.6-terra");
@@ -80,34 +91,26 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
     const generatedRecon = matter(
       await readFile(join(out, "skills", "recon", "SKILL.md"), "utf-8"),
     );
-    const canonicalRecon = matter(
-      await readFile(join(ROOT, "skills", "recon", "SKILL.md"), "utf-8"),
-    );
+    const canonicalRecon = await projectedCanonical("skill:recon");
     assert.equal(generatedRecon.content, canonicalRecon.content);
 
     // Generated metadata belongs to the host, so inspect links without applying
     // canonical source-policy validation to the generated package.
     const projectedEdges: string[][] = [];
-    const generatedResources = await discoverResourceFiles(out);
-    for (const resource of [...generatedResources.agents, ...generatedResources.skills, ...generatedResources.stances]) {
+    for (const resource of plan.resources.map(({ resource, outputPath, pluginPath }) => ({ ...resource, sourcePath: outputPath, pluginPath }))) {
       const links = parseCompositionLinks(await readFile(resource.sourcePath, "utf8"));
       assert.deepEqual(links.diagnostics, []);
       for (const link of links.links) {
         const target = resolve(dirname(resource.sourcePath), link.destination);
         await readFile(target);
-        projectedEdges.push([resource.pluginPath, `./${relative(out, target).replaceAll("\\", "/")}`, link.title?.slice("composition:".length) ?? ""]);
+        projectedEdges.push([resource.pluginPath, `./${relative(out, target).replaceAll("\\", "/")}`, link.title?.slice("composition:".length).split(" ")[0] ?? ""]);
       }
     }
 
-    const canonical = await loadCanonicalComposition(
-      ROOT,
-      await discoverResourceFiles(ROOT),
-    );
-    assert.deepEqual(canonical.diagnostics, []);
-    assert.ok(canonical.composition);
-    // Pi carries all stances privately, but only Recon's workflow and agent.
+    assert.ok(plan.resources.some(({ resource, exposure, pluginPath }) => resource.name === "dangling-thread-review" && exposure === "reference" && pluginPath.startsWith("./references/")));
+    // Private references preserve navigation without joining the public catalog.
     const expectedReferences = canonical.composition.references.filter(
-      ({ source }) => source.section === "stances" || source.name === "recon",
+      ({ source }) => plan.outputBySourcePath.has(source.sourcePath),
     );
     assert.equal(projectedEdges.length, expectedReferences.length);
 
@@ -123,11 +126,14 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
       expectedReferences.map(({ source, target, relation }) => [source.pluginPath, target.pluginPath, relation]),
     );
     assert.deepEqual(
-      index.edges.map((edge) => [edge.generatedSource, edge.generatedTarget, edge.relation]),
-      projectedEdges,
+      index.edges.map((edge) => [edge.generatedSource, edge.generatedTarget, edge.relation]).sort(),
+      projectedEdges.sort(),
     );
     assert.equal(index.edges[0].canonicalSource, "./agents/recon.agent.md");
-    assert.equal(index.edges[0].canonicalLine, 18);
+    const reconSource = await readFile(join(ROOT, "agents/recon.agent.md"), "utf8");
+    const workflowLine = reconSource.split("\n").findIndex((line) => line.includes("[Recon workflow]"));
+    assert.ok(workflowLine >= 0);
+    assert.equal(index.edges[0].canonicalLine, workflowLine + 1);
     assert.equal(index.edges[0].generatedSource, "./agents/wycats-recon.agent.md");
     assert.equal("line" in index.edges[0], false);
 

@@ -6,6 +6,7 @@ import test from "node:test";
 import { findClaudeCommand, findClaudeCommandBelow, resolveClaudeCommand } from "../../claude-executable.ts";
 import {
   ClaudeCodeCliAdapter,
+  ClaudeCodeInvocationError,
   claudeCodeInvocation,
   parseClaudeCodeStream,
   parseClaudeCodeConfig,
@@ -35,7 +36,7 @@ const suite: EvaluationSuite = {
 
 function testAdapter(): { adapter: ClaudeCodeCliAdapter; root: string } {
   const root = mkdtempSync(join(tmpdir(), "claude-adapter-"));
-  writeFileSync(join(root, "plugin.json"), '{"name":"wycats-ai-plugin"}\n');
+  writeFileSync(join(root, "plugin.json"), '{"name":"wycats"}\n');
   const projection = join(root, "out", "claude-code");
   mkdirSync(projection, { recursive: true });
   writeFileSync(join(projection, "projection-resources.json"), JSON.stringify({
@@ -46,6 +47,15 @@ function testAdapter(): { adapter: ClaudeCodeCliAdapter; root: string } {
   }));
   return { adapter: new ClaudeCodeCliAdapter(root), root };
 }
+
+void test("invokes a named nested agent using validated identity rather than its filename", () => {
+  const resource = { identity: "wycats-plugin:agents/careful-review", name: "careful-review", path: "agents/team/reviewer.agent.md" };
+  const invocation = claudeCodeInvocation(resource, "wycats", "Review.", "Projected.");
+  assert.deepEqual(invocation.resourceArguments, ["--agent", "wycats:careful-review"]);
+  const result = parseClaudeCodeStream(JSON.stringify({ type: "result", subtype: "success", result: "Reviewed." }),
+    resource, "wycats", invocation.directInvocation);
+  assert.equal(result.resourceInvocation.resource, "wycats:careful-review");
+});
 
 void test("supplies captured config bytes and cleans up after build failure", async () => {
   const source = '{"target":"claude-code","models":{"balanced":"sonnet"}}';
@@ -61,8 +71,8 @@ void test("supplies captured config bytes and cleans up after build failure", as
 
 void test("requires a Claude Code build target and concrete model mapping", () => {
   assert.throws(() => parseClaudeCodeConfig({ target: "codex", models: { balanced: "sonnet" } }), /must target claude-code/);
-  assert.throws(() => parseClaudeCodeConfig({ target: "claude-code" }), /models object/);
-  assert.throws(() => parseClaudeCodeConfig({ target: "claude-code", models: { balanced: 42 } }), /non-empty string or null/);
+  assert.throws(() => parseClaudeCodeConfig({ target: "claude-code" }), /models/);
+  assert.throws(() => parseClaudeCodeConfig({ target: "claude-code", models: { balanced: 42 } }), /models.balanced/);
   assert.throws(() => parseClaudeCodeConfig({ target: "claude-code", models: { balanced: null } }), /concrete balanced/);
   assert.deepEqual(parseClaudeCodeConfig({ target: "claude-code", models: { balanced: "sonnet", auxiliary: null } }), { models: { balanced: "sonnet", auxiliary: null } });
 });
@@ -153,7 +163,7 @@ void test("uses built resource addresses while invoking skills and stances throu
     };
     assert.equal(
       adapter.projectPrompt(stanceSuite, "Canonical request"),
-      "Invoke the wycats-ai-plugin:relational-continuity skill before answering the canonical request below.\n\nCanonical request",
+      "Invoke the wycats:relational-continuity skill before answering the canonical request below.\n\nCanonical request",
     );
     assert.equal(
       adapter.projectedResourcePath(suite.resource),
@@ -177,16 +187,16 @@ void test("runs a projected agent directly through Claude Code's agent surface",
   const result = '{"findings":[],"rewrittenDocument":"Agent result"}';
   const invocation = claudeCodeInvocation(
     suite.resource,
-    "wycats-ai-plugin",
+    "wycats",
     canonicalPrompt,
     "Projected launcher prompt",
   );
   assert.deepEqual(invocation, {
-    resourceArguments: ["--agent", "wycats-ai-plugin:slop-linter"],
+    resourceArguments: ["--agent", "wycats:slop-linter"],
     prompt: canonicalPrompt,
     directInvocation: {
       surface: "cli-agent",
-      resource: "wycats-ai-plugin:slop-linter",
+      resource: "wycats:slop-linter",
     },
   });
   assert.throws(
@@ -194,25 +204,43 @@ void test("runs a projected agent directly through Claude Code's agent surface",
       parseClaudeCodeStream(
         stream({ type: "result", subtype: "success", is_error: false, result }),
         suite.resource,
-        "wycats-ai-plugin",
+        "wycats",
       ),
-    /did not complete a wycats-ai-plugin:slop-linter resource invocation/,
+    /did not complete a wycats:slop-linter resource invocation/,
   );
   assert.deepEqual(
     parseClaudeCodeStream(
       stream({ type: "result", subtype: "success", is_error: false, result }),
       suite.resource,
-      "wycats-ai-plugin",
+      "wycats",
       invocation.directInvocation,
     ),
     {
       result,
       resourceInvocation: {
         surface: "cli-agent",
-        resource: "wycats-ai-plugin:slop-linter",
+        resource: "wycats:slop-linter",
       },
     },
   );
+});
+
+void test("invokes the editorial role natively and preserves its reading when receipt validation fails", () => {
+  const resource = {
+    identity: "wycats-plugin:agents/editorial-reader",
+    name: "editorial-reader",
+    path: "agents/editorial-reader.agent.md",
+  };
+  const reading = "What should this introduction lead its readers to do?";
+  const invocation = claudeCodeInvocation(resource, "wycats", "Read the introduction.", "Launcher prompt.");
+  assert.deepEqual(invocation.resourceArguments, ["--agent", "wycats:editorial-reader"]);
+  const output = stream({ type: "result", subtype: "success", result: reading });
+  assert.equal(parseClaudeCodeStream(output, resource, "wycats", invocation.directInvocation).result, reading);
+  assert.throws(() => parseClaudeCodeStream(output, resource, "wycats"), (error: unknown) => {
+    assert.ok(error instanceof ClaudeCodeInvocationError);
+    assert.equal(error.rawResponse, reading);
+    return true;
+  });
 });
 
 void test("recognizes a completed invocation through the projected skill surface", () => {
@@ -233,7 +261,7 @@ void test("recognizes a completed invocation through the projected skill surface
                 type: "tool_use",
                 id: "skill-1",
                 name: "Skill",
-                input: { skill: "wycats-ai-plugin:relational-continuity" },
+                input: { skill: "wycats:relational-continuity" },
               },
             ],
           },
@@ -247,14 +275,14 @@ void test("recognizes a completed invocation through the projected skill surface
         { type: "result", subtype: "success", is_error: false, result },
       ),
       resource,
-      "wycats-ai-plugin",
+      "wycats",
     ),
     {
       result,
       resourceInvocation: {
         surface: "tool",
         tool: "Skill",
-        resource: "wycats-ai-plugin:relational-continuity",
+        resource: "wycats:relational-continuity",
         toolUseId: "skill-1",
       },
     },
@@ -278,9 +306,9 @@ void test("rejects a skill response without a successful skill invocation", () =
       parseClaudeCodeStream(
         directResult,
         resource,
-        "wycats-ai-plugin",
+        "wycats",
       ),
-    /did not complete a wycats-ai-plugin:relational-continuity resource invocation/,
+    /did not complete a wycats:relational-continuity resource invocation/,
   );
 
   const failedInvocation = stream(
@@ -292,7 +320,7 @@ void test("rejects a skill response without a successful skill invocation", () =
             type: "tool_use",
             id: "agent-1",
             name: "Skill",
-            input: { skill: "wycats-ai-plugin:relational-continuity" },
+            input: { skill: "wycats:relational-continuity" },
           },
         ],
       },
@@ -310,8 +338,8 @@ void test("rejects a skill response without a successful skill invocation", () =
       parseClaudeCodeStream(
         failedInvocation,
         resource,
-        "wycats-ai-plugin",
+        "wycats",
       ),
-    /did not complete a wycats-ai-plugin:relational-continuity resource invocation/,
+    /did not complete a wycats:relational-continuity resource invocation/,
   );
 });

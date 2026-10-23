@@ -21,6 +21,7 @@ export interface AdapterRequest {
   canonicalPrompt: string;
   projectedPrompt: string;
   resource: EvaluationResource;
+  maxTurns?: number;
 }
 
 export interface AdapterMetadata {
@@ -47,6 +48,6 @@ export interface EvaluationAdapter {
   readonly transport: string;
   prepare(): Promise<AdapterMetadata>;
   projectedResourcePath(resource: EvaluationResource): string;
-  projectPrompt(suite: EvaluationSuite, canonicalPrompt: string): string;
+  projectPrompt(suite: Pick<EvaluationSuite, "resource">, canonicalPrompt: string): string;
   execute(request: AdapterRequest): AdapterObservation;
 }

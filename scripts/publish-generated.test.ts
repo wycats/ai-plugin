@@ -65,7 +65,7 @@ for (const target of ["claude-code", "codex"] as const) {
       if (target === "codex") {
         await cp(built, join(output, "plugin"), { recursive: true });
         await mkdir(join(output, ".agents", "plugins"), { recursive: true });
-        await writeFile(join(output, ".agents", "plugins", "marketplace.json"), JSON.stringify({ name: "wycats-ai-plugin", plugins: [{ name: "wycats-ai-plugin", source: { source: "local", path: "./plugin" } }] }));
+        await writeFile(join(output, ".agents", "plugins", "marketplace.json"), JSON.stringify({ name: "wycats", plugins: [{ name: "wycats", source: { source: "local", path: "./plugin" } }] }));
       }
       const publish = target === "codex" ? publishCodexOutput : publishClaudeCodeOutput;
       const branch = target === "codex" ? "codex-plugin" : "cc-plugin";

@@ -1031,7 +1031,7 @@ per source, and no host anywhere in the file (R2).
   // yields three honest presentations rather than three subtly different corpora.
   "resources": [
     "consumer:skills/housekeeping",
-    "wycats-plugin:agents/slop-linter",
+    "wycats-plugin:agents/editorial-reader",
     "wycats-plugin:agents/recon",
     "wycats-plugin:skills/gh-write-pr-description",
     "wycats-plugin:skills/dangling-thread-review",
@@ -1606,8 +1606,8 @@ absence check while still yielding a closure that is quietly incomplete.
       "digestAlgorithm": "<canonical-resource-digest version>",
       "digest": "sha256:…"
     },
-    "wycats-plugin:agents/slop-linter": {
-      "inputs": ["agents/slop-linter.agent.md"],
+    "wycats-plugin:agents/editorial-reader": {
+      "inputs": ["agents/editorial-reader.agent.md"],
       "sharedInputRefs": [
         "wycats-plugin:source-manifest",
         "wycats-plugin:resource-contract",
@@ -1850,7 +1850,7 @@ directory copies with copies derived from the resolved resources' locked input
 boundaries. An adapter that still emits the two unselected hook scripts must list
 them as support outputs and would still fail the exact-subset responsibility.
 Generated metadata is part of the same proof. The current full-corpus Codex
-manifest legitimately advertises session lifecycle, walkthrough, and recon
+manifest legitimately advertises implementation-quality, walkthrough, and recon
 workflows. Reusing those descriptions and default prompts unchanged for this
 subset would advertise skills outside its active projection. A selection-aware
 packager must derive the fields from the resolved active set or reject the
@@ -2028,8 +2028,8 @@ dangling references before it can emit the locked support output.
     "consumer:skills/housekeeping": [
       { "path": "skills/housekeeping/SKILL.md" }
     ],
-    "wycats-plugin:agents/slop-linter": [
-      { "path": "agents/slop-linter.agent.md" }
+    "wycats-plugin:agents/editorial-reader": [
+      { "path": "agents/editorial-reader.agent.md" }
     ],
     "wycats-plugin:agents/recon": [
       { "path": "agents/recon.agent.md" }
@@ -2137,7 +2137,7 @@ dangling references before it can emit the locked support output.
       // model comes from the configuration used for THIS build, so this is the
       // adapter's applied binding, not an override of some canonical default:
       // upstream's example config is a comparator, not an inherited value.
-      "resources": ["wycats-plugin:agents/slop-linter"],
+      "resources": ["wycats-plugin:agents/editorial-reader"],
       "kind": "model-role",
       "from": "auxiliary",
       "to": "sonnet",
@@ -2452,7 +2452,7 @@ making the model-backed run part of the deterministic build.
 }
 ```
 
-The Codex report also maps `agents/slop-linter`, `agents/recon`, and
+The Codex report also maps `agents/editorial-reader`, `agents/recon`, and
 `agents/recon-worker` under `referenceOnly`, each to its copied
 `agents/*.agent.md` path with the reason that this host packages agents as source
 material but does not discover or activate them. The files remain attributable
@@ -2697,7 +2697,7 @@ remains unverified.
         //       {
         //         "invocationId": "<delegated invocation id>",
         //         "parentInvocationId": "<parent invocation id>",
-        //         "resourceOrRole": "wycats-plugin:agents/slop-linter",
+        //         "resourceOrRole": "wycats-plugin:agents/editorial-reader",
         //         "selector": "sonnet",
         //         "providerAuthority": "<immutable provider authority>",
         //         "identity": "<immutable model version or deployment identity>"
@@ -2852,7 +2852,7 @@ remains unverified.
     "unverified": [
       {
         "resources": [
-          "wycats-plugin:agents/slop-linter",
+          "wycats-plugin:agents/editorial-reader",
           "wycats-plugin:agents/recon",
           "wycats-plugin:agents/recon-worker"
         ],

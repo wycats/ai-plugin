@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { buildConfigSchema } from "../../build-config.ts";
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
@@ -7,7 +9,7 @@ import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
 import { findClaudeCommand, type ClaudeCommand } from "../../claude-executable.ts";
 import type { EvaluationResource, EvaluationSuite } from "../core.ts";
-import { canonicalResourceDescriptor } from "../resource.ts";
+import { evaluationResourceKind } from "../resource.ts";
 import { discoverResourceFiles } from "../../resource-discovery.ts";
 import { loadCanonicalComposition, formatCompositionDiagnostics } from "../../resource-composition.ts";
 import { createProjectionPlan, parseProjectionResourceMap, resolveProjectedResource, type ProjectionResourceMap } from "../../projection-plan.ts";
@@ -35,24 +37,27 @@ export async function withConfigSnapshot<T>(source: string, use: (path: string) 
   }
 }
 
-export function parseClaudeCodeConfig(value: unknown): { models: Record<string, string | null> } {
-  if (!isRecord(value) || value.target !== "claude-code") {
-    throw new Error("The evaluation adapter config must target claude-code.");
-  }
-  if (!isRecord(value.models)) {
-    throw new Error("The evaluation adapter config must declare a models object.");
-  }
-  const models: Record<string, string | null> = {};
-  for (const [role, target] of Object.entries(value.models)) {
-    if (target !== null && (typeof target !== "string" || !target.trim())) {
-      throw new Error(`The evaluation adapter model '${role}' must be a non-empty string or null.`);
+// Evaluation reads the same model mappings as the build, but needs a pinned
+// launcher model so runs can be reproduced. Other build fields are irrelevant here.
+const claudeCodeConfigSchema = buildConfigSchema.pick({ target: true, models: true }).strip().extend({
+  target: z.literal("claude-code", { error: "The evaluation adapter config must target claude-code." }),
+}).superRefine(({ models }, context) => {
+  for (const [role, model] of Object.entries(models)) {
+    if (typeof model === "string" && !model.trim()) {
+      context.addIssue({ code: "custom", path: ["models", role], message: "Expected a non-empty string or null." });
     }
-    models[role] = target;
   }
   if (!models.balanced) {
-    throw new Error("The evaluation adapter requires a concrete balanced model mapping.");
+    context.addIssue({ code: "custom", path: ["models", "balanced"], message: "The evaluation adapter requires a concrete balanced model mapping." });
   }
-  return { models };
+});
+
+export function parseClaudeCodeConfig(value: unknown) {
+  const result = claudeCodeConfigSchema.safeParse(value);
+  if (!result.success) {
+    throw new Error(`Invalid evaluation adapter config:\n${z.prettifyError(result.error)}`);
+  }
+  return { models: result.data.models };
 }
 
 export async function validateClaudeCodeProjection(root: string): Promise<void> {
@@ -79,10 +84,9 @@ function matchingInvocation(
   if (block.type !== "tool_use" || typeof block.id !== "string" || !isRecord(block.input)) {
     return undefined;
   }
-  const descriptor = canonicalResourceDescriptor(resource.path);
-  const expectedResource = `${pluginName}:${descriptor.name}`;
+  const expectedResource = `${pluginName}:${resource.name}`;
   if (
-    descriptor.kind !== "agent" &&
+    evaluationResourceKind(resource) !== "agent" &&
     block.name === "Skill" &&
     block.input.skill === expectedResource
   ) {
@@ -102,16 +106,24 @@ export function claudeCodeInvocation(
   canonicalPrompt: string,
   projectedPrompt: string,
 ): { resourceArguments: string[]; prompt: string; directInvocation?: ResourceInvocation } {
-  const descriptor = canonicalResourceDescriptor(resource.path);
-  if (descriptor.kind !== "agent") {
+  if (evaluationResourceKind(resource) !== "agent") {
     return { resourceArguments: [], prompt: projectedPrompt };
   }
-  const scopedName = `${pluginName}:${descriptor.name}`;
+  const scopedName = `${pluginName}:${resource.name}`;
   return {
     resourceArguments: ["--agent", scopedName],
     prompt: canonicalPrompt,
     directInvocation: { surface: "cli-agent", resource: scopedName },
   };
+}
+
+export class ClaudeCodeInvocationError extends Error {
+  readonly rawResponse: string | undefined;
+
+  constructor(message: string, rawResponse: string | undefined) {
+    super(message);
+    this.rawResponse = rawResponse;
+  }
 }
 
 export function parseClaudeCodeStream(
@@ -172,10 +184,9 @@ export function parseClaudeCodeStream(
     }
   }
 
-  const descriptor = canonicalResourceDescriptor(resource.path);
-  const expectedResource = `${pluginName}:${descriptor.name}`;
+  const expectedResource = `${pluginName}:${resource.name}`;
   const resourceInvocation =
-    descriptor.kind === "agent"
+    evaluationResourceKind(resource) === "agent"
       ? directInvocation?.surface === "cli-agent" && directInvocation.resource === expectedResource
         ? directInvocation
         : undefined
@@ -184,9 +195,9 @@ export function parseClaudeCodeStream(
             invocation.toolUseId !== undefined && completedToolUses.has(invocation.toolUseId),
         );
   if (!resourceInvocation) {
-    const descriptor = canonicalResourceDescriptor(resource.path);
-    throw new Error(
-      `Claude Code did not complete a ${pluginName}:${descriptor.name} resource invocation.`,
+    throw new ClaudeCodeInvocationError(
+      `Claude Code did not complete a ${pluginName}:${resource.name} resource invocation.`,
+      launcherResult,
     );
   }
   if (launcherResult === undefined) {
@@ -286,10 +297,9 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
     return resolveProjectedResource(this.#projection, this.#resourceMap, resource.path);
   }
 
-  projectPrompt(suite: EvaluationSuite, canonicalPrompt: string): string {
-    const descriptor = canonicalResourceDescriptor(suite.resource.path);
-    if (descriptor.kind === "agent") return canonicalPrompt;
-    return `Invoke the ${this.#pluginName}:${descriptor.name} skill before answering the canonical request below.\n\n${canonicalPrompt}`;
+  projectPrompt(suite: Pick<EvaluationSuite, "resource">, canonicalPrompt: string): string {
+    if (evaluationResourceKind(suite.resource) === "agent") return canonicalPrompt;
+    return `Invoke the ${this.#pluginName}:${suite.resource.name} skill before answering the canonical request below.\n\n${canonicalPrompt}`;
   }
 
   execute(request: AdapterRequest): AdapterObservation {
@@ -319,7 +329,7 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
         "--model",
         this.#launcherModel,
         "--max-turns",
-        "3",
+        String(request.maxTurns ?? 3),
       ],
       {
         cwd: this.#root,
@@ -350,6 +360,7 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
     } catch (error) {
       return {
         ...observation,
+        rawResponse: error instanceof ClaudeCodeInvocationError ? error.rawResponse ?? "" : observation.rawResponse,
         executionError: error instanceof Error ? error.message : String(error),
       };
     }

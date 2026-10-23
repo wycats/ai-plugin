@@ -1,8 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { dirname, extname, isAbsolute, relative, resolve, sep } from "node:path";
-import matter from "gray-matter";
-import { parseResourceFrontmatter } from "./resource-frontmatter.ts";
-import { parseSkillActivation, readSkillSidecar, type SkillActivation } from "./skill-activation.ts";
+import { readSkillSidecar } from "./skill-activation.ts";
+import { parseCanonicalResource, type CanonicalResourceContent } from "./resource-source.ts";
 import type {
   DiscoveredResource,
   ResourceSection,
@@ -11,9 +10,14 @@ import type {
 export const COMPOSITION_RELATIONS = ["reference", "load"] as const;
 export type CompositionRelation = (typeof COMPOSITION_RELATIONS)[number];
 
-const COMPOSITION_TITLES = new Map<string, CompositionRelation>([
-  ["composition:reference", "reference"],
-  ["composition:load", "load"],
+export type CompositionIntent =
+  | { relation: "reference"; context?: never }
+  | { relation: "load"; context: "passage" | "activity" };
+
+const COMPOSITION_TITLES = new Map<string, CompositionIntent>([
+  ["composition:reference", { relation: "reference" }],
+  ["composition:load", { relation: "load", context: "passage" }],
+  ["composition:load context=activity", { relation: "load", context: "activity" }],
 ]);
 
 export interface CompositionDiagnostic {
@@ -22,27 +26,19 @@ export interface CompositionDiagnostic {
   message: string;
 }
 
-export interface CanonicalResource {
-  identity: string;
-  name: string;
-  section: ResourceSection;
-  sourcePath: string;
-  pluginPath: string;
-  frontmatter: Record<string, unknown>;
-  activation?: SkillActivation;
+export interface CanonicalResource extends DiscoveredResource, CanonicalResourceContent {
   skillSidecar?: Record<string, unknown>;
 }
 
-export interface CompositionReference {
+export type CompositionReference = CompositionIntent & {
   source: CanonicalResource;
   target: CanonicalResource;
-  relation: CompositionRelation;
   line: number;
   label: string;
   destination: string;
   destinationStart: number;
   destinationEnd: number;
-}
+};
 
 export interface CanonicalComposition {
   root: string;
@@ -70,29 +66,6 @@ interface ParseResult {
 function displayPath(root: string, path: string): string {
   const value = relative(root, path);
   return value === "" || value.startsWith(`..${sep}`) ? path : value;
-}
-
-function resourceName(resource: DiscoveredResource, parsed: Record<string, unknown>): string {
-  const declared = parsed.name;
-  if (typeof declared === "string" && declared.trim() !== "") {
-    return declared;
-  }
-
-  const filename = resource.sourcePath.split(/[\\/]/).at(-1) ?? "resource";
-  return filename.replace(/\.agent\.md$|\.instructions\.md$|\.md$/g, "");
-}
-
-function resourceIdentity(
-  resource: DiscoveredResource,
-  name: string,
-): string {
-  const namespace =
-    resource.section === "agents"
-      ? "agent"
-      : resource.section === "instructions"
-        ? "instruction"
-        : "skill";
-  return `${namespace}:${name}`;
 }
 
 function lineAt(content: string, offset: number): number {
@@ -416,46 +389,17 @@ export async function loadCanonicalComposition(
   for (const resource of canonicalMarkdownResources(discovered)) {
     const sourcePath = resolve(resource.sourcePath);
     const content = await readFile(sourcePath, "utf-8");
-    let parsedData: Record<string, unknown>;
-    let activation: SkillActivation | undefined;
-    let skillSidecar: Record<string, unknown> | undefined;
+    let entry: CanonicalResource;
     try {
-      if (resource.section === "skills" || resource.section === "stances") {
-        parsedData = parseResourceFrontmatter(content).data;
-        activation = parseSkillActivation(parsedData, resource.section);
-        skillSidecar = await readSkillSidecar(sourcePath);
-        if (typeof parsedData.description !== "string" || parsedData.description.trim() === "") {
-          throw new Error("description must be a nonempty string");
-        }
-      } else {
-        parsedData = matter(content).data as Record<string, unknown>;
-      }
+      const parsed = parseCanonicalResource(resource, content);
+      const skillSidecar = parsed.activation ? await readSkillSidecar(sourcePath) : undefined;
+      entry = { ...resource, ...parsed, sourcePath, skillSidecar };
     } catch (error) {
       diagnostics.push({ file: displayPath(canonicalRoot, sourcePath), line: 1,
         message: error instanceof Error ? error.message : String(error) });
       continue;
     }
-    const name = resourceName(resource, parsedData);
-    if (resource.section === "skills" || resource.section === "stances") {
-      const declaredName = parsedData.name;
-      const directoryName = dirname(sourcePath).split(/[\\/]/).at(-1) ?? "";
-      if (typeof declaredName !== "string" || declaredName.trim() === "") {
-        diagnostics.push({
-          file: displayPath(canonicalRoot, sourcePath),
-          line: 1,
-          message: "canonical resource is missing a non-empty frontmatter name",
-        });
-      } else if (declaredName !== directoryName) {
-        diagnostics.push({
-          file: displayPath(canonicalRoot, sourcePath),
-          line: 1,
-          message: `canonical resource name '${declaredName}' does not match directory '${directoryName}'`,
-        });
-      }
-    }
-    const identity = resourceIdentity(resource, name);
-    const entry: CanonicalResource = { ...resource, sourcePath, name, identity,
-      frontmatter: parsedData, activation, skillSidecar };
+    const { identity } = entry;
     const prior = identities.get(identity);
     if (prior) {
       diagnostics.push({
@@ -483,13 +427,13 @@ export async function loadCanonicalComposition(
     diagnostics.push(...parsed.diagnostics);
 
     for (const link of parsed.links) {
-      const relation =
+      const intent =
         link.title === undefined ? undefined : COMPOSITION_TITLES.get(link.title);
-      if (!relation) {
+      if (!intent) {
         diagnostics.push({
           file: displayPath(canonicalRoot, source.sourcePath),
           line: link.line,
-          message: `unsupported composition relationship title '${link.title ?? ""}'; expected exactly 'composition:load' or 'composition:reference'`,
+          message: `unsupported composition relationship title '${link.title ?? ""}'; expected 'composition:load', 'composition:load context=activity', or 'composition:reference'`,
         });
         continue;
       }
@@ -534,7 +478,12 @@ export async function loadCanonicalComposition(
         continue;
       }
 
-      if (relation === "load" && target.activation?.invocation === "explicit") {
+      if (intent.context === "activity" && !target.activation) {
+        diagnostics.push({ file: displayPath(canonicalRoot, source.sourcePath), line: link.line,
+          message: "context=activity requires a skill or stance target" });
+        continue;
+      }
+      if (intent.relation === "load" && target.activation?.invocation === "explicit") {
         diagnostics.push({ file: displayPath(canonicalRoot, source.sourcePath), line: link.line,
           message: `composition:load cannot target explicit-only skill '${target.name}'; use composition:reference` });
         continue;
@@ -543,7 +492,7 @@ export async function loadCanonicalComposition(
       references.push({
         source,
         target,
-        relation,
+        ...intent,
         line: link.line,
         label: link.label,
         destination: link.destination,

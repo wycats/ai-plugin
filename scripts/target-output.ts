@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { join } from "node:path";
 
 export const VSCODE_TARGET = "vscode";
@@ -14,7 +15,9 @@ export const OUTPUT_DIRECTORY_BY_TARGET = {
 
 export const LEGACY_VSCODE_OUTPUT_DIRECTORY_NAME = "vscode";
 
-export type BuildTarget = keyof typeof OUTPUT_DIRECTORY_BY_TARGET;
+export const buildTargetSchema = z.enum(Object.keys(OUTPUT_DIRECTORY_BY_TARGET) as Array<keyof typeof OUTPUT_DIRECTORY_BY_TARGET>);
+
+export type BuildTarget = z.infer<typeof buildTargetSchema>;
 
 export function isBuildTarget(target: string): target is BuildTarget {
   return Object.prototype.hasOwnProperty.call(

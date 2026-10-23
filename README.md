@@ -1,98 +1,162 @@
-# vscode-ai-plugin
+# wycats
 
-An agent toolkit for VS Code Copilot, Claude Code, Codex, and Pi, grounded in a theory of how language activates reasoning in language models.
+Reusable instructions for investigation, implementation, review, and writing in
+VS Code Copilot, Claude Code, Codex, and Pi.
 
 ## What this is
 
-This repo is a working agent plugin for VS Code, Claude Code, Codex, and Pi. Its
-canonical resources are projected into the capabilities each host provides;
-not every host activates every resource type. The repo is also the testbed for
-a framework about *how to write good agent customizations*, and a vocabulary
-of reusable patterns that make those customizations work.
+This plugin gives your coding agent workflows for tasks such as investigating a
+codebase or developing an RFC, stances that shape the judgment those tasks need,
+and agent roles for delegated work.
 
-The framework and the practice evolved together. Each skill we built refined the theory, and each theoretical insight improved the skills.
+The plugin grew out of working with agents on real projects and revising their
+instructions when the work revealed something we had missed. The repository
+also develops a theory of how those instructions work. Using the resources
+gives us ways to try that theory and reasons to revise it.
+
+## How the pieces work together
+
+Suppose an edit triggers an expensive calculation several times. You want to
+understand why before deciding what to change.
+
+Ask your agent to use the [Recon workflow](skills/workflows/recon/SKILL.md). It
+guides the investigation: follow the calls, compare explanations, and decide
+what to examine next. You may initially suspect that some calls should be
+removed. Discovering that several consumers need the same result changes the
+question to how those consumers could share the calculation.
+
+[Interpretive Synthesis](skills/stances/interpretive-synthesis/SKILL.md) describes
+the judgment involved in that change of understanding. The calls acquire a
+different meaning once we understand their consumers, and that new account
+changes what we need to investigate. This is a **stance**: relationships we can
+recognize and attend to across different kinds of work. It also matters when an
+implementation changes the premise of an RFC or a reader's response changes the
+opening of an essay. A **workflow** brings such stances into a particular task
+and describes how the work develops.
+
+An **agent** takes responsibility for a contribution. The
+[Recon worker](agents/recon-worker.agent.md) might trace the callers while another
+participant examines how updates reach them. The worker uses the same Recon
+workflow to pursue its part of the question. It shares findings while the
+investigation is underway and brings discoveries that affect the larger account
+to the coordinator. The coordinator uses those exchanges to reconsider the
+investigation as a whole.
+
+Stances live in `skills/stances/`, workflows in `skills/workflows/`, and agent
+roles in `agents/`. The build adapts these sources to each application's skill,
+agent, instruction, and hook support. The [target table](#how-the-build-works)
+describes what each package provides.
 
 ## The core idea
 
-Language models generate text by navigating a probability landscape. Every piece of context reshapes that landscape: the system prompt, the skill instructions, the conversation history, the user's message. Some contexts create broad, shallow valleys where many outputs are plausible (generic prose, mediocre code). Others create narrow, deep wells where the output is precise and coherent.
+Instructions shape what an agent notices, expects, and treats as worth pursuing.
+A stance makes those relationships explicit. For example,
+[Reader Orientation](skills/stances/reader-orientation/SKILL.md) asks what someone
+can understand where they encounter a piece of work. That question can guide an
+API explanation, a paragraph, or a navigation control. Each needs different
+details to make sense to its reader.
 
-A **stance** is a consistent set of relationships between the writer, the content, and the reader that creates a well. "The reader is a senior engineer" is a stance. "Every sentence must advance the argument" is a stance. Each one pulls the model's output toward a specific region of the probability landscape.
+We use a probability landscape as a working model for this influence: context
+makes some continuations more likely than others. Instructions can reinforce
+the same account of the work or pull it in competing directions. This gives us
+a question to ask when writing a skill: what does each instruction lead the
+agent to attend to, and how does that attention contribute to the task?
 
-The practical question for skill design is always: **does each instruction deepen the same well, or does it create a competing well?** Instructions that reinforce each other produce precise, coherent output. Instructions that compete produce confused or stilted output.
-
-This idea has consequences for how skills should be written: described honestly rather than prescriptively, using tensions rather than rules, separating generation from evaluation. [FOUNDATIONS.md](https://github.com/wycats/vscode-ai-plugin/blob/main/FOUNDATIONS.md) develops the full framework. [QUALITY.md](https://github.com/wycats/vscode-ai-plugin/blob/main/QUALITY.md) translates it into practical principles.
-
-The framework preserves stable relational invariants across situated
-projections. A stance owns the canonical articulation of an invariant; skills
-compose stances into workflows, agents crystallize them into cognitive modes,
-and runtime builds adapt their envelopes and activation surfaces without
-becoming new sources of meaning.
-
-The same selection problem appears at project scale. **Vision steering** selects
-the current bet by relating candidate work to a durable project thesis and an
-experienced outcome. **Operational steering** is narrower checkpoint guidance:
-it keeps lanes and PER-sized goals moving inside that bet. The current bet is a
-project-scoped steering projection that can connect several work surfaces; it
-is not a separate workflow entity.
+[Foundations](FOUNDATIONS.md) develops that model.
+[Quality](QUALITY.md) turns it into principles for writing and reviewing the
+resources. We revise both as using the plugin changes our understanding.
 
 ## Concept map
 
-The repo has two kinds of documentation: foundational theory that explains why the plugin is written this way, and design notes that explore emerging workflow concepts before they become skills.
+[Building together](instructions/building-together.instructions.md) describes how
+shared understanding develops through conversation, implementation, and use. It
+connects the skills and stances through the work they support. The
+[persistent guidance contract](docs/persistent-guidance.md) explains how each
+host receives it and the current delivery limits.
 
-- [FOUNDATIONS.md](https://github.com/wycats/vscode-ai-plugin/blob/main/FOUNDATIONS.md) — distributional mechanics: probability landscapes, stances, information boundaries, generation vs. evaluation, and selection across timescales.
-- [QUALITY.md](https://github.com/wycats/vscode-ai-plugin/blob/main/QUALITY.md) — practical principles for writing skills, agents, instructions, and hooks from those mechanics.
-- [docs/canonical-resources-and-runtime-projections.md](https://github.com/wycats/vscode-ai-plugin/blob/main/docs/canonical-resources-and-runtime-projections.md) — semantic authority across stance, workflow, project-state, and runtime projections.
-- [docs/runtime-projection-contract.md](https://github.com/wycats/vscode-ai-plugin/blob/main/docs/runtime-projection-contract.md) — precise skill activation semantics, package locations, native mappings, and conformance requirements.
-- [docs/curated-upstream-subset-consumption.md](https://github.com/wycats/vscode-ai-plugin/blob/main/docs/curated-upstream-subset-consumption.md) — host-neutral downstream selection, dependency closure, provenance, and honest projection across every supported target.
-- [docs/per-arc.md](https://github.com/wycats/vscode-ai-plugin/blob/main/docs/per-arc.md) — lightweight reference note for preserving current-bet orientation and evidence across repeated PER cycles.
-- [docs/exo-composition.md](https://github.com/wycats/vscode-ai-plugin/blob/main/docs/exo-composition.md) — exploratory brief for how stance-shaped cognition composes with durable project state and operational steering surfaces.
-- [docs/lane-centered-ai-workbench.md](https://github.com/wycats/vscode-ai-plugin/blob/main/docs/lane-centered-ai-workbench.md) — thought experiment for a workbench where project vision, a current bet, visible lanes, and PER-sized goals share one project reality.
-- [docs/setup.md](https://github.com/wycats/vscode-ai-plugin/blob/main/docs/setup.md) — configuration, local registration, and build setup details.
+The foundational documents develop the working model and writing principles.
+Supporting documents describe the package contracts and setup, preserve
+workflow decisions, and explore emerging concepts.
+
+- [FOUNDATIONS.md](https://github.com/wycats/ai-plugin/blob/main/FOUNDATIONS.md) — the working model: probability landscapes, stances, information boundaries, generation and evaluation, and selection across timescales.
+- [QUALITY.md](https://github.com/wycats/ai-plugin/blob/main/QUALITY.md) — practical principles for writing and reviewing skills, agents, instructions, and hooks.
+- [docs/canonical-resources-and-runtime-projections.md](https://github.com/wycats/ai-plugin/blob/main/docs/canonical-resources-and-runtime-projections.md) — semantic authority across stance, workflow, project-state, and runtime projections.
+- [docs/runtime-projection-contract.md](https://github.com/wycats/ai-plugin/blob/main/docs/runtime-projection-contract.md) — precise skill activation semantics, package locations, native mappings, and conformance requirements.
+- [docs/curated-upstream-subset-consumption.md](https://github.com/wycats/ai-plugin/blob/main/docs/curated-upstream-subset-consumption.md) — host-neutral downstream selection, dependency closure, provenance, and honest projection across every supported target.
+- [docs/per-arc.md](https://github.com/wycats/ai-plugin/blob/main/docs/per-arc.md) — lightweight reference note for preserving current-bet orientation and evidence across repeated PER cycles.
+- [docs/exo-composition.md](https://github.com/wycats/ai-plugin/blob/main/docs/exo-composition.md) — exploratory brief for how stance-shaped cognition composes with durable project state and operational steering surfaces.
+- [docs/lane-centered-ai-workbench.md](https://github.com/wycats/ai-plugin/blob/main/docs/lane-centered-ai-workbench.md) — thought experiment for a workbench where project vision, a current bet, visible lanes, and PER-sized goals share one project reality.
+- [docs/setup.md](https://github.com/wycats/ai-plugin/blob/main/docs/setup.md) — configuration, local registration, and build setup details.
 
 ## Stances
 
-When writing a skill, you're choosing *how the agent should think about the task*. We've found that certain collaborative patterns recur across different skills, and naming them makes them composable. The `stances/` directory contains these named patterns:
+These are some of the stances the workflows draw on. Each source describes the
+relationships involved and uses examples from different domains to make them
+recognizable.
 
-**Collaborative grounding** is the most fundamental. The agent has perception (tools, files, search) and superhuman breadth across all of human expression. The user has situated knowledge: intent, priorities, energy, the state of the world beyond the screen. Neither perspective is sufficient alone. Good collaboration combines both: the agent shares what it sees, the user contributes what the agent can't access.
+**Collaborative grounding** combines what the agent can investigate and infer
+with the user's situated experience. The agent brings observations and a
+recommendation; the user's priorities, examples, and corrections can change
+what those observations mean and how the work should proceed.
 
-**Authorial continuity** makes the author easier to hear in agent-assisted writing. The author remains present through the judgment the communication carries and the way it addresses its readers. The agent drafts from available evidence, and the author shapes what the communication says and its exact words through participation in those relationships and direct contact with the concrete situation.
+**Authorial continuity** keeps the author's judgment present in writing developed
+with an agent. The author's response can reveal what their readers already
+understand, which qualifications matter, and how a change in wording alters
+their position.
 
-**Relational continuity** keeps language attached to the work underway so later turns, summaries, and handoffs inherit usable orientation. Its skill description is intentionally ambient; the loaded stance deepens compact reminders like "let's focus on what we're doing" and "let's use precise and meaningful language."
+**Relational continuity** keeps language attached to the work underway so later
+turns, summaries, and handoffs inherit usable orientation. A compressed account
+preserves the concerns, observations, and relationships someone needs to
+continue from it.
 
-**Vision steering** holds a durable project thesis while evidence changes the route. It treats plans, tasks, pull requests, and infrastructure as hypotheses about how to produce an experienced outcome, then selects the smallest meaningful bet that can generate organic proof.
+**Vision steering** relates a local choice to what the work should make possible
+for people. That purpose gives details significance beyond their local quality.
+Experience can clarify the direction, reveal a further ambition, or show that
+the work has accomplished enough.
 
-**Public design reasoning** shapes durable proposal prose for RFCs, architecture notes, and canonization summaries. It treats sections as reader contracts: each heading matters because of the work it does for users, implementers, maintainers, educators, and future readers.
+**Public design reasoning** carries a design's reasoning, consequences, and
+commitments to people outside the originating conversation. A future reader
+should be able to build on the account and revisit its choices. Template
+sections earn their place through the help they provide those readers.
 
 **Reader orientation** starts from what someone can know where they encounter
 code, an interface, or an explanation. It supplies the relationships needed to
 reason locally, with deeper detail available through deliberate investigation.
-The implementation-quality skill applies this stance to a codebase's flow,
-types, organization, and documentation.
+It also asks what including an explanation suggests to someone who already
+understands the point. The implementation-quality skill applies this stance to
+a codebase's flow, types, organization, and documentation.
 
-**Joint reading** is what happens when two people examine code or a document together. The agent sees structural patterns; the user sees design intent. The walkthrough skill uses this stance.
+**Joint reading** develops understanding through shared material. Each
+participant can notice something the other missed, and their questions change
+what both see in a particular passage or code path. Walkthrough gives that
+reading a rhythm; Colleague Review uses it to develop an artifact through
+another participant's encounter.
 
-**Diagnostic questioning** is asking the right question at the right time. The one that maximally reduces uncertainty about the user's priorities. High-variance questions (where the agent genuinely can't predict the answer) come first, because their answers often resolve lower-variance questions implicitly. The session-rest skill uses this during triage.
+**Diagnostic questioning** lets each answer revise the questioner's
+understanding and guide what becomes worth asking next. A concrete question
+about the user's intent or experience can change the larger question the agent
+thought it needed to resolve. Dangling-thread review uses this when a thread's
+status depends on the user's situated knowledge.
 
-**Socratic elicitation** shapes *how* to ask: reflecting back the agent's understanding so the user can refine it, naming tensions to make them concrete, offering interpretations and inviting correction. The goal is to draw out what the user already knows but hasn't articulated, with minimal cognitive load.
+**Socratic elicitation** helps the user examine an intuition they cannot yet
+explain. A reflection, comparison, or small draft gives them something to
+recognize, question, or refine. Their response can develop the intuition and
+change what they thought they wanted to say.
 
-**Interpretive synthesis** is Gadamer's hermeneutic circle: understanding the whole through the parts and the parts through the whole. Each pass through the details revises the big picture, and the revised big picture changes how the details look. The session lifecycle skills use this when forming a coherent account of a session's trajectory.
+**Interpretive synthesis** is Gadamer's hermeneutic circle: understanding the whole through the parts and the parts through the whole. Each pass through the details revises the big picture, and the revised big picture changes how the details look. Recon uses this to revise its account as evidence arrives; walkthrough uses it as the parts change the shared understanding of the whole.
 
 ## What's in the plugin
 
-### Session lifecycle
-
-Sessions deplete context the way a day in Stardew Valley depletes energy. The returns on continued work diminish as context gets crowded. Transitions between sessions should feel natural, not forced.
-
-The session skills form a gradient based on how much the user serves as a bridge to the next session:
-
-- **`/session-save`**: ongoing tidiness, like mise en place in a kitchen. Keeps a sourced Project Orientation and the evidence around its current bet warm as significant work happens.
-- **`/session-rest`**: the natural end of a work cycle. Interprets the session inside the active bet and carries its Immediate gate forward without routinely reopening selection.
-- **`/session-close`**: end of day. Adds full triage, working-style reflection, and cold-start framing while preserving the same bet boundary.
-- **`/session-load`**: start a new cycle. Reconciles orientation sources, resumes the Immediate gate when the bet remains active, and invokes vision steering only when selection is genuinely open.
-
 ### Collaborative review
 
-- **`/walkthrough`**: two people reading code together, one chunk at a time. The agent surfaces structure; the user steers toward what matters. Pauses between chunks are where the value comes from.
+- **[`/colleague-review`](skills/workflows/colleague-review/SKILL.md)**: develop an
+  artifact through a colleague's reading, questions, and attempts to apply it.
+  Discussion can change the explanation, the work itself, or what you think
+  needs review. Return to the revision together to see what it now communicates.
+
+- **`/walkthrough`**: read code with the user one chunk at a time. Each
+  participant's observations and questions can change the shared understanding;
+  pauses give those contributions room to guide the next chunk.
 
 ### Architectural restructuring
 
@@ -113,32 +177,48 @@ The session skills form a gradient based on how much the user serves as a bridge
 
 ### Workflow orchestration
 
-- **`/steer-by-vision`**: explicit project reorientation that recovers the experienced outcome, selects one smallest meaningful end-to-end bet, keeps longer arcs warm, and names the evidence that will reopen steering.
-- **`/per-cycle`**: prepare-execute-review workflow for testing a selected bet and returning calibrated evidence.
-- **`/thread-coordinator`**: cross-thread coordination that preserves the current bet, routes one immediate gate, and returns to vision steering when its named signal arrives.
-- **`/recon`**: adaptive codebase investigation that follows leads and synthesizes findings.
+- **`/steer-by-vision`**: recover what the work should make possible, compare
+  plausible next moves, and recommend a direction. Carry the reasons and useful
+  alternatives forward so new evidence can inform the next choice.
+- **`/per-cycle`**: organize preparation, implementation, and independent review
+  of a consequential change. Participants keep expectations available for
+  comparison with the work and reconsider the approach together as they learn.
+- **`/thread-coordinator`**: keep separate chats working toward a shared outcome.
+  Follow ownership and dependencies, carry discoveries to affected efforts, and
+  make the next action clear.
+- **`/recon`**: investigate a question through code, documents, history, or other
+  evidence. Discoveries can change the explanation and which question would
+  best help the caller proceed.
 
 ### Design and proposal writing
 
-- **`/rfc-writing`**: stage-aware RFC drafting, revision, review, promotion, and canonization in the Rust/Ember tradition. It uses Exo's RFC lifecycle when present and treats Stage 5-style recommendation as corpus-level canonization work for related RFCs.
+- **`/rfc-writing`**: develop a proposal's reasoning and commitments as it moves
+  through discussion, implementation, and use. The project's process and the
+  decision ahead guide what the document needs to establish.
 
 ### Agents
 
-Most agents are subagents, invoked by skills rather than by the user directly. The PER agents (`prepare`, `execute`, `review`) are implementation details of the PER workflow. `pre-read` maps codebase terrain for the active bet's Immediate gate and flags orientation-source disagreements during session transitions. `recon-worker` supports the recon skill.
+`recon-worker` supports delegated investigation from the recon skill. PER describes
+the responsibilities of preparation, execution, and review in its workflow;
+the coordinator chooses suitable workers from the host's available agents.
 
-Two agents are user-facing: `recon` (codebase investigation) and `slop-linter` (identifies and removes slop from documents).
+`recon` is the user-facing investigation agent. The delegated
+[`editorial-reader`](agents/editorial-reader.agent.md) reads a draft from its
+intended audience's starting point, investigates ambiguities, and develops
+revisions with the writer. Its supporting stances keep the author's judgment
+and the reader's understanding present in that work.
 
 ### Hooks and instructions
 
-Hooks enforce mechanical constraints that don't require judgment: blocking `npm` in a pnpm environment, blocking `tsx` when Node runs TypeScript natively. The environment instruction provides always-on context about the development environment (proto-managed toolchains, pnpm, strict typing).
+Hooks enforce mechanical constraints that don't require judgment: blocking `npm` in a pnpm environment, blocking `tsx` when Node runs TypeScript natively. The VS Code environment instruction supplies development conventions for matching files. A generated session-start hook delivers Building together in Codex and VS Code Local sessions. Claude Code loads the full story through an [explicit project import](docs/setup.md#claude-code-persistent-guidance); see [delivery and limits](docs/persistent-guidance.md).
 
 A tool-call logging hook records every tool invocation as JSONL, providing an audit trail of what the agent actually did.
 
 ## Setup
 
 ```sh
-git clone https://github.com/wycats/vscode-ai-plugin.git
-cd vscode-ai-plugin
+git clone https://github.com/wycats/ai-plugin.git
+cd ai-plugin
 pnpm install
 pnpm run setup
 ```
@@ -181,36 +261,27 @@ the plugin:
 
 ```sh
 codex plugin marketplace add ./out/codex-marketplace
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
+codex plugin add wycats@wycats
 ```
 
 The published Codex marketplace lives on the generated `codex-plugin` branch:
 
 ```sh
-codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
+codex plugin marketplace add wycats/ai-plugin --ref codex-plugin
+codex plugin add wycats@wycats
 ```
 
 To update an installed Codex marketplace snapshot:
 
 ```sh
-codex plugin marketplace upgrade wycats-ai-plugin
+codex plugin marketplace upgrade wycats
 ```
 
 Then restart Codex. If the installed plugin cache appears stale, remove and
 re-add the plugin after upgrading the marketplace.
 
-If you installed the earlier main-branch Codex marketplace, migrate once:
-
-```sh
-codex plugin remove wycats-ai-plugin@wycats-ai-plugin
-codex plugin marketplace remove wycats-ai-plugin
-codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
-codex plugin add wycats-ai-plugin@wycats-ai-plugin
-```
-
-No VS Code migration is needed; VS Code continues to use `marketplace.json` and
-`dist/wycats/` on `main`.
+For an existing `wycats-ai-plugin` installation, follow the
+[rename migration](docs/setup.md#renaming-an-existing-installation).
 
 ### How the build works
 
@@ -225,7 +296,7 @@ writes runtime projections to `out/wycats/` for VS Code,
 | ----------- | --------------------------- |
 | VS Code     | Agents, workflow skills, hidden stances, instructions, and hooks |
 | Claude Code | Agents, workflow skills, stances materialized as hidden skills, and hooks |
-| Codex       | Workflow skills and stances materialized as hidden skills; agents are packaged as reference material |
+| Codex       | Workflow skills and stances, plus the persistent-context hook; agents are packaged as reference material |
 | Pi          | Public Recon workflow, private canonical stances, and the `wycats-recon` pi-subagents profile |
 
 The first Pi package is intentionally bounded to Recon. Its delegated profile
@@ -248,13 +319,13 @@ Once the Pi publication workflow has run on `main`, install the generated
 package from its publication branch:
 
 ```sh
-pi install git:github.com/wycats/vscode-ai-plugin@pi-plugin
+pi install git:github.com/wycats/ai-plugin@pi-plugin
 ```
 
 Fetch later publications explicitly, then run `/reload` or restart pi:
 
 ```sh
-pi update git:github.com/wycats/vscode-ai-plugin@pi-plugin
+pi update git:github.com/wycats/ai-plugin@pi-plugin
 # Or update all installed extension packages:
 pi update --extensions
 ```
@@ -278,12 +349,14 @@ resources are loaded only once. Keep model preferences in user/project
 pi-subagents overrides; edits inside a managed Git package checkout can be
 replaced by an update.
 
-Codex does not currently activate this plugin's agents, instructions, or
-hooks. Claude Code does not consume the VS Code instruction format. These are
-visible host capability boundaries, not alternate definitions of the shared
-resources.
+Codex's generated hook delivers persistent instructions after the user trusts
+it. The agents remain reference material, and the other targets' policy and
+logging hooks are not enabled in Codex. Claude Code uses an explicit project
+CLAUDE.md import that is refreshed alongside plugin updates. Pi's Recon
+profile currently omits the story. See the [persistent guidance contract](docs/persistent-guidance.md)
+for lifecycle and qualification limits.
 
-See [docs/setup.md](https://github.com/wycats/vscode-ai-plugin/blob/main/docs/setup.md) for full configuration details, including model presets by provider and tool group reference.
+See [docs/setup.md](https://github.com/wycats/ai-plugin/blob/main/docs/setup.md) for full configuration details, including model presets by provider and tool group reference.
 
 ## Development
 

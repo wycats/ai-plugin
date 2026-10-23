@@ -1,0 +1,2 @@
+# Preserve the exact historical bytes recorded by the pilot archive digests.
+evals/editorial-reader/pilot/** -text

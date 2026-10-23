@@ -77,7 +77,7 @@ void test("installed Pi fetches a later publication from the named branch", { sk
     pi(["install", source]);
     const installed = join(agentDir, "git", "github.com", "pi-local-test", "publication-fixture");
     const installedManifest = JSON.parse(await readFile(join(installed, "package.json"), "utf8")) as { name: string };
-    assert.equal(installedManifest.name, "wycats-ai-plugin-pi");
+    assert.equal(installedManifest.name, "wycats");
     await writeFile(join(output, "revision.txt"), "updated via pi\n");
     const expected = await publishPiOutput(output, remote);
     pi(["update", "--extensions"]);

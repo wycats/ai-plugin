@@ -8,7 +8,8 @@
   },
   "toolGroups": {
     "core": ["Read", "Grep", "Glob", "WebFetch", "WebSearch", "TodoWrite"],
-    "agent": ["Agent"],
+    "agent": ["Agent", "TaskStop"],
+    "communication": ["SendMessage"],
     "browser": ["WebFetch", "WebSearch"],
     "edit": ["Edit", "Write", "MultiEdit"],
     "memory": ["Read", "Write"],

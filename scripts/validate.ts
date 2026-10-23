@@ -10,7 +10,7 @@
  */
 
 import { readFile, stat } from "node:fs/promises";
-import { isAbsolute, join } from "node:path";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   RESOURCE_SECTIONS,
@@ -18,8 +18,7 @@ import {
   type DiscoveredResource,
 } from "./resource-discovery.ts";
 import { loadCanonicalComposition } from "./resource-composition.ts";
-
-const HOOK_TYPES = new Set(["policy", "observer", "side-effect"]);
+import { parseHookManifest } from "./hook-manifest.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 
@@ -144,7 +143,7 @@ async function validateInstructions(instructions: DiscoveredResource[]) {
       error(`${instruction.pluginPath}: missing 'description' in frontmatter`);
     }
 
-    if (!fm.applyTo) {
+    if (!fm.applyTo && fm["wycats.context"] !== "persistent") {
       error(`${instruction.pluginPath}: missing 'applyTo' in frontmatter`);
     }
   }
@@ -160,44 +159,13 @@ async function validateHooks(hooks: DiscoveredResource[]) {
     );
     if (!manifest) continue;
 
-    const type = manifest.type;
-    if (typeof type !== "string" || !HOOK_TYPES.has(type)) {
-      error(
-        `${hook.pluginPath}: 'type' must be one of policy, observer, side-effect`,
-      );
-    }
-
-    if (typeof manifest.name !== "string" || manifest.name.trim() === "") {
-      error(`${hook.pluginPath}: missing non-empty 'name'`);
-    }
-
-    const events = manifest.events;
-    if (
-      !Array.isArray(events) ||
-      events.length === 0 ||
-      events.some((event) => typeof event !== "string" || event.trim() === "")
-    ) {
-      error(`${hook.pluginPath}: 'events' must be a non-empty string array`);
-    }
-
-    if (manifest.tool !== undefined && typeof manifest.tool !== "string") {
-      error(`${hook.pluginPath}: optional 'tool' must be a string`);
-    }
-
-    const script = manifest.script;
-    if (typeof script !== "string" || script.trim() === "") {
-      error(`${hook.pluginPath}: missing non-empty 'script'`);
-    } else if (isAbsolute(script) || script.split(/[\\/]/).includes("..")) {
-      error(`${hook.pluginPath}: 'script' must stay under scripts/hooks/`);
-    } else if (!(await fileExists(join(ROOT, "scripts", "hooks", script)))) {
-      error(`${hook.pluginPath}: script not found: scripts/hooks/${script}`);
-    }
-
-    if (
-      manifest.timeout !== undefined &&
-      typeof manifest.timeout !== "number"
-    ) {
-      error(`${hook.pluginPath}: optional 'timeout' must be a number`);
+    try {
+      const parsed = parseHookManifest(manifest);
+      if (!(await fileExists(join(ROOT, "scripts", "hooks", parsed.script)))) {
+        error(`${hook.pluginPath}: script not found: scripts/hooks/${parsed.script}`);
+      }
+    } catch (err) {
+      error(`${hook.pluginPath}: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 }

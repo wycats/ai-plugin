@@ -10,6 +10,7 @@
  * (vscode → out/wycats/, claude-code → out/claude-code/, codex → out/codex/).
  */
 
+import { parseBuildConfig, type BuildConfig as Config } from "./build-config.ts";
 import { readFile, writeFile, mkdir, cp, stat } from "node:fs/promises";
 import { join, relative, dirname, resolve, posix, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,36 +36,22 @@ import {
   type CanonicalComposition,
 } from "./resource-composition.ts";
 import { assertSafeOutputOverride, prepareProjectionOutput } from "./projection-output.ts";
+import { vscodePluginManifest } from "./vscode-plugin.ts";
+import { projectPluginHooks } from "./hook-projection.ts";
+import { parseHookManifest, type HookManifest } from "./hook-manifest.ts";
 import { PI_PROFILE, piAgentContext } from "./pi-profile.ts";
 import { createProjectionPlan, projectionResourceMap, type ProjectionPlan, type ProjectedResource } from "./projection-plan.ts";
+import { contextDeliveryIndex } from "./context-delivery.ts";
+import { writePersistentContext } from "./persistent-context.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DEFAULT_CONFIG_PATH = join(ROOT, "config.json");
 const CONFIG_ENV_VAR = "VSCODE_AI_PLUGIN_CONFIG_PATH";
 
-interface Config {
-  target: string;
-  models: Record<string, string | null>;
-  thinkingLevels?: Record<string, string | null>;
-  toolGroups: Record<string, string[]>;
-  hookMatchers?: Record<string, string>;
-}
-
-interface PluginEntry {
-  path: string;
-}
-
 interface PluginMetadata {
   name: string;
   version: string;
   description: string;
-}
-
-interface PluginJson extends PluginMetadata {
-  skills?: string[];
-  agents?: PluginEntry[];
-  instructions?: PluginEntry[];
-  hooks?: PluginEntry[];
 }
 
 interface CodexPluginJson extends PluginMetadata {
@@ -167,7 +154,7 @@ const CONFIG_PATH = BUILD_OPTIONS.configPath;
 
 async function loadConfig(): Promise<Config> {
   try {
-    return JSON.parse(await readFile(CONFIG_PATH, "utf-8")) as Config;
+    return parseBuildConfig(JSON.parse(await readFile(CONFIG_PATH, "utf-8")) as unknown);
   } catch (err: unknown) {
     const displayPath = displayConfigPath(CONFIG_PATH);
     const error = err as NodeJS.ErrnoException;
@@ -200,6 +187,9 @@ function resolveTools(toolList: unknown[], config: Config): string[] {
   const resolved: string[] = [];
   for (const entry of toolList) {
     const name = String(entry);
+    // Existing configs predate communication. An omitted mapping leaves
+    // messaging unavailable instead of emitting a literal tool name.
+    if (name === "communication" && !(name in config.toolGroups)) continue;
     if (name in config.toolGroups) {
       resolved.push(...config.toolGroups[name]);
     } else {
@@ -269,16 +259,12 @@ function serializeFrontmatter(
   return lines.join("\n");
 }
 
-function deriveAgentName(filename: string): string {
-  // recon-worker.agent.md → recon-worker
-  return filename.replace(/\.agent\.md$/, "");
-}
-
 async function buildAgent(
   srcPath: string,
   outPath: string,
   outDir: string,
   config: Config,
+  pluginName: string,
   composition: CanonicalComposition,
   outputBySourcePath: ReadonlyMap<string, string>,
   profileSkillNames: string[],
@@ -290,14 +276,22 @@ async function buildAgent(
     composition,
     outputBySourcePath,
   );
-  const { data, content } = matter(raw);
-  const filename = relative(join(ROOT, "agents"), srcPath);
+  const { data: parsedData, content } = matter(raw);
+  // gray-matter caches identical source text. Target-specific edits belong to
+  // this emission, not another agent with the same authored frontmatter/body.
+  const data = { ...parsedData };
+  const canonicalName = composition.bySourcePath.get(resolve(srcPath))?.name;
+  if (!canonicalName) throw new Error(`Missing canonical agent name for ${srcPath}`);
   const isClaudeCode = config.target === "claude-code";
   const isPi = config.target === PI_TARGET;
 
-  // Claude Code and pi-subagents require a name field — insert at the front.
-  if ((isClaudeCode || isPi) && !data.name) {
-    const name = isPi ? PI_PROFILE.name : deriveAgentName(filename);
+  if (config.target === VSCODE_TARGET) {
+    // VS Code resolves delegation and handoffs by name. Explicit frontmatter
+    // replaces its plugin-qualified fallback, so carry the namespace ourselves.
+    data.name = `${pluginName}:${canonicalName}`;
+  } else if ((isClaudeCode || isPi) && !data.name) {
+    // Claude Code and pi-subagents require this field.
+    const name = isPi ? PI_PROFILE.name : canonicalName;
     const original = { ...data };
     for (const k of Object.keys(data)) {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -345,51 +339,42 @@ async function buildAgent(
   return `./${relative(outDir, outPath).split("\\").join("/")}`;
 }
 
-// --- Hook manifest (neutral format) ---
-
-interface HookManifest {
-  type: "policy" | "observer" | "side-effect";
-  name: string;
-  events: string[];
-  tool?: string;
-  script: string;
-  timeout?: number;
+async function readHookManifests(files: string[]): Promise<HookManifest[]> {
+  return Promise.all(files.map(async file => {
+    try {
+      const manifest = parseHookManifest(JSON.parse(await readFile(file, "utf8")) as unknown);
+      const scriptPath = join(ROOT, "scripts", "hooks", manifest.script);
+      if (!(await stat(scriptPath)).isFile()) throw new Error(`Hook script is not a file: ${scriptPath}`);
+      return manifest;
+    } catch (error) {
+      throw new Error(`${file}: ${error instanceof Error ? error.message : String(error)}`, { cause: error });
+    }
+  }));
 }
 
 /**
- * Build hooks for the target platform from neutral manifests.
- *
- * Reads manifests from hooks/*.json, copies scripts + lib to output,
- * then delegates to a platform-specific adapter.
+ * Assemble authored hooks and generated persistent delivery into one manifest.
+ * Copy the authored runtime only when that target includes authored hooks.
  */
 async function buildHooks(
   outDir: string,
   config: Config,
-  hookFiles: string[],
+  plan: ProjectionPlan,
+  manifests: HookManifest[],
 ): Promise<string[]> {
-  if (hookFiles.length === 0) return [];
+  const projected = projectPluginHooks(plan.target, manifests,
+    plan.persistentInstructions?.delivery, config.hookMatchers);
+  if (!projected) return [];
 
-  // Load all manifests
-  const manifests: HookManifest[] = [];
-  for (const file of hookFiles) {
-    manifests.push(JSON.parse(await readFile(file, "utf-8")) as HookManifest);
+  if (manifests.length) {
+    await cp(join(ROOT, "scripts", "hooks"), join(outDir, "scripts", "hooks"), { recursive: true });
+    await copyAgentHooksPackage(outDir);
   }
-
-  // Copy hook scripts and agent-hooks package to output
-  await cp(join(ROOT, "scripts", "hooks"), join(outDir, "scripts", "hooks"), {
-    recursive: true,
-  }).catch(() => {});
-  // Copy the package so hook imports resolve in the output
-  await copyAgentHooksPackage(outDir);
-
-  const hooksOutDir = join(outDir, "hooks");
-  await mkdir(hooksOutDir, { recursive: true });
-
-  if (config.target === "claude-code") {
-    return buildCCHooks(manifests, config, hooksOutDir);
-  } else {
-    return buildVSCodeHooks(manifests, hooksOutDir, outDir);
-  }
+  const { pluginPath, hooks } = projected;
+  const destination = join(outDir, pluginPath);
+  await mkdir(dirname(destination), { recursive: true });
+  await writeFile(destination, JSON.stringify({ hooks }, null, 2) + "\n");
+  return [pluginPath];
 }
 
 async function copyAgentHooksPackage(outDir: string): Promise<void> {
@@ -422,79 +407,6 @@ async function copyAgentHooksPackage(outDir: string): Promise<void> {
   });
 
   await writeFile(join(hooksDest, "src", "index.js"), outputText);
-}
-
-/** VS Code adapter: one JSON file per hook, flat handler arrays. */
-function buildVSCodeHooks(
-  manifests: HookManifest[],
-  hooksOutDir: string,
-  outDir: string,
-): Promise<string[]> {
-  const writes: Promise<void>[] = [];
-  const outPaths: string[] = [];
-
-  for (const m of manifests) {
-    const hooks: Record<
-      string,
-      { type: string; command: string; timeout?: number }[]
-    > = {};
-    for (const event of m.events) {
-      hooks[event] = [
-        {
-          type: "command",
-          command: `node scripts/hooks/${m.script}`,
-          ...(m.timeout !== undefined ? { timeout: m.timeout } : {}),
-        },
-      ];
-    }
-
-    const outFile = join(hooksOutDir, `${m.name}.json`);
-    writes.push(writeFile(outFile, JSON.stringify({ hooks }, null, 2) + "\n"));
-    outPaths.push("./" + relative(outDir, outFile));
-  }
-
-  return Promise.all(writes).then(() => outPaths);
-}
-
-/** Claude Code adapter: consolidated hooks.json with matcher groups. */
-function buildCCHooks(
-  manifests: HookManifest[],
-  config: Config,
-  hooksOutDir: string,
-): Promise<string[]> {
-  const matchers = config.hookMatchers ?? {};
-  const consolidated: Record<
-    string,
-    {
-      matcher?: string;
-      hooks: { type: string; command: string; timeout?: number }[];
-    }[]
-  > = {};
-
-  for (const m of manifests) {
-    const handler = {
-      type: "command" as const,
-      command: `node "$CLAUDE_PLUGIN_ROOT/scripts/hooks/${m.script}"`,
-      ...(m.timeout !== undefined ? { timeout: m.timeout } : {}),
-    };
-
-    const group: { matcher?: string; hooks: (typeof handler)[] } = {
-      hooks: [handler],
-    };
-    if (m.tool && matchers[m.tool]) {
-      group.matcher = matchers[m.tool];
-    }
-
-    for (const event of m.events) {
-      consolidated[event] ??= [];
-      consolidated[event].push(group);
-    }
-  }
-
-  return writeFile(
-    join(hooksOutDir, "hooks.json"),
-    JSON.stringify({ hooks: consolidated }, null, 2) + "\n",
-  ).then(() => ["./hooks/hooks.json"]);
 }
 
 async function writeProjectedResource(
@@ -540,6 +452,7 @@ async function writeCompositionIndex(
         canonicalLine: reference.line,
         generatedSource: `./${relative(outDir, source).split("\\").join("/")}`,
         relation: reference.relation,
+        ...(reference.relation === "load" ? { context: reference.context } : {}),
         generatedTarget: `./${relative(outDir, target).split("\\").join("/")}`,
         canonicalTarget: reference.target.pluginPath,
         canonicalTargetIdentity: reference.target.identity,
@@ -559,6 +472,7 @@ async function writeCompositionIndex(
         semantics: {
           reference: "consultation availability",
           load: "requested activation when the governing prose applies",
+          context: { passage: "read at the linked encounter", activity: "include with the active source or read at entry" },
         },
         edges,
       },
@@ -623,6 +537,7 @@ async function writePiCapabilityReport(
           "local filesystem reads, search, and shell commands",
         ],
         omitted: [
+          "persistent instructions (outside the bounded Recon profile)",
           "browser tools",
           "persistent memory",
           "Exo context tools",
@@ -661,6 +576,10 @@ async function build() {
   const projectedResources = plan.resources.map(({ resource }) => resource);
   const { outputBySourcePath } = plan;
 
+  const hookManifests = await readHookManifests(
+    plan.includesSourceHooks ? resources.hooks.map(resource => resource.sourcePath) : [],
+  );
+
   // Source and target preflight intentionally complete before generated output changes.
   await prepareProjectionOutput({
     outDir,
@@ -677,7 +596,7 @@ async function build() {
   ) as PluginMetadata;
 
   const agentResources = projectedResources.filter(
-    (resource) => resource.section === "agents",
+    (resource) => resource.kind === "agent",
   );
   const agentPaths: string[] = [];
   for (const resource of agentResources) {
@@ -689,6 +608,7 @@ async function build() {
         outPath,
         outDir,
         config,
+        pluginMeta.name,
         composition,
         outputBySourcePath,
         plan.profileResources.map(({ resource }) => resource.name),
@@ -707,14 +627,14 @@ async function build() {
     }
     await cp(copy.source, copy.destination, {
       recursive: true,
-      filter: (source) => !copy.excludedDirectories?.some(
+      filter: (source) => !copy.excludedFiles?.includes(source) && !copy.excludedDirectories?.some(
         (directory) => source === directory || source.startsWith(`${directory}${sep}`),
       ),
     });
   }
 
   for (const { resource, outputPath: outPath, skillMetadata } of plan.resources.filter(
-    ({ resource }) => resource.section === "skills" || resource.section === "stances",
+    ({ resource }) => resource.kind === "workflow" || resource.kind === "stance",
   )) {
     await writeProjectedResource(
       resource,
@@ -725,32 +645,31 @@ async function build() {
     );
   }
 
-  const skillPaths = plan.resources.filter(({ resource }) => resource.section === "skills").map(({ pluginPath }) => pluginPath);
-  const stancePaths = plan.resources.filter(({ resource }) => resource.section === "stances").map(({ pluginPath }) => pluginPath);
+  const skillPaths = plan.resources.filter(({ resource }) => resource.kind === "workflow").map(({ pluginPath }) => pluginPath);
+  const stancePaths = plan.resources.filter(({ resource }) => resource.kind === "stance").map(({ pluginPath }) => pluginPath);
 
   const allSkillPaths = [...skillPaths, ...stancePaths];
 
-  const hookPaths = !plan.includesHooks
-    ? []
-    : await buildHooks(
-        outDir,
-        config,
-        resources.hooks.map((resource) => resource.sourcePath),
-      );
+  for (const { resource, outputPath } of plan.resources.filter(({ resource }) => resource.kind === "instruction")) {
+    await writeProjectedResource(resource, outputPath, composition, outputBySourcePath);
+  }
+  await writePersistentContext(outDir, plan, composition);
+  const hookPaths = await buildHooks(outDir, config, plan, hookManifests);
 
   await writeCompositionIndex(outDir, composition, outputBySourcePath);
+  await writeFile(join(outDir, "context-delivery.json"), JSON.stringify(contextDeliveryIndex(composition, plan), null, 2) + "\n");
   await writeFile(join(outDir, "projection-resources.json"), JSON.stringify(projectionResourceMap(plan), null, 2) + "\n");
 
   const packageJson = isPi
     ? {
-        name: "wycats-ai-plugin-pi",
+        name: pluginMeta.name,
         version: pluginMeta.version,
         description: `${pluginMeta.description} Pi projection.`,
         private: true,
         keywords: ["pi-package"],
         engines: { node: ">=24.0.0" },
         pi: {
-          skills: plan.resources.filter(({ resource, exposure }) => resource.section === "skills" && exposure === "public").map(({ pluginPath }) => posix.dirname(pluginPath)),
+          skills: plan.resources.filter(({ resource, exposure }) => resource.kind === "workflow" && exposure === "public").map(({ pluginPath }) => posix.dirname(pluginPath)),
           subagents: { agents: ["./agents"] },
         },
       }
@@ -764,7 +683,7 @@ async function build() {
     await writePiCapabilityReport(outDir, plan);
     console.log(`Built to ${relative(ROOT, outDir)}/`);
     console.log(`  agents:       ${String(agentPaths.length)} pi-subagents profile`);
-    console.log(`  skills:       ${String(skillPaths.length)} public workflow`);
+    console.log(`  skills:       ${String(plan.resources.filter(({ resource, exposure }) => resource.kind === "workflow" && exposure === "public").length)} public workflow`);
     console.log(`  stances:      ${String(stancePaths.length)} private canonical resources`);
     console.log("  manifest:     package.json");
     console.log("  capabilities: projection-capabilities.json");
@@ -795,8 +714,8 @@ async function build() {
     console.log(`  hooks:        ${String(hookPaths.length)}`);
     console.log(`  manifest:     .claude-plugin/plugin.json`);
   } else if (isCodex) {
-    // Codex: generate .codex-plugin/plugin.json. Codex discovers skills from
-    // skills/; agents and hooks are copied only as source/reference material.
+    // Codex discovers skills and the generated context hook from fixed paths.
+    // Agents remain reference material; authored policy hooks are omitted.
     const codexManifest: CodexPluginJson = {
       name: pluginMeta.name,
       version: pluginMeta.version,
@@ -811,16 +730,16 @@ async function build() {
       keywords: ["codex", "agents", "skills", "workflow", "review"],
       skills: "./skills/",
       interface: {
-        displayName: "Wycats AI Plugin",
+        displayName: pluginMeta.name,
         shortDescription: "Personal workflow skills for Codex",
         longDescription:
-          "A personal agent toolkit for Codex with workflow skills, session lifecycle support, collaborative review patterns, and reusable stances for stronger agent collaboration.",
+          "A personal agent toolkit for Codex with workflow skills, architectural and implementation quality practices, collaborative review patterns, and reusable stances for stronger agent collaboration.",
         developerName: "wycats",
         category: "Developer Tools",
         capabilities: ["Interactive", "Write"],
         websiteURL: "https://github.com/wycats/vscode-ai-plugin",
         defaultPrompt: [
-          "Use the session lifecycle skills for this repo",
+          "Improve implementation quality in this codebase",
           "Walk me through this code with the walkthrough skill",
           "Run a recon pass over this project",
         ],
@@ -843,44 +762,10 @@ async function build() {
     console.log(`  manifest:     .codex-plugin/plugin.json`);
   } else {
     // VS Code: copy instructions; generate plugin.json
-    for (const resource of projectedResources.filter((resource) => resource.section === "instructions")) {
-      const outPath = outputBySourcePath.get(resolve(resource.sourcePath));
-      if (!outPath) throw new Error(`Missing output path for ${resource.pluginPath}`);
-      await writeProjectedResource(
-        resource,
-        outPath,
-        composition,
-        outputBySourcePath,
-      );
-    }
-    const instructionPaths = plan.resources.filter(({ resource }) => resource.section === "instructions").map(({ pluginPath }) => pluginPath);
+    const instructionPaths = plan.resources.filter(({ resource }) => resource.kind === "instruction" && !resource.persistentContext).map(({ pluginPath }) => pluginPath);
 
-    const pluginJson: PluginJson = {
-      name: pluginMeta.name,
-      version: pluginMeta.version,
-      description: pluginMeta.description,
-    };
-
-    if (agentPaths.length > 0) {
-      pluginJson.agents = agentPaths.map((p) => ({ path: p }));
-    }
-    if (allSkillPaths.length > 0) {
-      pluginJson.skills = [
-        ...(skillPaths.length > 0 ? ["./skills/"] : []),
-        ...(stancePaths.length > 0 ? ["./stances/"] : []),
-      ];
-    }
-    if (instructionPaths.length > 0) {
-      pluginJson.instructions = instructionPaths.map((p) => ({ path: p }));
-    }
-    if (hookPaths.length > 0) {
-      pluginJson.hooks = hookPaths.map((p) => ({ path: p }));
-    }
-
-    await writeFile(
-      join(outDir, "plugin.json"),
-      JSON.stringify(pluginJson, null, 2) + "\n",
-    );
+    const manifest = vscodePluginManifest(pluginMeta, { agentPaths, instructionPaths });
+    await writeFile(join(outDir, "plugin.json"), JSON.stringify(manifest, null, 2) + "\n");
 
     console.log(`Built to ${relative(ROOT, outDir)}/`);
     console.log(`  agents:       ${String(agentPaths.length)}`);

@@ -2,6 +2,13 @@
 
 Status: exploratory
 
+This earlier product exploration retains its proposed coordination model. For
+current plugin behavior, read [PER](../skills/workflows/per-cycle/SKILL.md),
+[vision steering](../skills/workflows/steer-by-vision/SKILL.md), and
+[thread coordination](../skills/workflows/thread-coordinator/SKILL.md).
+Their later revisions allow responsibilities and coordination records to follow
+the work rather than requiring this exploration’s phase or current-bet structure.
+
 This note is a relationship brief, not foundational doctrine. It sits outside
 `FOUNDATIONS.md` and `QUALITY.md` on purpose: those documents define the dense,
 generative theory of this plugin. This note asks a narrower product question:
@@ -102,7 +109,7 @@ This plugin should treat Exo as an available workflow substrate when Exo tools
 exist, and as a design influence when they do not.
 
 In the VS Code target, serious agents already include the `exo` tool group. That
-means prepare, execute, review, recon, recon-worker, and pre-read can ground
+means recon and recon-worker can ground
 their work in Exo state when the host exposes `exosuit.exosuit-context/exo-run`.
 
 In the Claude Code target, the `exo` tool group is currently empty. Until that

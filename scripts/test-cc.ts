@@ -12,6 +12,9 @@ import { readFile, writeFile, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { findClaudeCommand, type ClaudeCommand } from "./claude-executable.ts";
+import { claudeCodeInvocation, parseClaudeCodeStream } from "./eval/adapters/claude-code.ts";
+import type { EvaluationResource } from "./eval/core.ts";
+import type { ResourceInvocation } from "./eval/adapters/adapter.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const CC_OUT = join(ROOT, "out", "claude-code");
@@ -30,22 +33,14 @@ function requireClaudeCommand(): ClaudeCommand {
 const CLAUDE = requireClaudeCommand();
 
 const EXPECTED_AGENTS = [
-  "execute",
-  "pre-read",
-  "prepare",
   "recon",
   "recon-worker",
-  "review",
-  "slop-linter",
+  "editorial-reader",
 ];
 
 const EXPECTED_SKILLS = [
   "per-cycle",
   "recon",
-  "session-close",
-  "session-load",
-  "session-rest",
-  "session-save",
   "walkthrough",
 ];
 
@@ -58,21 +53,25 @@ interface TestResult {
 interface ClaudeInvocation {
   output: string;
   failure?: string;
+  resourceInvocation?: ResourceInvocation;
 }
 
 const results: TestResult[] = [];
 
-function cc(prompt: string, maxTurns = 3): ClaudeInvocation {
+function cc(prompt: string, maxTurns = 3, resource?: EvaluationResource): ClaudeInvocation {
+  const invocation = resource ? claudeCodeInvocation(resource, "wycats", prompt, prompt) : undefined;
   const result = spawnSync(
     CLAUDE.executable,
     [
       ...CLAUDE.argumentPrefix,
       "--plugin-dir",
       CC_OUT,
+      ...(invocation?.resourceArguments ?? []),
       "-p",
       prompt,
       "--output-format",
-      "text",
+      resource ? "stream-json" : "text",
+      ...(resource ? ["--verbose"] : []),
       "--max-turns",
       String(maxTurns),
     ],
@@ -95,6 +94,14 @@ function cc(prompt: string, maxTurns = 3): ClaudeInvocation {
       output: "",
       failure: `Claude Code CLI ${outcome}: ${detail}`,
     };
+  }
+  if (resource) {
+    try {
+      const parsed = parseClaudeCodeStream(result.stdout, resource, "wycats", invocation?.directInvocation);
+      return { output: parsed.result, resourceInvocation: parsed.resourceInvocation };
+    } catch (error) {
+      return { output: result.stdout, failure: error instanceof Error ? error.message : String(error) };
+    }
   }
   return { output: result.stdout };
 }
@@ -185,19 +192,24 @@ async function run() {
       : `expected block, got: ${hookOutput.output.slice(0, 100)}`;
   });
 
-  // Test 4: Slop-linter agent works
-  const slopOutput = cc(
-    'Use the slop-linter agent to lint this single sentence: "In today\'s rapidly evolving landscape, we leverage cutting-edge AI." Return only the findings table.',
-    3,
+  // Test 4: Native invocation works even when the role is not user-invocable.
+  // This is a transport smoke check; the editorial evaluation needs human review.
+  const editorialOutput = cc(
+    'Read this release note for users deciding whether to upgrade: "Exports now keep the column order from your saved view. The refresh interval remains five minutes." Return what helps the writer continue. Keep proposed prose in your response.',
+    12,
+    {
+      identity: "wycats-plugin:agents/editorial-reader",
+      name: "editorial-reader",
+      path: "agents/editorial-reader.agent.md",
+    },
   );
 
-  test("Slop-linter produces findings", () => {
-    if (slopOutput.failure) return slopOutput.failure;
-    return slopOutput.output.includes("Label") ||
-      slopOutput.output.includes("Generic") ||
-      slopOutput.output.includes("slop")
-      ? true
-      : `no findings detected in: ${slopOutput.output.slice(0, 100)}`;
+  test("Editorial Reader native invocation returns a reading", () => {
+    if (editorialOutput.failure) return editorialOutput.failure;
+    if (editorialOutput.resourceInvocation?.resource !== "wycats:editorial-reader") {
+      return "missing editorial-reader invocation evidence";
+    }
+    return editorialOutput.output.trim() !== "" ? true : "empty editorial reading";
   });
 
   // Test 5: Recon reads files

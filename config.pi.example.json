@@ -12,6 +12,7 @@
     "auxiliary": null
   },
   "toolGroups": {
+    "communication": [],
     "core": ["read", "grep", "find", "ls"],
     "agent": [],
     "browser": [],

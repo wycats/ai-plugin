@@ -25,8 +25,8 @@ stance handle to keep its well active. The relevant question is where a change
 to the meaning belongs. A projection may reinforce or apply the canonical
 resource; it should not acquire independent authority to redefine it.
 
-Exact language matters. These resources shape a model's probability landscape,
-so semantic preservation is stronger than carrying the same topic or intent.
+Exact language matters because it directs attention and establishes relationships
+that a summary of the same topic or intent can leave out.
 Prefer copying authoritative language directly. Treat a rewritten projection
 as a semantic change unless the difference is confined to the host envelope.
 
@@ -38,8 +38,8 @@ The same relationship appears at several layers:
 | ---------- | --------------- | ------------------------------- |
 | Cross-domain example | Stance | A different subject that preserves the stance's relational invariant |
 | Workflow skill | Its own maneuver plus composed stances | Entry, sequencing, collaboration, output, and handoff for a situated task |
-| Agent | Its fused cognitive mode plus crystallized stances | Persistent operational behavior for a delegated role |
-| Project Orientation | User steering or the designated project-purpose surface | A current-bet view that carries purpose into sessions and coordination |
+| Agent | Its role responsibility and continuing stance orientation | Persistent operational behavior for a delegated role |
+| Project Orientation | User steering or the designated project-purpose surface | An account of purpose and current direction that carries into sessions and coordination |
 | Runtime package | Root source resources and build configuration | Host-specific location, discovery, model/tool names, hook envelopes, and supported surfaces |
 
 These projections are not interchangeable. A skill composes stances; it does
@@ -49,9 +49,10 @@ available to a host; it does not become the authoring surface.
 
 ## Activation intent and runtime discovery
 
-A resource's description explains applicability. Its `user-invocable` field
-states whether it belongs on the user's direct workflow surface; `invocation`
-states whether relevance can select it or the user must choose it explicitly.
+A resource's description explains applicability. Its `wycats.user-invocable`
+metadata states whether it belongs on the user's direct workflow surface;
+`wycats.invocation` states whether relevance can select it or the user must
+choose it explicitly.
 Choosing to enter a substantial workflow is part of that workflow's meaning,
 so these declarations belong to the canonical resource.
 
@@ -71,8 +72,10 @@ A canonical resource can make a relationship navigable with an ordinary
 relative Markdown link whose title is exactly one of these values:
 
 ```markdown
-[interpretive synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load")
-[collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference")
+As discoveries change your understanding,
+[revisit the observations and questions that depended on it](../../stances/interpretive-synthesis/SKILL.md "composition:load").
+When the direction depends on the user's intent,
+[develop it with them](../../stances/collaborative-grounding/SKILL.md "composition:reference").
 ```
 
 `composition:reference` means the full resource remains available for
@@ -80,24 +83,24 @@ consultation. `composition:load` requests activation when the governing prose
 applies. The surrounding sentence owns the condition, timing, emphasis, and
 purpose; the title does not establish a separate activation state machine.
 The activation contract permits load edges into contextual resources and
-reference edges into either policy. Background guidance can therefore say
-“keep active throughout,” while a situated interruption can say “when surfaces conflict,” and both can use the
-same load relationship without losing their different shapes.
+reference edges into either policy. The sentence can guide attention throughout a workflow or introduce a
+judgment when a particular condition arises. Both can use the same load
+relationship while preserving their different timing.
 
-The supported grammar is an inline Markdown link with a relative destination
-and a single- or double-quoted title (parenthesized Markdown titles are also
-accepted). Composition destinations point directly to a discovered canonical
-Markdown resource; URL schemes, absolute paths, fragments, and query strings
-are outside this identity form. Validation reports malformed markers, exact
-`composition` namespaces with unsupported relationship values, likely
-namespace typos within edit distance two when paired with exact `load` or
-`reference`, identity collisions, and unresolved or invalid targets with
-source file and line. This bounded typo check catches plausible authoring
-mistakes without treating arbitrary documentation titles as markers; it does
-not promise to classify every possible misspelling. Top-level and blockquoted
-fenced code plus inline code remain literal examples. Ordinary documentation
-links and historical unmarked links remain ordinary Markdown and carry no
-inferred composition relationship.
+The [context-delivery extension](runtime-projection-contract.md#3-context)
+adds an optional `context=activity` qualifier to load links. It identifies
+supporting instructions that should accompany the source activity from its
+beginning. Unqualified loads retain passage-governed retrieval, and references
+remain available for consultation. This is a relationship-level choice: a
+stance can frame one workflow while supporting a particular judgment in another.
+The parser and activity-closure planner implement these meanings. The first
+runtime bridge targets a programmatically selected Copilot SDK agent. Its scope,
+examples, and remaining native mappings live in the contract, which owns the grammar.
+
+The contract owns the [link grammar](runtime-projection-contract.md#22-link-grammar)
+and its validation rules. The destination identifies a canonical resource,
+the label describes the linked work, and the title carries the relationship.
+Ordinary documentation links remain outside the composition graph.
 
 Builds validate both source resolution and target projection completeness
 before cleaning generated output. They retain the label, title, and all
@@ -109,6 +112,24 @@ without asserting that generated frontmatter retained the same line number.
 The index supports inspection and discovery; canonical prose remains the
 authority for what each relationship means.
 
+Package builds preserve the marker as a Markdown title and emit an intent-only
+`context-delivery.json` plan. Installing a package does not install a runtime
+consumer of that plan. The separate Copilot SDK bridge uses its activity closure
+for native agent preloading and resolves later skill names and readable paths. An executing agent can follow the projected path with its available
+reading tools. Native invocation metadata separately controls whether a skill
+is eligible for selection. Package checks establish that the target is
+available at the linked path. A runtime trial must establish whether the agent
+reads it when the governing condition arises.
+
+The delivery extension permits adapters to translate composition-link syntax
+and add a distinguishable delivery envelope while preserving the linked action
+and surrounding prose. It keeps the canonical relation in the composition
+index. This matters where native parsers treat a Markdown title as part of the
+path or eagerly attach every linked file. The projection must carry the
+intended context scope as well as a valid address. The contract’s
+[delivery mappings](runtime-projection-contract.md#44-context-delivery)
+distinguish tested mechanisms, documented capabilities, and read fallbacks.
+
 ## Projection plans and artifact addresses
 
 `scripts/projection-plan.ts` selects materialized resources and records their
@@ -119,7 +140,8 @@ describe the intended discovery surface; they do not prove runtime activation.
 
 The bounded Pi profile lives in `scripts/pi-profile.ts`. Its delegated catalog
 contains the public Recon workflow and four constituent stances. The package
-also carries the larger private stance collection for navigation. Packaging
+also carries the larger private stance collection and referenced workflows for
+navigation. Those additional workflows live outside native discovery. Packaging
 availability and the delegated catalog remain separate decisions.
 
 Every target emits `projection-resources.json` with `schemaVersion: 1`, the
@@ -155,11 +177,40 @@ simulating equivalence through different guidance.
 
 ## Authoring boundary
 
-The root `stances/`, `skills/`, `agents/`, `instructions/`, and neutral hook
-manifests are the plugin's canonical authoring surfaces. Abstract model roles,
+The grouped `skills/stances/` and `skills/workflows/` directories, root `agents/`
+and `instructions/`, and neutral hook manifests are the plugin's canonical
+authoring surfaces. Instruction resources declare semantic kind and activation
+in string-valued `wycats.*` metadata. The source reader separates those meanings
+from physical location; adapters choose target paths from the normalized model. Abstract model roles,
 tool groups, and canonical hook tool names let the build adapt execution
 details without rewriting behavior. Generated `out/`, tracked `dist/wycats/`,
 and publication branches are derived runtime artifacts.
+
+Composition and evaluation share the [canonical source reader](../scripts/resource-source.ts).
+It resolves the authoring format into a name, kind, identity, and activation
+policy. A nested container retains its leaf name; an agent's declared name
+takes precedence over its filename. Legacy directory conventions are interpreted
+at this boundary, so consumers receive the same meaning whichever source format
+an author uses. Whether grouping should eventually supply the kind is an
+authoring decision; adapters continue to consume the resolved model.
+
+Generated files have a different contract from source files. Native activation
+keys are valid in a generated skill even though authors cannot declare them in
+canonical source. Evaluation checks the source against its suite identity, then
+checks the generated resource's discovery fields without reinterpreting its host
+envelope as authoring metadata. Invocation uses the validated name; the resource
+map supplies the generated address.
+
+Hook projection follows the same direction. Neutral manifests describe policies,
+events, and scripts; the [hook adapters](../scripts/hook-projection.ts) produce
+each host's final envelope directly. VS Code Local uses flat event handlers and
+host-expanded package roots. Claude Code retains matcher groups and shell-expanded
+roots. Their shared policy does not erase those execution differences.
+Script paths are relative to `scripts/hooks/` and may contain nested directories
+and any Node-supported file extension. Source validation and both adapters require
+portable path characters: letters, digits, underscores, periods, hyphens, and
+forward slashes, with no parent traversal. This lets each host compose the script
+path with its package-root expansion without introducing shell syntax.
 
 This repository is the proving ground for this architecture and owns the
 resources it authors. It does not need to become the permanent home of every

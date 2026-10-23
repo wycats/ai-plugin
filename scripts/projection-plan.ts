@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { dirname, isAbsolute, join, posix, relative, resolve, sep } from "node:path";
 import { codexSkillSidecar } from "./skill-activation.ts";
 import { PI_PROFILE } from "./pi-profile.ts";
@@ -7,15 +8,22 @@ import {
   type CanonicalComposition,
   type CanonicalResource,
 } from "./resource-composition.ts";
-import { CODEX_TARGET, PI_TARGET, VSCODE_TARGET, isBuildTarget, type BuildTarget } from "./target-output.ts";
+import { CODEX_TARGET, PI_TARGET, VSCODE_TARGET, buildTargetSchema, isBuildTarget, type BuildTarget } from "./target-output.ts";
+
+const resourceExposureSchema = z.enum(["public", "private", "reference"]);
 
 export interface ProjectedResource {
   resource: CanonicalResource;
   outputPath: string;
   pluginPath: string;
-  exposure: "public" | "private" | "reference";
+  exposure: z.infer<typeof resourceExposureSchema>;
   /** Resolved before output cleanup; emitted after copying supporting files. */
   skillMetadata?: { frontmatter: Record<string, unknown>; codexSidecar?: Record<string, unknown> };
+}
+
+export interface PersistentInstructionPlan {
+  resources: ProjectedResource[];
+  delivery: "session-start" | "claude-project-import";
 }
 
 export interface ProjectionPlan {
@@ -23,8 +31,25 @@ export interface ProjectionPlan {
   resources: ProjectedResource[];
   profileResources: ProjectedResource[];
   outputBySourcePath: ReadonlyMap<string, string>;
-  supportCopies: Array<{ source: string; destination: string; optional: boolean; excludedDirectories?: string[] }>;
-  includesHooks: boolean;
+  supportCopies: Array<{ source: string; destination: string; optional: boolean; excludedDirectories?: string[]; excludedFiles?: string[] }>;
+  /** Authored policy/observer hooks are independent of persistent delivery. */
+  includesSourceHooks: boolean;
+  persistentInstructions?: PersistentInstructionPlan;
+}
+
+function projectedDestination(resource: CanonicalResource, target: BuildTarget): string {
+  if (resource.persistentContext) return resource.pluginPath.slice(2);
+  if (resource.kind === "workflow" || resource.kind === "stance") {
+    if (target === PI_TARGET && resource.kind === "workflow" && resource.identity !== PI_PROFILE.resources[0]) {
+      return `references/workflows/${resource.name}/SKILL.md`;
+    }
+    const directory = target === PI_TARGET && resource.kind === "stance" ? "stances" : "skills";
+    return `${directory}/${resource.name}/SKILL.md`;
+  }
+  if (target === PI_TARGET && resource.kind === "agent") return `agents/${PI_PROFILE.name}.agent.md`;
+  if (target === VSCODE_TARGET && resource.kind === "agent") return `com.github.copilot/${resource.pluginPath.slice(2)}`;
+  if (target === VSCODE_TARGET && resource.kind === "instruction") return `com.github.copilot/rules/${resource.pluginPath.slice("./instructions/".length)}`;
+  return resource.pluginPath.slice(2);
 }
 
 /** One address and exposure decision for every materialized canonical resource.
@@ -37,18 +62,30 @@ export function createProjectionPlan(
   if (!isBuildTarget(target)) throw new Error(`Unsupported build target '${target}'`);
   const selected = composition.resources.filter((resource) => {
     if (target === PI_TARGET) {
-      return resource.pluginPath === PI_PROFILE.agent ||
-        resource.pluginPath === PI_PROFILE.resources[0] || resource.section === "stances";
+      return resource.identity === PI_PROFILE.agent ||
+        resource.identity === PI_PROFILE.resources[0] || resource.kind === "stance";
     }
-    return resource.section !== "instructions" || target === VSCODE_TARGET;
+    return resource.kind !== "instruction" || resource.persistentContext || target === VSCODE_TARGET;
   });
+  if (target === PI_TARGET) {
+    // A reference makes a workflow readable without advertising another native
+    // entry. Loading an omitted workflow still fails completeness validation.
+    const included = new Set(selected);
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const { source, target: referenced, relation } of composition.references) {
+        if (included.has(source) && relation === "reference" && referenced.kind === "workflow" && !included.has(referenced)) {
+          included.add(referenced);
+          selected.push(referenced);
+          changed = true;
+        }
+      }
+    }
+  }
   const resources: ProjectedResource[] = [];
   for (const resource of selected) {
-    const destination = target === PI_TARGET && resource.section === "agents"
-      ? `agents/${PI_PROFILE.name}.agent.md`
-      : resource.section === "stances" && (target === "claude-code" || target === CODEX_TARGET)
-        ? `skills/${resource.name}/SKILL.md`
-        : resource.pluginPath.slice(2);
+    const destination = projectedDestination(resource, target);
     const frontmatter = resource.frontmatter;
     let skillMetadata: ProjectedResource["skillMetadata"];
     if (resource.activation) {
@@ -74,9 +111,10 @@ export function createProjectionPlan(
       outputPath: resolve(outDir, destination),
       pluginPath: `./${destination}`,
       skillMetadata,
-      exposure: target === CODEX_TARGET && resource.section === "agents"
+      exposure: (target === CODEX_TARGET && resource.kind === "agent") ||
+        (target === PI_TARGET && resource.kind === "workflow" && resource.identity !== PI_PROFILE.resources[0])
         ? "reference"
-        : resource.section === "stances" || resource.section === "instructions" ||
+        : resource.kind === "stance" || resource.kind === "instruction" ||
             (resource.activation?.userInvocable ?? frontmatter["user-invocable"]) === false
           ? "private"
           : "public",
@@ -87,41 +125,56 @@ export function createProjectionPlan(
   if (diagnostics.length) {
     throw new Error(`Target projection validation failed before output cleanup:\n${formatCompositionDiagnostics(diagnostics)}`);
   }
-  const profileResources = target === PI_TARGET ? PI_PROFILE.resources.map((path) => {
-    const projected = resources.find(({ resource }) => resource.pluginPath === path);
-    if (!projected) throw new Error(`Pi profile requires canonical resource '${path}'`);
+  const profileResources = target === PI_TARGET ? PI_PROFILE.resources.map((identity) => {
+    const projected = resources.find(({ resource }) => resource.identity === identity);
+    if (!projected) throw new Error(`Pi profile requires canonical resource '${identity}'`);
     return projected;
   }) : [];
-  if (target === PI_TARGET && !resources.some(({ resource }) => resource.pluginPath === PI_PROFILE.agent)) {
+  if (target === PI_TARGET && !resources.some(({ resource }) => resource.identity === PI_PROFILE.agent)) {
     throw new Error(`Pi profile requires canonical agent '${PI_PROFILE.agent}'`);
   }
-  const copyDirectory = (path: string, optional = true) => ({
-    source: join(composition.root, path), destination: join(outDir, path), optional,
-  });
-  const supportCopies: ProjectionPlan["supportCopies"] = target === PI_TARGET
-    ? [copyDirectory(dirname(PI_PROFILE.resources[0].slice(2)), false), copyDirectory("stances")]
-    : [copyDirectory("skills"), ...(target === VSCODE_TARGET ? [copyDirectory("stances"), copyDirectory("instructions")] : [])];
-  if (target === "claude-code" || target === CODEX_TARGET) {
-    for (const { resource, outputPath } of resources) {
-      if (resource.section === "stances") {
-        const source = dirname(resource.sourcePath);
-        // Nested resources own their support files and are projected independently.
-        const excludedDirectories = composition.resources
-          .map((nested) => dirname(nested.sourcePath))
-          .filter((directory) => directory.startsWith(`${source}${sep}`));
-        supportCopies.push({ source, destination: dirname(outputPath), optional: false, excludedDirectories });
-      }
-    }
+  const supportCopies: ProjectionPlan["supportCopies"] = resources
+    .filter(({ resource }) => resource.kind === "workflow" || resource.kind === "stance")
+    .map(({ resource, outputPath }) => {
+      const source = dirname(resource.sourcePath);
+      // Each container owns its supporting files. Nested discovered containers
+      // receive their own projection rather than leaking raw source envelopes.
+      const excludedDirectories = composition.resources
+        .map((nested) => dirname(nested.sourcePath))
+        .filter((directory) => directory.startsWith(`${source}${sep}`));
+      return { source, destination: dirname(outputPath), optional: false, excludedDirectories };
+    });
+  if (target === VSCODE_TARGET) {
+    // Instruction supporting files retain their existing shared directory scope.
+    supportCopies.push({ source: join(composition.root, "instructions"),
+      destination: join(outDir, "com.github.copilot", "rules"), optional: true,
+      excludedFiles: composition.resources.filter(resource => resource.persistentContext).map(resource => resource.sourcePath) });
+  }
+  const persistentResources = resources.filter(({ resource }) => resource.persistentContext);
+  if (target === "claude-code" && persistentResources.length &&
+      resources.some(({ resource }) => resource.activation && resource.name === "setup-guidance")) {
+    throw new Error("Claude persistent delivery reserves the skill name 'setup-guidance' for project installation.");
   }
   return { target, resources, profileResources, outputBySourcePath, supportCopies,
-    includesHooks: target === VSCODE_TARGET || target === "claude-code" };
+    includesSourceHooks: target === VSCODE_TARGET || target === "claude-code",
+    ...(persistentResources.length ? { persistentInstructions: {
+      resources: persistentResources,
+      delivery: target === "claude-code" ? "claude-project-import" as const : "session-start" as const,
+    } } : {}) };
 }
 
-export interface ProjectionResourceMap {
-  schemaVersion: 1;
-  target: BuildTarget;
-  resources: Array<{ canonicalSource: string; generatedSource: string; identity: string; exposure: ProjectedResource["exposure"] }>;
-}
+const projectionResourceMapSchema = z.object({
+  schemaVersion: z.literal(1),
+  target: buildTargetSchema,
+  resources: z.array(z.object({
+    canonicalSource: z.string(),
+    generatedSource: z.string(),
+    identity: z.string(),
+    exposure: resourceExposureSchema,
+  })),
+});
+
+export type ProjectionResourceMap = z.infer<typeof projectionResourceMapSchema>;
 
 export function projectionResourceMap(plan: ProjectionPlan): ProjectionResourceMap {
   return {
@@ -133,14 +186,14 @@ export function projectionResourceMap(plan: ProjectionPlan): ProjectionResourceM
 }
 
 export function parseProjectionResourceMap(value: unknown, target: BuildTarget): ProjectionResourceMap {
-  const isRecord = (entry: unknown): entry is Record<string, unknown> => typeof entry === "object" && entry !== null;
-  if (!isRecord(value) || value.schemaVersion !== 1 || value.target !== target || !Array.isArray(value.resources) ||
-      !(value.resources as unknown[]).every((entry) => isRecord(entry) && typeof entry.canonicalSource === "string" &&
-        typeof entry.generatedSource === "string" && typeof entry.identity === "string" &&
-        typeof entry.exposure === "string" && ["public", "private", "reference"].includes(entry.exposure))) {
-    throw new Error(`Invalid projection resource map for '${target}'`);
+  const result = projectionResourceMapSchema.safeParse(value);
+  if (!result.success) {
+    throw new Error(`Invalid projection resource map for '${target}':\n${z.prettifyError(result.error)}`);
   }
-  return value as unknown as ProjectionResourceMap;
+  if (result.data.target !== target) {
+    throw new Error(`Invalid projection resource map for '${target}': received '${result.data.target}'`);
+  }
+  return result.data;
 }
 
 /** Read the built artifact's address contract, rather than reconstructing a host layout. */

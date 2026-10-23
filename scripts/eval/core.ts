@@ -365,7 +365,7 @@ export async function loadSuite(path: string): Promise<EvaluationSuite> {
   return (await loadSuiteSnapshot(path)).suite;
 }
 
-function rejectDuplicateJsonMembers(node: JsonNode, location: string, context: string): void {
+export function rejectDuplicateJsonMembers(node: JsonNode, location: string, context: string): void {
   if (node.type === "object") {
     const seen = new Set<string>();
     for (const property of node.children ?? []) {

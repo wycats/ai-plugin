@@ -2,6 +2,13 @@
 
 Status: thought experiment
 
+This earlier product exploration retains its proposed coordination model. For
+current plugin behavior, read [PER](../skills/workflows/per-cycle/SKILL.md),
+[vision steering](../skills/workflows/steer-by-vision/SKILL.md), and
+[thread coordination](../skills/workflows/thread-coordinator/SKILL.md).
+Their later revisions allow responsibilities and coordination records to follow
+the work rather than requiring this exploration’s phase or current-bet structure.
+
 This document is a north-star implementation guide, not foundational doctrine.
 It explores what a single coherent product could look like if the agent
 framework in this repo and Exo were designed together from scratch for a more
@@ -732,7 +739,7 @@ This repo contributes the agent operating model:
 - stances for shaping cognition
 - PER as hypothesis, experiment, and evaluation
 - recon as grounded investigation
-- session lifecycle as continuity management
+- synthesis and gap-reading for preserving understanding across work
 - vision steering as project-level selection
 - evidence discipline for agent reports
 - quality rules for avoiding incoherent instruction stacks
@@ -775,11 +782,12 @@ not as a replacement for them.
 
 ### Agent mechanics in this repo
 
-- `skills/per-cycle/SKILL.md`: prepare, execute, review cycle.
-- `skills/recon/SKILL.md`: grounded adaptive investigation.
-- `agents/prepare.agent.md`: falsifiable pre-execution hypotheses.
-- `agents/execute.agent.md`: bounded action with instrument feedback.
-- `agents/review.agent.md`: evaluation against prediction and result.
+- `skills/workflows/per-cycle/SKILL.md`: preparation, execution, review, and
+  the coordinator's responsibility for shaping delegated assignments.
+- `skills/workflows/recon/SKILL.md`: grounded adaptive investigation.
+- `skills/stances/hypothesis-forming/SKILL.md` and
+  `skills/stances/hypothesis-evaluating/SKILL.md`: expectations that evidence
+  can revise, and evaluation of what the comparison reveals.
 - `agents/recon.agent.md` and `agents/recon-worker.agent.md`: investigation
   surfaces.
 

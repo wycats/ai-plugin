@@ -42,7 +42,7 @@ async function main(): Promise<void> {
   const manifest = JSON.parse(await readFile(join(output, ".claude-plugin", "plugin.json"), "utf8")) as { name: string };
   console.log(`\nPublished to ${CLAUDE_CODE_PUBLICATION_BRANCH} branch.`);
   console.log("\nFor first-time install:");
-  console.log("  /plugin marketplace add wycats/vscode-ai-plugin@cc-plugin");
+  console.log("  /plugin marketplace add wycats/vscode-ai-plugin#cc-plugin");
   console.log(`  /plugin install ${manifest.name}@${manifest.name}`);
   console.log("\nTo update after publishing:");
   console.log(`  /plugin marketplace update ${manifest.name}`);

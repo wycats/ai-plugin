@@ -1,0 +1,41 @@
+<figure class="understanding-cycle {{variant}}">
+<svg class="cycle" viewBox="0 0 540 270" role="img" aria-labelledby="{{id}}-title {{id}}-description">
+  <title id="{{id}}-title">The relationship between understanding, attention, and experience</title>
+  <desc id="{{id}}-description">Our understanding of what we're building guides what we notice and pursue. This brings us into contact with what we encounter, which can revise our understanding.</desc>
+  <defs>
+    <marker id="{{id}}-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 2 1 L 8 5 L 2 9" />
+    </marker>
+    <marker id="{{id}}-return-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="return-stroke" d="M 2 1 L 8 5 L 2 9" />
+    </marker>
+  </defs>
+
+  <g class="cycle-understanding">
+    <text x="270" y="36">Our understanding of</text>
+    <text x="270" y="59">what we're building</text>
+    <path class="understanding-mark" d="M 246 74 Q 270 79 294 74" />
+  </g>
+  <g class="cycle-attention">
+    <text x="116" y="168">What we notice</text>
+    <text x="116" y="191">and pursue</text>
+  </g>
+  <g class="cycle-experience">
+    <text x="424" y="168">What we</text>
+    <text x="424" y="191">encounter</text>
+  </g>
+
+  <g class="cycle-guides">
+    <path d="M 155 65 C 128 77 111 106 112 137" marker-end="url(#{{id}}-arrow)" />
+    <text class="edge" x="66" y="103">guides</text>
+  </g>
+  <g class="cycle-contact">
+    <path d="M 185 202 C 232 226 306 226 354 202" marker-end="url(#{{id}}-arrow)" />
+    <text class="edge" x="270" y="250">brings us into contact with</text>
+  </g>
+  <g class="cycle-return">
+    <path class="return-stroke" d="M 428 137 C 431 100 413 75 385 65" marker-end="url(#{{id}}-return-arrow)" />
+    <text class="edge" x="480" y="103">can revise</text>
+  </g>
+</svg>
+</figure>

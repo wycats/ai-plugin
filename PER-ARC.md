@@ -2,9 +2,9 @@
 
 > Historical dashboard snapshot, last updated 2026-05-24. It is not the
 > project's current orientation or a source of project selection. Current work
-> should resolve Project Orientation from the precedence described in
-> [docs/per-arc.md](docs/per-arc.md) and the session lifecycle skills. This file
-> remains as evidence of the earlier pipeline-hardening arc.
+> can follow Thread Coordinator to
+> [recover its scope and current state](skills/workflows/thread-coordinator/SKILL.md#establish-the-scope-and-recover-current-state).
+> This file remains as evidence of the earlier pipeline-hardening arc.
 
 ## Arc
 

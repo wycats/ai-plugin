@@ -1,0 +1,55 @@
+{
+  "originalSourceRoot": ".runtime/editorial-rethink/reader-pilot/",
+  "files": [
+    {
+      "archive": "request.md",
+      "source": ".runtime/editorial-rethink/reader-pilot/request.md",
+      "sha256": "9fd18744afe2f204f1e79f0df4d61eb2c27ed14e0a2f2a8b9b1e2d1ab3735280"
+    },
+    {
+      "archive": "readme-before.md",
+      "source": ".runtime/editorial-rethink/reader-pilot/readme-before.md",
+      "sha256": "22f6db78bce714d36f8aa6b0f8e72cd1241f9bd47603ca1fae30bd1dcab35162"
+    },
+    {
+      "archive": "inputs.json",
+      "source": ".runtime/editorial-rethink/reader-pilot/inputs.json",
+      "sha256": "17d2b59c3c7dd09feb8383a6f1b88b1cf747bf0d4fc0bd256682e16e8918bf67"
+    },
+    {
+      "archive": "reading.md",
+      "source": ".runtime/editorial-rethink/reader-pilot/reading.md",
+      "sha256": "c2af47542932fcb23fa5e6f63fd77f49e1a6ddb36ac75155a0ec363719c3e500"
+    },
+    {
+      "archive": "exchange.md",
+      "source": ".runtime/editorial-rethink/reader-pilot/exchange.md",
+      "sha256": "4d4dbc7389b42ae6a1e9cddf22432252510e2c585f2c1697fab674b80cdda940"
+    },
+    {
+      "archive": "proposed-opening.md",
+      "source": ".runtime/editorial-rethink/reader-pilot/proposed-opening.md",
+      "sha256": "4bd89a64528556aa430f44db3131f68fa72765907a65513d74c2fc90d92908fc"
+    },
+    {
+      "archive": "accepted-opening.md",
+      "source": ".runtime/editorial-rethink/reader-pilot/accepted-opening.md",
+      "sha256": "72efd74df3bca034f2870e34d0639a5a6f561ac3327ebc863863dd22c315aa71"
+    },
+    {
+      "archive": "role.agent.md",
+      "source": ".runtime/editorial-rethink/editorial-reader.agent.md",
+      "sha256": "fcc79239a12b38c75642ca05bb5cc15b525a6bfe2b1221de57c59197efd7ca13"
+    },
+    {
+      "archive": "reader-orientation.SKILL.md",
+      "source": "skills/stances/reader-orientation/SKILL.md",
+      "sha256": "6fa85f20ef4a3741fe61764dcb4d45a367216de7668a93548ab8b95550b92fe9"
+    },
+    {
+      "archive": "authorial-continuity.SKILL.md",
+      "source": "skills/stances/authorial-continuity/SKILL.md",
+      "sha256": "5a361bf4c6c5e06529c3d7eaa0a5f648bba0ebb4a8bb50396bd9b8afe6b90743"
+    }
+  ]
+}

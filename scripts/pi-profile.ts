@@ -1,14 +1,14 @@
 /** The bounded Recon projection: discovery, delegated context, and activation intent. */
 export const PI_PROFILE = {
   name: "wycats-recon",
-  agent: "./agents/recon.agent.md",
+  agent: "agent:recon",
   // The public workflow comes first, followed by its delegated stance catalog.
   resources: [
-    "./skills/recon/SKILL.md",
-    "./stances/diagnostic-questioning/SKILL.md",
-    "./stances/interpretive-synthesis/SKILL.md",
-    "./stances/observational-grounding/SKILL.md",
-    "./stances/relational-continuity/SKILL.md",
+    "skill:recon",
+    "skill:diagnostic-questioning",
+    "skill:interpretive-synthesis",
+    "skill:observational-grounding",
+    "skill:relational-continuity",
   ],
   agentContext: {
     advertise: true,
