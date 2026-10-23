@@ -13,13 +13,11 @@ metadata:
 
 Read back through the conversation and surface the threads that were started but not followed.
 
-**Stance composition:** Use **gap-reading** to recover material that has fallen
-out of view and **interpretive-synthesis** as it changes your understanding of
-the conversation. Some threads may remain worth keeping while their
-significance is unresolved. Use
-**diagnostic-questioning** with **collaborative-grounding** only when the
-user's situated judgment determines whether a thread remains live. Use
-**relational-continuity** when carrying the result forward.
+[Recover material that has fallen out of view](../../stances/gap-reading/SKILL.md "composition:load") and
+[let it change your understanding of the conversation](../../stances/interpretive-synthesis/SKILL.md "composition:load").
+Some threads may remain worth keeping while their significance is unresolved.
+[Keep the account attached to the work that produced it](../../stances/relational-continuity/SKILL.md "composition:load")
+when carrying the result forward.
 
 ## What to do
 
@@ -37,8 +35,9 @@ user's situated judgment determines whether a thread remains live. Use
    what subsequently happened to it, and what makes it worth returning to or
    keeping unresolved. Check available evidence for later decisions before
    bringing an apparent omission to the user. When their intent or experience
-   would change your judgment, use **diagnostic-questioning** with
-   **collaborative-grounding** to make that uncertainty concrete.
+   would change your judgment,
+   [make the uncertainty concrete in a question](../../stances/diagnostic-questioning/SKILL.md "composition:load")
+   and [develop the judgment with them](../../stances/collaborative-grounding/SKILL.md "composition:load").
 
 ## When to use
 

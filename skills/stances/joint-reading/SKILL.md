@@ -1,8 +1,9 @@
 ---
 name: joint-reading
-description: Use when walking through code, documents, or changes with the user
-  where both perspectives contribute — the agent sees structural patterns, the
-  user sees design intent.
+description: Use when reading code, documents, or other shared material with
+  another participant, including the user or an agent colleague. Develop an
+  understanding together as each participant's observations and questions
+  change what the other sees in the work.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"
@@ -11,7 +12,9 @@ metadata:
 
 # Joint Reading
 
-Two people examining the same material together, where each perceives things the other doesn't, and the conversation is anchored to specific locations in the shared artifact.
+Participants examine the same material together, each noticing things the
+other may have missed. The conversation is anchored to specific locations in
+the shared artifact.
 
 ---
 
@@ -39,14 +42,16 @@ A real estate agent and a contractor walking through a house together. The agent
 
 An explanation or a suggestion about where to look can help both participants
 examine the material. The shared reading develops when their responses affect
-what the other notices and understands. Make room for the user's perception of
-the implementation as well as their intent, and contribute your own reasoning
-about the design alongside observations from tools. Those contributions can
-change as the conversation proceeds.
+what the other notices and understands. Make room for the other participant's
+observations and contextual knowledge, and contribute your own reasoning
+alongside observations from tools. Those contributions can change as the
+conversation proceeds.
 
 ## Composition notes
 
-Joint reading is **collaborative grounding** anchored to shared material. The agent's perception and the user's situated knowledge combine through the shared artifact they're both looking at.
+Joint reading keeps the exchange anchored to shared material. When the reading
+depends on the user's situated knowledge, **collaborative grounding** brings
+that knowledge into the shared examination.
 
 Composes well with **interpretive synthesis** (the big-picture revision during a walkthrough is joint reading + interpretive synthesis). Composes well with **diagnostic questioning** when the reading surfaces ambiguities that need the user's input. The walkthrough skill uses joint reading as its primary stance.
 

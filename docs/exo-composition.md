@@ -2,6 +2,13 @@
 
 Status: exploratory
 
+This earlier product exploration retains its proposed coordination model. For
+current plugin behavior, read [PER](../skills/workflows/per-cycle/SKILL.md),
+[vision steering](../skills/workflows/steer-by-vision/SKILL.md), and
+[thread coordination](../skills/workflows/thread-coordinator/SKILL.md).
+Their later revisions allow responsibilities and coordination records to follow
+the work rather than requiring this exploration’s phase or current-bet structure.
+
 This note is a relationship brief, not foundational doctrine. It sits outside
 `FOUNDATIONS.md` and `QUALITY.md` on purpose: those documents define the dense,
 generative theory of this plugin. This note asks a narrower product question:

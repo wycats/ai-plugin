@@ -20,8 +20,8 @@
     "test:publication": "node --test scripts/publish-generated.test.ts scripts/publish-pi.test.ts",
     "publish-vscode": "node scripts/publish-vscode.ts",
     "eval": "node scripts/eval/run.ts",
-    "test:eval": "node --test scripts/eval/core.test.ts scripts/eval/resource.test.ts scripts/eval/run.test.ts scripts/eval/adapters/claude-code.test.ts",
-    "test:composition": "node --test scripts/build-config.test.ts scripts/persistent-context.test.ts scripts/resource-composition.test.ts scripts/skill-activation.test.ts scripts/projection-plan.test.ts scripts/pi-projection.test.ts scripts/pi-subagents-integration.test.ts scripts/vscode-plugin.test.ts scripts/hook-projection.test.ts scripts/install-local.test.ts",
+    "test:eval": "node --test scripts/eval/core.test.ts scripts/eval/editorial.test.ts scripts/eval/resource.test.ts scripts/eval/run.test.ts scripts/eval/adapters/claude-code.test.ts",
+    "test:composition": "node --test scripts/build-config.test.ts scripts/agent-identity.test.ts scripts/persistent-context.test.ts scripts/guidance-recovery.test.ts scripts/resource-composition.test.ts scripts/context-delivery.test.ts scripts/skill-activation.test.ts scripts/projection-plan.test.ts scripts/pi-projection.test.ts scripts/pi-subagents-integration.test.ts scripts/vscode-plugin.test.ts scripts/hook-projection.test.ts scripts/install-local.test.ts",
     "test:pi-runtime": "node --test scripts/pi-subagents-integration.test.ts",
     "test-cc": "node scripts/test-cc.ts",
     "validate": "node scripts/validate.ts",
@@ -30,7 +30,7 @@
     "generate:config-schema": "node scripts/generate-config-schema.ts",
     "build:site": "node site/build.mjs",
     "check:site": "node site/check.mjs",
-    "test:site": "node --test site/check.test.mjs"
+    "test:site": "node --test site/check.test.mjs site/reading.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

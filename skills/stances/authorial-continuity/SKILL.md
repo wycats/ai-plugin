@@ -1,8 +1,8 @@
 ---
 name: authorial-continuity
-description: Use when drafting or revising language that will be attributed to a
-  user, especially public prose where editorial help must preserve the author's
-  judgment, ownership, and relationship with the readers.
+description: Use when developing language that will be attributed to someone,
+  preserving how their judgment takes shape in words and in their relationship
+  with the people who will read them.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"
@@ -11,91 +11,97 @@ metadata:
 
 # Authorial Continuity
 
-Make the author easier to hear.
-
----
-
-Agent-mediated writing remains the author's when the author continues to
-supply the judgment: what matters, what follows from the evidence, which
-tradeoffs they accept, and how they stand in relation to their readers. The
-agent organizes and clarifies that judgment so other people can understand it.
+Writing on someone's behalf carries their judgment into a relationship with
+readers. What they choose to explain, concede, emphasize, or leave understood
+helps readers recognize their position. An editorial change can preserve every
+explicit claim and still change that position.
 
 ## The core tension
 
-A message expresses what the author wants to say to its readers. Voice is how
-the author addresses them in a way that fits the relationships and current
-context around the communication.
+The agent can investigate the subject, propose an explanation, and notice
+something the author has not yet articulated. The author participates in the
+relationships the writing enters. They know what a concession will acknowledge,
+which disagreement an example will recall, and when a seemingly ordinary phrase
+would sound borrowed. Available evidence gives the agent a way into that
+understanding. The author's response can change it.
 
-The agent can learn about the relationships and current context from available
-evidence. The author participates in the relationships and has direct contact
-with the concrete details that make the situation particular. Which details
-matter cannot be settled in advance.
+Voice takes shape in this particular communication. A public reply addresses
+one person while other people listen. An introduction gives new readers a way
+into a subject familiar to the author. The words position the author toward
+both the immediate reader and the wider audience.
 
-When an agent writes on the author's behalf, the communication can express what
-the author wants to say and still make them sound absent from their own
-communication.
+## Judgment in the words
 
-## Where voice lives
+An understatement can acknowledge a tolerable inconvenience while making room
+for a serious proposal. A qualification can limit the claim a skeptical reader
+expects. A pause or a repeated word can give a realization its weight. These
+choices help constitute what the author means. Replacing them with fluent,
+propositionally similar language can alter the argument's force.
 
-A communication with a primary reader usually also has a wider audience. Voice
-is how the author addresses the primary reader within the wider group and
-current context in which the communication will be read. The exact words shape
-how the author is present to all of them.
+Shared vocabulary and experience let a few words carry several implications.
+An editor may need to work out those implications to understand the passage.
+Explaining them all can change the author's position. A reader who already
+assumes a limitation may take its explicit mention as a sign that the author
+has a particular concern about it. The qualification can be true while
+introducing a doubt the author did not mean to express.
 
-Learn the author's voice for this communication from attributable evidence
-close to its readers and context. The current conversation may be enough.
-Related tasks are especially useful when they preserve the author's own
-language and their edits to agent drafts. When available, a connected chat such
-as Slack can show how the author speaks with the intended readers and within
-the surrounding group. Writing known to come from the author or approved by
-them adds further evidence.
+The author's familiarity with these readers helps distinguish a useful
+qualification from a distracting one. Their response to a draft can reveal
+what they expect readers to infer, which misunderstanding matters, and how
+much emphasis it deserves. Carry that understanding into the wording and
+placement of the explanation.
 
-A repository establishes public conventions. Treat its prose as evidence of
-personal voice when authorship is known.
+## Evidence of this relationship
 
-Use the smallest relevant set of sources. Private or cross-task context may
-help the agent understand the author. Carry into the artifact only content that
-belongs there.
+The author's own language, their corrections to drafts, and writing they have
+approved provide evidence of their judgment. A correction often explains why
+one expression fits its occasion. Carry that understanding into another passage
+by examining its situation. A memorable phrase may belong only where it first
+appeared.
+
+Choose sources close to the communication and its readers. Repository prose
+establishes conventions, while known authorship supports an inference about
+personal voice. Private correspondence may explain a relationship without
+belonging in the resulting document. Keep the distinction between the author's
+words, their approval, and the agent's interpretation available during the work.
+
+## Continuity as understanding develops
+
+An author can discover what they mean by responding to a draft. Their correction
+may change a fact, the stakes of a proposal, or the premise of an explanation.
+Continuity follows that development. Earlier wording can need substantial
+revision once the author understands its subject differently.
+
+The agent can contribute reasons to reconsider a claim. Keep that proposed
+judgment available for the author to examine before presenting it as their
+settled position. Collaboration is especially valuable where several accurate
+accounts would express different priorities or relationships.
 
 ## The relational structure
 
-An audio engineer mixes a singer-songwriter's recording. The mix changes the
-balance and clarity so listeners can hear the performance more fully. The
-phrasing and emotional shape remain the songwriter's.
+An audio engineer makes a singer-songwriter's words easier to hear. Removing
+every hesitation would also change how the performance addresses its listeners.
+The songwriter can distinguish a distracting accident from a hesitation that
+belongs to the song.
 
 A speechwriter helps a union leader answer a longtime organizer at a public
-meeting. The answer is directed to one person and heard by the whole room. The
-speechwriter can shape the answer, but the leader knows which words belong in
-that shared history. A line that sounds borrowed would embarrass the leader in
-front of people who know them.
+meeting. Their shared history gives a brief acknowledgment meaning to the whole
+room. Explaining that history aloud could change the leader's relationship to
+the organizer and to everyone listening.
 
-A translator renders a personal letter for its recipient. The language changes,
-but the letter still has to sound like this writer speaking to this person.
-Fluency serves the relationship already present in the letter.
+A translator works with the writer of a personal letter. Discussing a sentence
+reveals that what first sounded like reassurance is intended as an apology. The
+translation's opening and closing now need reconsideration so the recipient can
+recognize the responsibility the writer wants to take.
 
-Each collaborator changes the form so the audience still hears the author.
-
-## Work on the words
-
-Put a draft in front of the author early. Their response to the actual words
-reveals whether the draft says what they want to say and whether they would use
-this language with these readers in this context.
-
-Revise what the communication says and the exact words with the author over
-several passes. In direct communication with another person, the author will
-usually make the final edit and send it themselves.
+The collaborator helps shape the expression while the author remains involved
+in the judgment it carries.
 
 ## Composition notes
 
-Authorial continuity always relies on **collaborative-grounding**. The agent
-drafts from available evidence, and the author shapes the words through their
-participation in the relationships and direct contact with the concrete
-situation.
-
-It composes with **interpretive-synthesis** when working material needs to
-become a coherent account, and with **relational-continuity** when the words
-must stay attached to the specific work. **Public-design-reasoning** brings in
-the needs of a durable public audience.
-
-Authorial continuity keeps the author present in the resulting prose through
-the judgment it carries and the way it addresses its readers.
+[Reader Orientation](../reader-orientation/SKILL.md "composition:reference")
+attends to the understanding available where readers encounter the work.
+[Collaborative Grounding](../collaborative-grounding/SKILL.md "composition:reference")
+supports decisions that need the author's situated knowledge.
+[Interpretive Synthesis](../interpretive-synthesis/SKILL.md "composition:reference")
+reconsiders the account as details and the whole illuminate one another.

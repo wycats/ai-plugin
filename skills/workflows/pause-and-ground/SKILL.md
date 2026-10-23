@@ -12,10 +12,8 @@ metadata:
 # Pause and Ground
 
 Bring the current explanation back into contact with the observations that
-support it. Use [observational grounding](../../stances/observational-grounding/SKILL.md "composition:load")
-to examine the assumption carrying the next decision. Keep
-[relational continuity](../../stances/relational-continuity/SKILL.md "composition:load")
-active so the pause stays attached to the work underway.
+support it. [Examine the assumption carrying the next decision](../../stances/observational-grounding/SKILL.md "composition:load")
+and [keep the explanation attached to the work underway](../../stances/relational-continuity/SKILL.md "composition:load").
 
 Name the uncertainty that prompted the pause and inspect what could resolve
 it. The result may support the current direction, change the question, or

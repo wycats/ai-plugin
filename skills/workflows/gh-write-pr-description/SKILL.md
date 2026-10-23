@@ -16,20 +16,12 @@ Carry the reasoning behind a change into review. Build the reviewer's intuition
 for why the change exists, then explain how it works, what changes for users or
 maintainers, and where its limits are.
 
-Keep the author present through the judgment the description carries and the
-way it addresses its readers.
+[Keep the author present through the judgment the description carries](../../stances/authorial-continuity/SKILL.md "composition:load")
+and the way it addresses its readers.
 
 This skill has three phases: recover the change's reasoning and the author's
 position, draft and revise a coherent PR description with the author, then
 evaluate the finished artifact from the reader's side.
-
-**Stances used:** Keep **authorial-continuity** active throughout. It always
-relies on **collaborative-grounding**. Use **interpretive-synthesis** during
-recovery and **relational-continuity** during drafting. Add
-**public-design-reasoning** when the change needs a durable design explanation.
-During evaluation, use **gap-reading** for material the description may have
-left out and **observational-grounding** when evidence from different surfaces
-conflicts or may not describe the same phenomenon.
 
 ## Core tension
 
@@ -55,8 +47,7 @@ smallest useful reviewer-facing structure, usually `Why`, `What changed`, and
 
 Inspect the issue or request, the diff and relevant code, the surrounding
 design, the evidence, and the parts of task history that explain the change.
-Use **interpretive-synthesis** to recover reasoning in which the details and
-the whole agree. When the material supports it, make this path visible:
+[Recover the reasoning by reading the details and the whole in light of one another](../../stances/interpretive-synthesis/SKILL.md "composition:load"). When the material supports it, make this path visible:
 
 ```text
 situation or force -> observation -> author's judgment -> change -> consequence
@@ -66,8 +57,8 @@ Preserve the design and learning history that makes the decision
 understandable. Give private shorthand its meaning before asking the reviewer
 to use it.
 
-Use the current conversation and sources close to the PR to understand what the
-author wants to say to its readers in this concrete situation. Keep user,
+[Develop what the author wants to say to these readers with them](../../stances/collaborative-grounding/SKILL.md "composition:load"),
+using the current conversation and sources close to the PR. Keep user,
 agent, and third-party language distinguishable while forming the description.
 
 ## Phase 2: Draft with the author for the reviewer
@@ -80,7 +71,8 @@ same change the body and evidence will explain.
 Use `Why` to build the reader's intuition. Begin with the situation that made
 the change necessary. Show what the author learned and why this change is the
 right response. Explain enough that the implementation feels like a consequence
-of the reasoning.
+of the reasoning. When the change needs a durable design explanation,
+[write for the people who will use, implement, and maintain it](../../stances/public-design-reasoning/SKILL.md "composition:load").
 
 Use the remaining template sections to:
 
@@ -95,6 +87,7 @@ Use the remaining template sections to:
   output, comments, or the task closeout. Bring a result into the PR body when
   it matters to review.
 
+[Keep the wording attached to the concrete work and circumstances](../../stances/relational-continuity/SKILL.md "composition:load").
 Let the material determine the structure. Put a draft in front of the author
 early, then work on the actual words together:
 
@@ -117,18 +110,22 @@ Look for breaks in the account. The title, body, evidence, and visual artifacts
 should describe the same change. The reviewer should be able to distinguish
 what was observed from what the author concluded, understand how strongly the
 evidence supports that conclusion, and see where confidence ends. When evidence
-comes from different surfaces, establish that it bears on the same behavior
+comes from different surfaces,
+[establish that it bears on the same behavior](../../stances/observational-grounding/SKILL.md "composition:load")
 before combining it into one claim.
 
-Return to the working material and look for anything the coherent description
-left out that would change the review: a live tradeoff, limitation, deferred
+[Return to the working material for omissions that would change the review](../../stances/gap-reading/SKILL.md "composition:load"):
+a live tradeoff, limitation, deferred
 piece of work, or decision the reviewer needs to make.
 
 Read it again as a communication from this author to these readers. The
 language should carry the author's judgment and fit the relationships and
 current context around the review.
 
-Run the slop-linter as a separate evaluator when available. Use its findings to
-remove filler and identify missing substance. Bring any resulting revisions
-back through the author before publication, then read the description again as
-a whole.
+Invite a fresh editorial reading when familiarity with the change may hide a
+missing explanation or an unintended implication. Give the
+[Editorial Reader](../../../agents/editorial-reader.agent.md "composition:reference")
+the draft, its audience, and the underlying work. Let its reading develop before
+explaining your editorial choices. Discuss consequential differences and return
+to the revised description to see what it now communicates. Bring resulting
+revisions back through the author before publication.

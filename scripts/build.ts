@@ -41,6 +41,7 @@ import { projectPluginHooks } from "./hook-projection.ts";
 import { parseHookManifest, type HookManifest } from "./hook-manifest.ts";
 import { PI_PROFILE, piAgentContext } from "./pi-profile.ts";
 import { createProjectionPlan, projectionResourceMap, type ProjectionPlan, type ProjectedResource } from "./projection-plan.ts";
+import { contextDeliveryIndex } from "./context-delivery.ts";
 import { writePersistentContext } from "./persistent-context.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -186,6 +187,9 @@ function resolveTools(toolList: unknown[], config: Config): string[] {
   const resolved: string[] = [];
   for (const entry of toolList) {
     const name = String(entry);
+    // Existing configs predate communication. An omitted mapping leaves
+    // messaging unavailable instead of emitting a literal tool name.
+    if (name === "communication" && !(name in config.toolGroups)) continue;
     if (name in config.toolGroups) {
       resolved.push(...config.toolGroups[name]);
     } else {
@@ -255,11 +259,6 @@ function serializeFrontmatter(
   return lines.join("\n");
 }
 
-function deriveAgentName(filename: string): string {
-  // recon-worker.agent.md → recon-worker
-  return filename.replace(/\.agent\.md$/, "");
-}
-
 async function buildAgent(
   srcPath: string,
   outPath: string,
@@ -277,20 +276,22 @@ async function buildAgent(
     composition,
     outputBySourcePath,
   );
-  const { data, content } = matter(raw);
-  const filename = relative(join(ROOT, "agents"), srcPath);
+  const { data: parsedData, content } = matter(raw);
+  // gray-matter caches identical source text. Target-specific edits belong to
+  // this emission, not another agent with the same authored frontmatter/body.
+  const data = { ...parsedData };
+  const canonicalName = composition.bySourcePath.get(resolve(srcPath))?.name;
+  if (!canonicalName) throw new Error(`Missing canonical agent name for ${srcPath}`);
   const isClaudeCode = config.target === "claude-code";
   const isPi = config.target === PI_TARGET;
 
   if (config.target === VSCODE_TARGET) {
     // VS Code resolves delegation and handoffs by name. Explicit frontmatter
     // replaces its plugin-qualified fallback, so carry the namespace ourselves.
-    const name = composition.bySourcePath.get(resolve(srcPath))?.name;
-    if (!name) throw new Error(`Missing canonical agent name for ${srcPath}`);
-    data.name = `${pluginName}:${name}`;
+    data.name = `${pluginName}:${canonicalName}`;
   } else if ((isClaudeCode || isPi) && !data.name) {
     // Claude Code and pi-subagents require this field.
-    const name = isPi ? PI_PROFILE.name : deriveAgentName(filename);
+    const name = isPi ? PI_PROFILE.name : canonicalName;
     const original = { ...data };
     for (const k of Object.keys(data)) {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -451,6 +452,7 @@ async function writeCompositionIndex(
         canonicalLine: reference.line,
         generatedSource: `./${relative(outDir, source).split("\\").join("/")}`,
         relation: reference.relation,
+        ...(reference.relation === "load" ? { context: reference.context } : {}),
         generatedTarget: `./${relative(outDir, target).split("\\").join("/")}`,
         canonicalTarget: reference.target.pluginPath,
         canonicalTargetIdentity: reference.target.identity,
@@ -470,6 +472,7 @@ async function writeCompositionIndex(
         semantics: {
           reference: "consultation availability",
           load: "requested activation when the governing prose applies",
+          context: { passage: "read at the linked encounter", activity: "include with the active source or read at entry" },
         },
         edges,
       },
@@ -654,6 +657,7 @@ async function build() {
   const hookPaths = await buildHooks(outDir, config, plan, hookManifests);
 
   await writeCompositionIndex(outDir, composition, outputBySourcePath);
+  await writeFile(join(outDir, "context-delivery.json"), JSON.stringify(contextDeliveryIndex(composition, plan), null, 2) + "\n");
   await writeFile(join(outDir, "projection-resources.json"), JSON.stringify(projectionResourceMap(plan), null, 2) + "\n");
 
   const packageJson = isPi

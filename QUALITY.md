@@ -1,19 +1,22 @@
 # Quality Principles
 
-These principles govern how skills, agents, instructions, and hooks in this plugin are written. They are the practical application of the distributional mechanics described in [FOUNDATIONS.md](FOUNDATIONS.md) — how stances create gravitational wells in the probability landscape, how wells compose through reinforcement and orthogonality, and how information flows between agent and user.
+These principles guide how skills, agents, instructions, and hooks in this
+plugin are written. [FOUNDATIONS.md](FOUNDATIONS.md) explains the working model
+behind them: how language establishes a stance and how available information
+shapes what an agent can judge.
 
-They are not style guidelines. They are first-principles observations about how the model's probability engine works. If a skill deviates from these principles, it should be for one of two reasons:
-
-1. The task genuinely requires compliance mode — no tensions to resolve, no judgment needed, just exact execution. This is rare.
-2. The task is deterministic and should be code, not a skill. Natural language is the wrong tool for mechanical processes.
-
-If neither reason applies and a skill still deviates, that's a signal something is wrong with the skill.
+Judge a resource by how well it helps the agent understand and carry out its
+work. A trial may expose a missing distinction in the resource or an assumption
+in these principles that needs revision. Preserve exact requirements where the
+work depends on them, such as an authorization boundary or an output contract.
+Put mechanical checks in code when they can reliably establish the result.
 
 ## Structure matches execution shape
 
-The document's visual structure should mirror the workflow's actual shape. If the workflow is a loop, the document should look like a loop. If one phase is more important than the others, it should be the longest and most prominent section.
-
-An agent should be able to understand the workflow shape by reading only the section headers.
+The sections should make the work's main responsibilities and transitions easy
+to find. Explain what causes a return to an earlier question when the workflow
+depends on iteration. Give each responsibility the space needed to understand
+it, including a short section when its judgment is already clear.
 
 ## Template sections are reader contracts
 
@@ -48,21 +51,35 @@ applied to skill design. Add detail or indirection when it improves the reader's
 ability to act; a clear boundary can contain substantial mechanics without
 bringing them all into the main path.
 
-## The critical path is visually dominant
+## Make consequential judgments easy to find
 
-If there's one thing the agent must not skip, make it the longest section, position it where attention is highest, and state its importance explicitly. Structural prominence is preattentive — the agent registers it before reasoning about content.
+Put a consequential judgment where the agent has the context to make it. Explain
+what depends on it and what evidence can support it. A clear heading, a worked
+example, or a short reminder at the transition may provide the emphasis needed.
 
 ## Tensions over rules
 
-A well-stated tension is more precise than a rule because it adapts to context. Rules are equally strict in all situations, which means they're either too tight (blocking valid cases) or too loose (permitting invalid ones). Tensions encode the relationship between competing concerns and trust the agent to resolve them with judgment.
+Describe the concerns a judgment must reconcile and why each matters. A
+handoff must be compact enough to use while preserving the reasons someone
+needs to continue. Naming that tension helps the agent judge what can be
+compressed in this particular handoff.
 
-When writing about what can go wrong, name the underlying tension rather than listing prohibited behaviors. "Source truth vs. session memory" covers more ground and produces better reasoning than three separate "don't" statements.
+Keep requirements exact where their force depends on being exact. An
+authorization boundary or a package path has a different job from guidance
+about what deserves emphasis. Explain that job where the agent needs to act
+on it.
 
 ## Stance emerges from honest description
 
-The way a skill is written activates a region of the model's training distribution. Language that describes tensions honestly, explains why things matter, and trusts the reader to apply principles — this naturally sits in the distribution neighborhood of good technical writing, mentorship, and architectural guidance.
+Develop the instruction from an understanding of the work. Describing a real
+tension gives the agent concerns to recognize in a new situation. Explaining
+why a transition matters gives it a reason to return there when a finding
+changes the account.
 
-You do not need to engineer the stance deliberately. Understand the tensions, describe them clearly, and the stance takes care of itself. Trying to sound authoritative or adding defensive rules pushes toward worse regions of the distribution (compliance documentation, corrective feedback on poor work).
+In the landscape metaphor, this is how the prose gives a stance its shape.
+Examine what the words lead the agent to attend to. A sentence that sounds
+authoritative may leave the needed relationship unexplained; a concrete
+example may make it available.
 
 ## Separate execution path from reference material
 
@@ -70,9 +87,13 @@ During execution, the agent needs to know what to do next. Templates, triage tab
 
 If you could imagine looking something up in a table of contents, it's reference material. Put it after the process.
 
-## Explicit loop constructs for iteration
+## Make the return through the work explicit
 
-Agents follow sequences well but infer loops poorly. If the workflow requires iteration, show the loop structure as pseudocode:
+Explain which findings warrant reconsideration and where they should return.
+In PER, an implementation detail can reopen the expectation that justified the
+approach. In RFC work, it can change a commitment other work relies on.
+
+Use pseudocode when a repeated sequence helps the agent keep its place:
 
 ```
 repeat:
@@ -82,30 +103,46 @@ repeat:
   4. If done → exit
 ```
 
-Prose instructions to "repeat from step N" are easy to skim past. Pseudocode blocks are read as control flow.
+For a return that depends on interpreting a finding, a worked example can show
+how participants recognize what needs reconsideration. Choose the form that
+explains the actual recurrence.
 
 ## One concern per section
 
-When a step tries to do multiple things (spawn a subagent, triage questions, surface decisions to the user, ask a meta-question), the agent has to hold all of them in working memory at once. Split them into separate sub-steps so each one can be executed independently.
+Give a section a recognizable responsibility. Arranging a delegated inquiry,
+interpreting its findings, and bringing a decision to the user may warrant
+separate sections when each needs its own context. Keep related judgments
+together when separating them would hide the relationship that makes them
+possible.
 
-## Language is the precision tool
+## Use language to develop contextual judgment
 
-Natural language is uniquely good at encoding conditional precision — statements that become more precise as context narrows. A well-written tension is vague in the abstract but resolves sharply when the agent knows the specific situation. This is not a weakness of language. It is a feature that formal specifications lack.
+Natural language can describe a relationship whose application becomes more
+precise in context. “Preserve enough reasoning for someone to continue” depends
+on what that person will do and what they can already know. Examples help the
+agent recognize what the relationship requires in a particular situation.
 
-Use language to describe constraints in a way that captures the tensions between them. Formal specification language pushes the model toward exhaustive enumeration and mechanical verification, which is the opposite of contextual judgment.
+Use prose to develop that judgment and precise contracts for the requirements
+other work must rely on. A formal specification or mechanical check can settle
+some obligations, leaving the prose to explain their purpose and how they bear
+on choices the check cannot make.
 
-## Agents crystallize stances; skills compose them
+## Agents establish roles; workflows compose the work
 
-An agent file establishes a cognitive mode: a small number of stances fused so deeply that the seams disappear. The agent doesn't alternate between stances. It *is* the fused mode. A skill composes stances with visible seams and managed transitions, orchestrating when each one is active.
+An agent file establishes responsibility for a contribution and a continuing
+cognitive orientation through the stances that shape it. Editorial Reader, for example, keeps the intended audience's
+understanding and the author's judgment present throughout its reading.
+A workflow describes how the work develops and where particular judgments
+become useful.
 
 This is also a semantic ownership boundary:
 
 - A **stance** owns the domain-general invariant, its central tension, and the
   examples that make the relationship precise.
-- A **skill** owns the situated maneuver: its entry conditions, execution
+- A **workflow** owns the situated maneuver: its entry conditions, execution
   shape, transitions, collaboration points, output, and handoff.
-- An **agent** owns the fused operational behavior that makes its stances
-  present throughout a delegated role.
+- An **agent** owns the role's responsibility and its relationship to the caller
+  and other participants, including the stances that should accompany its work.
 
 The description and visibility of a resource are part of its canonical
 activation intent. A runtime projection may translate that intent into a
@@ -131,11 +168,54 @@ matching edit? Usually it should not. A change to the delegated role's
 responsibility should change the agent. Short restatements can make that role
 vivid while leaving the method's decisions with the workflow.
 
-## Negative instructions cluster with poor work
+## Descriptions help the agent choose
 
-Dense blocks of "don't do X" instructions are correlated in the training data with corrective feedback, low-trust delegation, and defensive documentation. The model has learned that this pattern surrounds contexts where expected output quality is low.
+The description may be all an agent sees before deciding to read a resource.
+Name a recognizable situation and the contribution the resource can make there.
+Compare nearby descriptions to see whether their different purposes are clear.
+Joint Reading concerns understanding shared material together. Walkthrough
+organizes that reading into chunks with pauses for discussion.
 
-Reframe negative instructions as positive principles or named tensions. Keep explicit warnings only for genuinely non-obvious mechanical facts (e.g., "session memory is cleared between conversations" or "strikethrough text is still read and acted on by agents").
+Read each description against its body. A description that promises reciprocal
+collaboration needs a body that leaves both participants room to contribute.
+Revise the underlying account when it fails that comparison, then describe what
+the resource actually offers.
+
+Activation metadata and composition links express availability and delivery
+intent. A phrase such as “background guidance” does not preload a resource.
+Keep those mechanics in the [runtime projection contract](docs/runtime-projection-contract.md),
+and use the description to help the agent recognize relevance.
+
+## Link the judgment where it arises
+
+In operational prose, describe what the agent needs to attend to and link that
+phrase to its supporting stance. For example:
+
+```markdown
+When a finding changes your understanding of the problem,
+[revisit earlier comments whose meaning depended on that explanation](../../stances/interpretive-synthesis/SKILL.md "composition:load").
+```
+
+The sentence should guide the work before the reader follows the link. The
+stance gives that judgment depth across situations. Preserve the conditions
+that make it relevant, and let the link label express its particular role here.
+Named stance references remain useful when comparing concepts or describing
+their relationships.
+
+The composition marker records the intended relationship for validation and
+projection. Loading the linked body still depends on the executing agent and
+its available tools. Check that behavior separately from the quality of the
+prose and the validity of the packaged path.
+
+## Describe the work affirmatively
+
+A list of prohibited mistakes can leave the agent without an account of what
+good work requires. Describe the relationships it should preserve, the evidence
+it should examine, and what a useful contribution makes possible.
+Use an explicit warning where a consequential boundary could otherwise be
+mistaken. Permission to edit a patch, for example, does not itself authorize
+posting a reply on the user's behalf. Explain the distinction where the agent
+needs to act on it.
 
 ## Keep language inside the work
 
@@ -143,18 +223,37 @@ Conversation history becomes working material. A good formulation takes its shap
 
 Two short reminders carry this stance in conversation. "Let's focus on what we're doing" restores attention to the active work. "Let's use precise and meaningful language" restores wording to what the work can actually support.
 
-## Write for the agent's attention curve
+## Review what the prose contributes
 
-Agents read skills front-to-back with highest attention at the beginning. This means:
+Read a sentence from the context its reader has at that point. Ask what it adds
+and whether that addition is needed. When two clauses have been paired without
+explaining their relationship, work out how one bears on the other. That may
+require an explanation, further investigation, or removing a clause that adds
+nothing. Punctuation can reveal a habitual construction, but changing punctuation
+alone leaves its reasoning intact.
 
-- Mental model first
-- Critical path early
-- Reference material last
-- The most important "do not skip" instruction at the transition point where the agent is most likely to take a shortcut
+Bring consequential findings back to the author or participants who can help
+examine them. A review can change the account the document should give, as well
+as how clearly it gives that account.
+
+## Write for the agent's attention
+
+Put the mental model and consequential responsibilities early so the agent
+encounters them before acting. Place supporting reference material where it
+can be consulted when needed. At a transition, supply the context for a
+judgment that could otherwise disappear into a long account of the process.
+
+Check what the executing host actually delivers. A linked stance body, a
+resource's discovery description, and its full text can reach the agent at
+different times. Order alone cannot supply material that was never loaded.
 
 ## Triangulate stances with cross-domain examples
 
-When defining a stance, choose 3-4 examples from unrelated domains whose overlap is precisely the relational structure you want. The examples do two jobs: they activate the right well (through their shared structure) and they exclude nearby attractors (through their differences). A fourth example is needed when the first three accidentally include an attractor that the variation doesn't carve out. A framing sentence that marks which axis is variation and which is invariant helps the model read the examples correctly.
+Choose examples from different domains that make the shared relationship
+recognizable. Three or four often give enough variation to expose an
+incidental feature the examples otherwise have in common. Add or change an
+example when it helps distinguish the intended relationship from that feature.
+A framing sentence can explain what varies and what remains shared.
 
 Preserve that variation when revising examples, including compact examples in
 an agent's role description. Different professions alone may leave the same
@@ -165,21 +264,43 @@ before collapsing them into one.
 
 ## Collaboration over inference for situated decisions
 
-Some tensions involve information that only the user has — timing, priorities, energy, the state of the world beyond the screen. These are not gaps in the agent's knowledge that better tools could close. They are structurally situated in the user's experience.
+Some judgments depend on the user's experience: their priorities, energy,
+intent, or sense of what has momentum. Work from what they have already shared.
+Bring a consequential uncertainty into the conversation with observations and
+a recommendation they can examine.
 
-When a skill involves situated tensions, the resolution is always collaboration: the agent shares what it observes (context usage, progress, complexity of remaining work) and asks the user to combine that with what they know. The form matters — a question that says "here's what I see, what does that mean for you?" is more useful than "should we continue?"
+Their response can change the agent's understanding of the situation and the
+question worth pursuing. Preserve that contribution in the work that follows.
+A skill should make room for this exchange where the user's judgment could
+change the direction.
 
 ## The information landscape
 
-Information the agent needs falls into four categories. Knowing which category a piece of information belongs to determines how the agent should act.
+These four categories help distinguish what the agent can investigate from
+what needs another participant's contribution. Establish which applies to the
+information needed for the current judgment.
 
-**Agent-only perception** — information the agent can access through tools that the user doesn't typically see. Terminal output details, log contents, file system structure beyond the visible explorer. The agent should use tools to get this information directly. Gaps here are subtle — the user doesn't know what the agent can't see, and the agent doesn't know what it's missing. Identifying these gaps requires an architect's eye.
+**Agent-only perception** — information the agent can investigate through tools
+that the user does not typically examine: terminal output details, log contents,
+file system structure. Use those sources directly and bring consequential
+observations into the conversation. Compare what a judgment needs with what the
+tools expose to identify gaps neither participant may have noticed.
 
-**Shared perception** — information both the agent and user can see, using the same concepts and design language. Diagnostics in the Problems panel, the file open in the editor, visible errors. This is the highest-value category because it aligns the agent's understanding with the user's experience. When the agent references something from shared perception, the user can immediately confirm or correct. Tools like `get_errors` and the integrated browser live here. Gaps in shared perception feel surprising to the user — they see something "obvious" that the agent is blind to.
+**Shared perception** — information both participants can examine, such as a
+code passage, diagnostic, or visible error. Check what the available tools
+actually expose before treating a detail as shared. A common reference lets
+the user confirm an observation or question its interpretation.
 
-**Unshared environmental** — information that exists in the environment but the agent can't access yet. This is the most dangerous category. The agent doesn't know it's blind, so it defaults to inference from patterns rather than asking. The information is objective and knowable, but without the right tool it silently becomes a guess. When a skill depends on information that might be unshared, it should explicitly direct the agent to ask rather than infer. As tools improve, unshared information moves to perception — but until it does, treating it as situated (ask the user) is safer than letting it become inferential (guess from patterns).
+**Unshared environmental** — information that exists but is outside the
+agent's current observation. A judgment about an error visible only to the
+user needs that observation. Look for a tool that can reach it, or ask for the
+particular detail the judgment depends on. Keep the missing observation
+recognizable as a gap until it is supplied.
 
-**Inherently situated** — information that lives in the user's embodied experience. Priorities, energy, timing, flow state, what's happening around them. No tool will ever capture this. The resolution is always collaboration, and it's always contextual.
+**Inherently situated** — the user's experience and judgment, including
+priorities, energy, timing, and flow state. Earlier exchanges can help the
+agent reason from it; the user can correct or develop that understanding.
+Ask where the remaining uncertainty could change the work.
 
 ### Diagnosing skill failures with the information landscape
 
@@ -188,8 +309,17 @@ When a skill isn't working well:
 - Is the agent inferring something it should be observing? → tool gap, or the agent isn't using available tools
 - Is the agent inferring something it should be asking about? → collaboration gap in the skill
 - Is the agent asking about something it could observe? → wasting the collaboration budget
-- Is the user frustrated by questions? → unshared environmental information needs to become observable
+- Are questions frustrating the user? → examine whether they ask for observable
+  facts, repeat an answer, or leave the framing work to the user
 
 ### The collaboration budget
 
-The user has limited capacity for answering questions about things the agent "should" be able to see. Every question about an unshared environmental fact feels like a tool failure, even when asking is the right thing to do. This means the collaboration budget should be reserved for inherently situated decisions — the things that genuinely require the user's judgment. Moving unshared environmental information into perception (through better tools) is not just a capability improvement. It preserves the collaboration budget for where it matters most.
+Questions cost attention. Investigate what the available evidence can settle
+and make the remaining uncertainty concrete enough for the user to contribute.
+When an environmental fact is inaccessible, a focused question can be the
+right way to proceed. Better observation reduces that need and leaves more
+attention for decisions that depend on the user's experience.
+
+The user's answer may reveal an unexpected possibility worth developing.
+Respecting their attention includes giving that possibility room when it
+could change what the work is for.

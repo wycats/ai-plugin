@@ -65,8 +65,8 @@ work without an owner. Establish who should take it forward and what that
 changes for the other participants. Continue within the agreed coordination
 scope, and bring a proposed expansion to the user when it needs authorization.
 
-Use [vision-steering](../../stances/vision-steering/SKILL.md "composition:load")
-to consider what the combined progress now makes possible. When several
+[Consider what the combined progress now makes possible](../../stances/vision-steering/SKILL.md "composition:load")
+in relation to the shared purpose. When several
 project directions need comparison, or the ongoing work has lost its purpose,
 [steer-by-vision](../steer-by-vision/SKILL.md "composition:reference") gives that
 decision room. Resume an existing discussion from its pending question. Keep
@@ -110,8 +110,8 @@ continue, and verify that result afterward. Where possible, let the user
 answer in the coordination chat and carry the answer to the owner through the
 authorized messaging surface.
 
-Use [collaborative grounding](../../stances/collaborative-grounding/SKILL.md "composition:reference")
-when the decision depends on the user's experience or priorities. Keep the
+[Work through the decision with the user](../../stances/collaborative-grounding/SKILL.md "composition:reference")
+when it depends on their experience or priorities. Keep the
 question connected to what the work has revealed and explain your recommendation.
 
 ## Continue without losing the state of the work

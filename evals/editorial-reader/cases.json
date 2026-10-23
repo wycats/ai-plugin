@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "protocol": "editorial-reading/v1",
+  "resource": {
+    "identity": "wycats-plugin:agents/editorial-reader",
+    "name": "editorial-reader",
+    "path": "agents/editorial-reader.agent.md"
+  },
+  "description": "Development readings for inspecting reader understanding, supported revisions, and consequential questions. Human assessment remains pending after capture.",
+  "cases": [
+    {
+      "id": "release-note",
+      "description": "A release note for existing users.",
+      "audience": "Existing dashboard users deciding whether to upgrade.",
+      "purpose": "Explain what changes when users upgrade.",
+      "assignment": "Read the release note. You may propose a revision; keep proposed prose in your response.",
+      "document": "Exports now keep the column order from your saved view. The refresh interval remains five minutes.",
+      "context": [
+        {
+          "name": "Support context",
+          "content": "Customers have asked whether the new export also makes their dashboard refresh faster. The export change does not affect refresh timing."
+        }
+      ],
+      "reviewQuestions": [
+        "What would these readers understand about the upgrade?",
+        "Does retaining or changing the refresh qualification preserve its calibration for these readers?",
+        "Does the reading identify an actual consequence rather than treating intervention as useful by itself?"
+      ]
+    },
+    {
+      "id": "implementation-note",
+      "description": "A maintainer-facing explanation with implementation context.",
+      "audience": "Maintainers who know the service but have not read this change.",
+      "purpose": "Explain why the cache change affects repeated requests.",
+      "assignment": "Read this paragraph alongside the supporting implementation. Develop a supported revision or return the question that needs more evidence.",
+      "document": "The cache prevents repeated requests from running the calculation again. Clearing it after every request keeps later requests up to date.",
+      "context": [
+        {
+          "name": "Implementation excerpt",
+          "content": "const pending = new Map();\nasync function compute(key) {\n  if (pending.has(key)) return pending.get(key);\n  const work = calculate(key);\n  pending.set(key, work);\n  try { return await work; } finally { pending.delete(key); }\n}\n\nAssume calculate returns a Promise. No cache survives completion of a request."
+        }
+      ],
+      "reviewQuestions": [
+        "What relationship does the reader infer between repeated requests and the lifetime of the stored calculation?",
+        "Does the reading use the implementation to distinguish overlapping work from reuse after completion?",
+        "What evidence or author decision remains necessary, and does the proposed explanation stay within the supplied implementation?"
+      ]
+    },
+    {
+      "id": "project-opening",
+      "description": "An introduction with two plausible purposes.",
+      "audience": "Developers familiar with coding agents who have just arrived at the repository.",
+      "purpose": "Introduce the project.",
+      "assignment": "Read the opening and return what helps the writer choose how to develop it. Proposed wording can be conditional on a consequential choice.",
+      "document": "This project began as a collection of instructions for my coding agent. It is also where I explore how instructions shape what an agent notices. The repository contains workflows, stances, and roles.",
+      "context": [
+        {
+          "name": "Repository context",
+          "content": "The repository distributes a usable plugin for several coding applications and also contains essays about instruction design. The author has not yet said which reader activity this introduction should lead toward."
+        }
+      ],
+      "reviewQuestions": [
+        "What can a new reader infer about what the repository offers?",
+        "If the reading asks the author a question, does it identify a choice whose answer would affect this introduction?",
+        "Does it preserve uncertainty about the intended emphasis instead of deciding the author's purpose by inference?"
+      ]
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 ---
 name: relational-continuity
-description: "Background guidance for all plugin work: keep language inside the
-  work, focus on what we're doing, and use precise and meaningful language that
-  stays attached to the work underway."
+description: Use when wording needs to carry the work forward in conversation,
+  a summary, or a handoff. Preserve the concerns and relationships that make the
+  next contribution meaningful.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"

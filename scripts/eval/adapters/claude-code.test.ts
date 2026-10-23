@@ -6,6 +6,7 @@ import test from "node:test";
 import { findClaudeCommand, findClaudeCommandBelow, resolveClaudeCommand } from "../../claude-executable.ts";
 import {
   ClaudeCodeCliAdapter,
+  ClaudeCodeInvocationError,
   claudeCodeInvocation,
   parseClaudeCodeStream,
   parseClaudeCodeConfig,
@@ -222,6 +223,24 @@ void test("runs a projected agent directly through Claude Code's agent surface",
       },
     },
   );
+});
+
+void test("invokes the editorial role natively and preserves its reading when receipt validation fails", () => {
+  const resource = {
+    identity: "wycats-plugin:agents/editorial-reader",
+    name: "editorial-reader",
+    path: "agents/editorial-reader.agent.md",
+  };
+  const reading = "What should this introduction lead its readers to do?";
+  const invocation = claudeCodeInvocation(resource, "wycats", "Read the introduction.", "Launcher prompt.");
+  assert.deepEqual(invocation.resourceArguments, ["--agent", "wycats:editorial-reader"]);
+  const output = stream({ type: "result", subtype: "success", result: reading });
+  assert.equal(parseClaudeCodeStream(output, resource, "wycats", invocation.directInvocation).result, reading);
+  assert.throws(() => parseClaudeCodeStream(output, resource, "wycats"), (error: unknown) => {
+    assert.ok(error instanceof ClaudeCodeInvocationError);
+    assert.equal(error.rawResponse, reading);
+    return true;
+  });
 });
 
 void test("recognizes a completed invocation through the projected skill surface", () => {

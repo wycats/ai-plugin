@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { renderPersistentInstructions } from "./persistent-context.mjs";
 import {
-  checkPath, commitChange, readContents, resumePendingChange, saveRecoveryCopy,
+  checkPath, commitChange, readContents, resumePendingChange, saveRecoveryCopy, withGuidanceOperation,
   type GuidanceContents, type GuidancePaths,
 } from "./guidance-files.mjs";
 
@@ -45,14 +45,16 @@ async function main(): Promise<void> {
   }
 
   const paths = await projectPaths(command.project);
-  await resumePendingChange(paths, command.dryRun);
-  const project = { paths, contents: await readContents(paths) };
+  await withGuidanceOperation(paths, command.dryRun, async () => {
+    await resumePendingChange(paths, command.dryRun);
+    const project = { paths, contents: await readContents(paths) };
 
-  switch (command.action) {
-    case "install": return installGuidance(project, command.dryRun);
-    case "remove": return removeGuidance(project, command.dryRun);
-    case "repair": return repairGuidance(project, command.dryRun);
-  }
+    switch (command.action) {
+      case "install": return installGuidance(project, command.dryRun);
+      case "remove": return removeGuidance(project, command.dryRun);
+      case "repair": return repairGuidance(project, command.dryRun);
+    }
+  });
 }
 
 async function installGuidance(project: ProjectInstallation, dryRun: boolean): Promise<void> {

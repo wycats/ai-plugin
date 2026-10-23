@@ -1,8 +1,8 @@
 ---
 name: collaborative-grounding
-description: Use when working with the user on tasks requiring their situated
-  knowledge — priorities, intent, energy, context the agent can't see. Describes
-  the relational structure of productive human-agent collaboration.
+description: Use when the user's priorities, experience, or intent could change
+  how the work should proceed. Bring what you have learned into the conversation
+  so their judgment can shape the next move.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"

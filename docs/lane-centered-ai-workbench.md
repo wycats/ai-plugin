@@ -2,6 +2,13 @@
 
 Status: thought experiment
 
+This earlier product exploration retains its proposed coordination model. For
+current plugin behavior, read [PER](../skills/workflows/per-cycle/SKILL.md),
+[vision steering](../skills/workflows/steer-by-vision/SKILL.md), and
+[thread coordination](../skills/workflows/thread-coordinator/SKILL.md).
+Their later revisions allow responsibilities and coordination records to follow
+the work rather than requiring this exploration’s phase or current-bet structure.
+
 This document is a north-star implementation guide, not foundational doctrine.
 It explores what a single coherent product could look like if the agent
 framework in this repo and Exo were designed together from scratch for a more

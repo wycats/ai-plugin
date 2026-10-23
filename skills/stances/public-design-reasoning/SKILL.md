@@ -1,8 +1,8 @@
 ---
 name: public-design-reasoning
-description: Use when writing durable public design prose for RFCs, proposals,
-  architecture notes, and canonization summaries where the document must serve
-  users, implementers, maintainers, educators, and future readers.
+description: Use when an RFC, proposal, or architecture account needs to explain
+  a design to people outside the originating conversation. Carry its reasoning,
+  consequences, and commitments into an account they can build on and revisit.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"

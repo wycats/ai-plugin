@@ -69,9 +69,9 @@ For each important source of complexity, work through two questions:
 >
 > **If we were expressing that truth today, would we still encode it this way?**
 
-Use [interpretive synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load")
-to explain the concepts, relationships, invariants, and meaningful variation
-revealed by the evidence. Organize the account around what must be understood
+[Develop the account as the evidence changes your understanding of the system](../../stances/interpretive-synthesis/SKILL.md "composition:load").
+Explain the concepts, relationships, invariants, and meaningful variation it
+reveals. Organize the account around what must be understood
 and why. Include concrete cases that force a distinction, failures that exposed
 an earlier model's limits, and the reasons a boundary has proved meaningful.
 Internal knowledge matters alongside observable behavior: ownership, independent
@@ -96,18 +96,16 @@ Distinguish behavior observed today from obligations to preserve, and distinguis
 both from proposed changes. An unexplained detail remains an open question.
 
 Scale the account to the work: a focused change may need a few paragraphs in
-the review or plan; a broad restructuring may need a design document. Use
-[reader orientation](../../stances/reader-orientation/SKILL.md "composition:reference")
-to judge whether it supplies the context a reader needs without having followed
-the investigation. It should support architectural reasoning while keeping the
+the review or plan; a broad restructuring may need a design document.
+[Judge whether it supplies the context a reader needs](../../stances/reader-orientation/SKILL.md "composition:reference")
+without having followed the investigation. It should support architectural reasoning while keeping the
 evidence accessible for deeper inspection.
 
 #### Test what the account explains
 
 Read the account against representative behavior, historical failures, and cases
-that initially looked alike but proved different. Use
-[gap reading](../../stances/gap-reading/SKILL.md "composition:load") to identify
-what its coherence may have smoothed away. A fluent explanation can still omit
+that initially looked alike but proved different.
+[Look for what the coherent account may have smoothed away](../../stances/gap-reading/SKILL.md "composition:load"). A fluent explanation can still omit
 the condition that made a safeguard necessary.
 
 The test is:

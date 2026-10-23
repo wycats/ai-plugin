@@ -38,6 +38,16 @@ vocabulary. An experienced reader entering through an unfamiliar interface may
 need a relationship explained that a beginner following the full tutorial
 already encountered.
 
+Readers also interpret the choice to explain something. A qualification can
+supply a boundary they need, or draw attention to a boundary they already
+assume. In the latter case, they may look for a further reason it was mentioned
+and infer doubt or significance the author did not intend. Judge what the
+explanation changes for these readers, including what its presence suggests.
+
+Shared understanding depends on the particular audience and occasion. Prior
+exchanges and familiar conventions offer evidence of it. A broad label such as
+“experienced reader” leaves open which assumptions these people share here.
+
 Deeper inspection should reveal the mechanics behind the understanding already
 offered. When it overturns that understanding, either the account was misleading
 or the underlying structure needs to change. Clear boundaries can contain

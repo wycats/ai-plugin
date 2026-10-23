@@ -1,9 +1,8 @@
 ---
 name: rfc-writing
-description: Use when drafting, revising, reviewing, or promoting RFCs and
-  design proposals, including Exo-managed RFCs, staged RFC lifecycle work,
-  Rust/Ember-style RFC prose, and canonization or recommendation work for
-  related RFCs.
+description: Use when developing or revising an RFC or design proposal,
+  assessing its readiness for a decision, or reconciling it with implementation
+  and experience. Carry the design's reasoning and commitments through the work.
 metadata:
   wycats.kind: workflow
   wycats.user-invocable: "true"
@@ -12,132 +11,129 @@ metadata:
 
 # RFC Writing
 
-An RFC is durable public design reasoning. It makes a change understandable to
-users, implementers, maintainers, educators, and future readers, and it keeps
-the stage of the work visible as the design moves from idea to implemented
-reality.
+An RFC carries a design's reasoning and commitments across the work that
+shapes it. Readers need to understand the proposed change, why it is worth
+making, and what they can already rely on. As implementation and use reveal
+more, revise the account so it remains useful for the decisions ahead.
 
-Use [public-design-reasoning](../../stances/public-design-reasoning/SKILL.md "composition:load")
-for the public account and [interpretive-synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load")
-as its details change the design being explained. Keep
-[relational-continuity](../../stances/relational-continuity/SKILL.md "composition:load")
-active so the language stays attached to the work and evidence.
+[Write for people who will encounter the design without this conversation](../../stances/public-design-reasoning/SKILL.md "composition:load context=activity").
+As discoveries change your understanding,
+[reconsider what earlier evidence and decisions now mean](../../stances/interpretive-synthesis/SKILL.md "composition:load").
 
-When a consequential choice depends on the user's intent, use
-[collaborative-grounding](../../stances/collaborative-grounding/SKILL.md "composition:load").
-When that intent is still taking shape, [socratic-elicitation](../../stances/socratic-elicitation/SKILL.md "composition:load")
-can help the user develop it through a passage or example they can respond to.
-Use [hypothesis-evaluating](../../stances/hypothesis-evaluating/SKILL.md "composition:load")
-when implementation or other results let you examine the proposal's
-expectations. Judge stage readiness against the repository's actual process.
+## Find the decision the document needs to support
 
-## Core stance
+Read the proposal, its discussion, and the project's process. Establish what
+has been agreed, what remains open, and who will use the next revision to make
+a decision. An exploratory proposal may need a concrete example before anyone
+can judge its direction. An accepted design may need an account of what
+implementation revealed before maintainers can judge release readiness.
 
-The tension is public argument vs. implementation memory.
+Look for the project's RFC README and template, and read a recently accepted
+proposal. Use them to understand what its stages mean, what reviewers expect,
+and who approves advancement. Follow that process when shaping the document
+and proposing its next step.
 
-Recent context often contains branch state, debugging notes, design fragments,
-and half-formed decisions. An RFC turns that material into a public artifact.
-Write from the design the project is trying to make true, grounded in observed
-state and explicit evidence. Preserve tradeoffs, alternatives, and unresolved
-questions because they help future readers understand the decision, not because
-the template has empty boxes.
+If the project has no staged process, describe the decision and its basis in
+ordinary language. Agree with the user before introducing formal stages.
+When the design depends on their priorities or experience,
+[develop that part of the account with them](../../stances/collaborative-grounding/SKILL.md "composition:load"). A passage or example
+can give them something specific to correct or develop.
 
-Template sections are reader contracts. Motivation helps readers understand why
-the change is worth considering. Detailed design makes the change buildable.
-Drawbacks make the tradeoff honest. Alternatives make the choice legible.
-Unresolved questions show where learning remains. Let each section do its
-reader-facing job in the current RFC.
+## Match the work to what remains uncertain
 
-## Exo-first workflow
+A stage tells participants what has been agreed and what still needs to be
+learned. The activity alone does not establish the stage: a prototype can help
+choose a direction long before anyone commits to supporting it.
 
-When the repository is Exo-managed, treat Exo as the RFC source of truth.
-Exo owns RFC identity, lifecycle state, current stage, related goals and tasks,
-managed content, implementation evidence, and stage-transition readiness.
+These decisions recur in staged processes. Use them to interpret the project's
+requirements and choose useful work.
 
-Discover the current RFC operations from the available Exo tool surface or the
-workspace's Exo documentation before reading or changing RFC state. Then use
-that managed surface to read lifecycle state, inspect the RFC artifact, update
-managed content, and request stage transitions. The plugin supplies the
-authoring stance and readiness judgment; Exo supplies the live operation
-contract.
+**Is the problem worth pursuing?** Show who encounters it, what they are trying
+to do, and where current approaches fall short. Explore enough alternatives to
+make the choice meaningful. A sketch or small experiment may reveal that the
+problem needs to be framed differently.
 
-Request a stage transition only when the user explicitly asks for it or
-confirms it after seeing the readiness evidence.
+**Can we commit to this direction?** Explain the proposed behavior and the
+tradeoffs behind it. Make the remaining questions explicit enough that people
+can judge whether to begin implementation. Distinguish details implementation
+can settle from uncertainties that could overturn the direction.
 
-If Exo is unavailable, follow the repository's local RFC process and template.
-Inspect the local README, template, or prior accepted RFCs before choosing
-headings or format, and mark Exo-derived state as unavailable instead of
-reconstructing it from memory.
+**Can we support what was built?** Compare the implementation with the design,
+including compatibility and the material people need to use it. Establish
+which interfaces and behaviors the project is prepared to support. Use its
+release criteria to determine what evidence is still needed.
 
-## Stage-aware writing
+**Has it reached users?** Verify where the change is available and to whom.
+Record the relevant release, deployment, or publication. This gives later
+reports of use a concrete version to refer to.
 
-Match the prose to the lifecycle stage. Stage names vary by project; use the
-local process names and preserve these jobs.
+**Should people adopt it?** Examine experience with the feature and the support
+around it. A feature may be available while migration, tooling, or related
+features still make adoption difficult. When several RFCs contribute to one
+practice, evaluate whether people can use and learn that practice as a whole.
 
-**Stage 0: Idea.** Capture the live problem, affected audience, possible shape,
-and questions that determine whether the idea should receive more design
-attention. Keep the artifact light enough for exploration while making the
-problem concrete.
+As the design develops, identify questions that another prose revision cannot
+settle. Use [PER](../per-cycle/SKILL.md "composition:reference")
+to organize implementation or an experiment around those questions. PER develops
+and tests understanding through a particular episode of work. The RFC preserves
+what that episode changes about the design and its commitments.
 
-**Stage 1: Proposal.** Make the public case for doing the work. Explain the
-motivation, user and maintainer impact, design direction, drawbacks,
-alternatives, and the questions that must be resolved before acceptance.
+## Write the design people need to understand
 
-**Stage 2: Draft.** Make the design implementation-ready. Specify the system
-contract, user-facing behavior, compatibility surface, migration path, testing
-shape, and clear criteria for reaching implemented reality.
+Build the account around the behavior someone should be able to understand,
+use, and implement. Show it in examples before requiring the reader to follow
+its machinery. Explain alternatives where they clarify why this design was
+chosen, and drawbacks where they expose a cost the project is accepting.
 
-**Stage 3: Candidate.** Reconcile the RFC with what was built. Read code,
-tests, docs, release notes, and Exo state before editing. The document should
-reflect implemented reality, including meaningful deviations from the draft and
-the evidence that supports readiness.
+Use each template section for the question it helps readers answer. When a
+section has little to contribute, keep it brief. Put investigation logs and
+execution details in supporting records, with links where they substantiate a
+claim or preserve an unresolved question.
 
-**Stage 4: Stable.** Align the RFC with shipped behavior and the living manual.
-Check that docs, tests, and current project behavior tell one coherent story,
-and that the RFC corpus remains mutually consistent.
+After drafting, read from the position of someone encountering the proposal
+for the first time. Can they see why the change matters and how it would work?
+Where a sentence adds another claim, decide whether the reader needs it there.
+Explain the relationship when it matters, and remove the claim when it adds
+nothing to the decision.
 
-## Canonization mode
+## Return discoveries to the design
 
-Use canonization mode when a set of Stage 3 or Stage 4 RFCs together defines a
-recommended idiom, product feature, or project practice.
+When implementation or use changes your understanding, identify which
+assumptions deserve another look. Share the evidence with people who can help
+interpret it, including those whose work relies on the decision. The exchange may change what the
+observation means before it changes the design.
 
-Synthesize the group as a corpus, not a pile of individual decisions. Identify
-the user-facing concept the RFCs now teach together, the implementation and
-tooling support that makes the idiom practical, the learning path that should
-appear in docs, and the migration or ecosystem state that makes broad use
-reasonable.
+For example, a proposal gives an investigator tools to delegate work. A trial
+reveals that its workers also need to initiate conversations, although they
+should remain unable to create agents. The design now needs to distinguish
+communication from delegation. That finding changes both the capability model
+and what must be checked in older configurations.
 
-The output may be a recommendation section, a canonization note, a docs/manual
-update plan, or an RFC revision plan. In each case, make the recommendation
-rest on current evidence: shipped behavior, docs, tests, tooling, migration
-support, and consistency across the related RFCs.
-
-## Writing loop
-
-Use a generate-then-evaluate loop so prose quality and readiness judgment do
-not collapse into each other.
+Trace the consequences through the proposal. Revise the behavior, examples, and
+rationale that depended on the earlier assumption. Preserve a brief account of
+why an agreed decision changed, following the project's amendment practice.
+For a change to commitments others rely on, bring the affected decision back
+to the people authorized to make it. Keep the existing commitment visible while
+its replacement is being considered.
 
 ```text
-repeat:
-  1. Observe the local process, stage, templates, existing RFCs, and evidence.
-  2. Ground the user's design intent and any situated audience concerns.
-  3. Draft or revise the RFC section by section according to each section's job.
-  4. Evaluate stage readiness against the evidence and local process.
-  5. Carry forward the concrete gaps, decisions, and next authoring work.
+when a finding calls the design into question:
+  examine it with the relevant evidence and participants
+  identify which assumptions and commitments it affects
+  develop the revision and seek any required decision
+  check the affected work and update the design account
 ```
 
-Ask the user for situated decisions: intent, priority, acceptable tradeoffs,
-audience, and whether to request a stage transition. Use tools for observable
-facts: RFC state, implementation status, tests, docs, git history, and local
-templates.
+## Bring the next decision with its evidence
 
-## Exo design pressure
+[Assess what the work establishes against its expectations](../../stances/hypothesis-evaluating/SKILL.md "composition:load"). A successful build supports different
+claims from observed use. Explain which requirements for the next stage are
+satisfied and which remain open, with evidence appropriate to those claims.
+Request a stage transition when the user has explicitly asked for it or has
+confirmed it after seeing the readiness evidence. Follow the project's review
+and approval process for the transition itself.
 
-Exo currently models RFC Stages 0-4, with Stage 4 serving as the living canon.
-Treat Stage 5-style "Recommended" work as canonization mode in this skill:
-grouped, corpus-level work that may later deserve first-class Exo support.
-
-Useful future Exo surfaces include recommendation groups, canonization checks,
-stage-specific authoring prompts, and manual/docs coherence checks. When the
-skill reveals one of those needs during real RFC work, name the Exo improvement
-as design pressure rather than mixing tool-design proposals into the RFC body.
+As implementation becomes available, connect the RFC to the documentation that
+teaches its use. Keep the rationale and consequential revisions available to
+future readers while directing everyday usage questions to the maintained
+documentation.

@@ -8,17 +8,24 @@ import type { ResourceInvocation } from "./adapters/adapter.ts";
 import {
   buildCanonicalPrompt,
   gradeResponse,
-  loadSuiteSnapshot,
   parseEvaluationResponse,
   type EvaluationCase,
   type EvaluationResponse,
   type Grade,
 } from "./core.ts";
+import {
+  buildEditorialPrompt,
+  loadBehavioralSuiteSnapshot,
+  protocolMaxTurns,
+  recordEditorialReading,
+  type BehavioralSuite,
+  type EditorialCase,
+} from "./editorial.ts";
 import { resolveCanonicalResourcePath, validateCanonicalResource, validateProjectedResource } from "./resource.ts";
 import { validateReportPath } from "./output.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("../..", import.meta.url)));
-const DEFAULT_SUITE = join(ROOT, "evals", "slop-linter", "cases.json");
+const DEFAULT_SUITE = join(ROOT, "evals", "editorial-reader", "cases.json");
 
 interface Options {
   adapter: "claude-code-cli";
@@ -40,15 +47,18 @@ interface EvaluationResult {
   stderr?: string;
   exitCode?: number | null;
   executionError?: string;
+  error?: string;
   response?: EvaluationResponse;
-  grade: Grade;
+  grade?: Grade;
+  reading?: string;
+  assessment?: ReturnType<typeof recordEditorialReading>["assessment"];
 }
 
 function usage(): string {
   return `Usage: pnpm eval -- --adapter claude-code-cli [options]
 
 Options:
-  --suite <path>   Evaluation suite (default: evals/slop-linter/cases.json)
+  --suite <path>   Evaluation suite (default: evals/editorial-reader/cases.json)
   --case <id>      Run one case
   --output <path>  New file under .runtime/evals/ (default: timestamp-claude-code-cli.json)
   --dry-run        Print case prompts without invoking the target`;
@@ -96,11 +106,23 @@ function parseOptions(args = process.argv.slice(2)): Options {
   return { adapter: "claude-code-cli", suitePath, caseId, outputPath, dryRun };
 }
 
-function selectCases(cases: EvaluationCase[], caseId?: string): EvaluationCase[] {
+type BehavioralCase = EvaluationCase | EditorialCase;
+
+function selectCases(cases: BehavioralCase[], caseId?: string): BehavioralCase[] {
   if (!caseId) return cases;
   const selected = cases.find((testCase) => testCase.id === caseId);
   if (!selected) throw new Error(`Suite does not contain case '${caseId}'.`);
   return [selected];
+}
+
+function buildPrompt(suite: BehavioralSuite, testCase: BehavioralCase): string {
+  if (suite.protocol === "editorial-reading/v1" && "reviewQuestions" in testCase) {
+    return buildEditorialPrompt(suite, testCase);
+  }
+  if (suite.protocol === "document-review/v1" && "expect" in testCase) {
+    return buildCanonicalPrompt(suite, testCase);
+  }
+  throw new Error("Evaluation case does not match the suite protocol.");
 }
 
 function displayPath(path: string): string {
@@ -135,7 +157,7 @@ function adapterFailureMessage(message: string, stderr?: string): string {
 
 async function run(): Promise<void> {
   const options = parseOptions();
-  const { suite, source: suiteSource } = await loadSuiteSnapshot(options.suitePath);
+  const { suite, source: suiteSource } = await loadBehavioralSuiteSnapshot(options.suitePath);
   const cases = selectCases(suite.cases, options.caseId);
   const resourcePath = await resolveCanonicalResourcePath(ROOT, suite.resource.path);
   const resourceSource = await readFile(resourcePath, "utf-8");
@@ -156,7 +178,7 @@ async function run(): Promise<void> {
     console.log(`Transport: ${adapter.transport}`);
     for (const testCase of cases) {
       console.log(`\n--- ${testCase.id}: ${testCase.description} ---\n`);
-      const canonicalPrompt = buildCanonicalPrompt(suite, testCase);
+      const canonicalPrompt = buildPrompt(suite, testCase);
       console.log("Canonical request:\n");
       console.log(canonicalPrompt);
       console.log("\nTarget projection:\n");
@@ -175,6 +197,7 @@ async function run(): Promise<void> {
   validateProjectedResource(suite.resource, projectedResourceSource);
   const execution = {
     ...adapterMetadata,
+    maxTurns: protocolMaxTurns(suite.protocol),
     projectedResource: {
       path: displayPath(projectedResourcePath),
       digest: sha256(projectedResourceSource),
@@ -193,7 +216,7 @@ async function run(): Promise<void> {
 
   for (const testCase of cases) {
     process.stdout.write(`${testCase.id}... `);
-    const canonicalPrompt = buildCanonicalPrompt(suite, testCase);
+    const canonicalPrompt = buildPrompt(suite, testCase);
     const projectedPrompt = adapter.projectPrompt(suite, canonicalPrompt);
     let rawResponse: string | undefined;
     let transportOutput: string | undefined;
@@ -212,6 +235,7 @@ async function run(): Promise<void> {
         canonicalPrompt,
         projectedPrompt,
         resource: suite.resource,
+        maxTurns: execution.maxTurns,
       });
       rawResponse = observation.rawResponse;
       transportOutput = observation.transportOutput;
@@ -233,9 +257,7 @@ async function run(): Promise<void> {
           ),
         );
       }
-      const response = parseEvaluationResponse(observation.rawResponse);
-      const grade = gradeResponse(testCase, response);
-      results.push({
+      const captured: EvaluationResult = {
         id: testCase.id,
         description: testCase.description,
         canonicalPrompt,
@@ -246,10 +268,18 @@ async function run(): Promise<void> {
         resourceInvocation,
         stderr,
         exitCode,
-        response,
-        grade,
-      });
-      console.log(grade.passed ? "passed" : `failed: ${grade.failures.join(" ")}`);
+      };
+      if (suite.protocol === "editorial-reading/v1" && "reviewQuestions" in testCase) {
+        results.push({ ...captured, ...recordEditorialReading(testCase, observation.rawResponse) });
+        console.log("captured; awaiting human review");
+      } else if (suite.protocol === "document-review/v1" && "expect" in testCase) {
+        const response = parseEvaluationResponse(observation.rawResponse);
+        const grade = gradeResponse(testCase, response);
+        results.push({ ...captured, response, grade });
+        console.log(grade.passed ? "passed" : `failed: ${grade.failures.join(" ")}`);
+      } else {
+        throw new Error("Evaluation case does not match the suite protocol.");
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       results.push({
@@ -264,7 +294,10 @@ async function run(): Promise<void> {
         stderr,
         exitCode,
         executionError,
-        grade: { passed: false, failures: [message], observedFindingLabels: [] },
+        error: message,
+        ...(suite.protocol === "document-review/v1"
+          ? { grade: { passed: false, failures: [message], observedFindingLabels: [] } }
+          : {}),
       });
       console.log(`failed: ${message}`);
     }
@@ -292,10 +325,16 @@ async function run(): Promise<void> {
   };
   await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`, { flag: "wx" });
 
-  const passed = results.filter((result) => result.grade.passed).length;
-  console.log(`\n${String(passed)}/${String(results.length)} cases passed.`);
+  if (suite.protocol === "editorial-reading/v1") {
+    const captured = results.filter((result) => result.assessment !== undefined).length;
+    console.log(`\n${String(captured)} readings await human review; ${String(results.length - captured)} capture failures.`);
+    if (captured !== results.length) process.exitCode = 1;
+  } else {
+    const passed = results.filter((result) => result.grade?.passed).length;
+    console.log(`\n${String(passed)}/${String(results.length)} cases passed.`);
+    if (passed !== results.length) process.exitCode = 1;
+  }
   console.log(`Result: ${displayPath(outputPath)}`);
-  if (passed !== results.length) process.exitCode = 1;
 }
 
 run().catch((error: unknown) => {

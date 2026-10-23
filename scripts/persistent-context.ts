@@ -81,8 +81,11 @@ function encodeInstruction(body: string, outputPath: string, packageRoot: string
     const destination = resolve(dirname(outputPath), link.destination);
     const packagePath = relative(packageRoot, destination).replaceAll("\\", "/");
 
-    // Angle brackets preserve Markdown destinations when an installation path has spaces.
-    parts.push(body.slice(cursor, link.destinationStart) + "<", { packagePath }, ">");
+    // Parser offsets exclude existing angle brackets. Preserve them, adding a
+    // pair only for bare destinations so installation paths can contain spaces.
+    const angleDelimited = body[link.destinationStart - 1] === "<";
+    parts.push(body.slice(cursor, link.destinationStart) + (angleDelimited ? "" : "<"),
+      { packagePath }, angleDelimited ? "" : ">");
     cursor = link.destinationEnd;
   }
 

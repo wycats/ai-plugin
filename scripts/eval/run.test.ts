@@ -31,13 +31,15 @@ void test("projects one case without invoking the target", () => {
     "claude-code-cli",
     "--dry-run",
     "--case",
-    "empty-document",
+    "release-note",
   ]);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /--- empty-document:/);
+  assert.match(result.stdout, /--- release-note:/);
   assert.match(result.stdout, /Canonical request:/);
   assert.match(result.stdout, /Target projection:/);
-  assert.match(result.stdout, /Target projection:\n\nProtocol: document-review\/v1/);
+  assert.match(result.stdout, /Target projection:\n\nProtocol: editorial-reading\/v1/);
+  assert.match(result.stdout, /agents\/editorial-reader.agent.md/);
+  assert.doesNotMatch(result.stdout, /reviewQuestions|rewrittenDocument|Every action must remove/);
 });
 
 void test("refuses output paths that overwrite evaluation inputs", () => {
@@ -56,7 +58,7 @@ void test("refuses output paths that overwrite evaluation inputs", () => {
     "claude-code-cli",
     "--dry-run",
     "--output",
-    "agents/slop-linter.agent.md",
+    "agents/editorial-reader.agent.md",
   ]);
   assert.equal(resourceResult.status, 1);
   assert.match(resourceResult.stderr, /must be a new file under .runtime\/evals/);

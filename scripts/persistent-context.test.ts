@@ -85,7 +85,10 @@ for (const target of ["codex", "claude-code", "vscode"]) {
         const destination = destinations.get(resolve(dirname(sourcePath), link.destination));
         assert.ok(destination);
         await readFile(destination);
-        expected = expected.slice(0, link.destinationStart) + `<${destination.replaceAll("\\", "/")}>` + expected.slice(link.destinationEnd);
+        const angleDelimited = source[link.destinationStart - 1] === "<";
+        const start = link.destinationStart - (angleDelimited ? 1 : 0);
+        const end = link.destinationEnd + (angleDelimited ? 1 : 0);
+        expected = expected.slice(0, start) + `<${destination.replaceAll("\\", "/")}>` + expected.slice(end);
       }
       assert.equal(context, expected);
       if (target === "claude-code") {
@@ -190,6 +193,59 @@ for (const target of ["codex", "claude-code", "vscode"]) {
       assert.ok(projectedPath);
       assert.equal(await readFile(projectedPath, "utf8"), projectCompositionLinks(
         await readFile(sourcePath, "utf8"), sourcePath, projectedPath, canonical.composition, destinations));
+    } finally {
+      await rm(temporary, { recursive: true, force: true });
+    }
+  });
+}
+
+for (const target of ["codex", "vscode", "claude-code"] as const) {
+  void test(`${target} preserves angle-delimited and bare composition links after relocation`, async () => {
+    const temporary = await realpath(await mkdtemp(join(tmpdir(), "persistent-link-delimiters-")));
+    try {
+      const source = join(temporary, "source");
+      await mkdir(join(source, "instructions"), { recursive: true });
+      await mkdir(join(source, "skills/target"), { recursive: true });
+      const skillSource = join(source, "skills/target/SKILL.md");
+      const skill = "---\nname: target\ndescription: Fixture target\n---\nTarget body.\n";
+      await writeFile(skillSource, skill);
+      const prose = (destination: string, bareDestination = destination) =>
+        `Read [angle](<${destination}> "composition:reference"), ` +
+        `[bare](${bareDestination} 'composition:reference'), and ` +
+        `[load](  <${destination}>  "composition:load" ).\n` +
+        "Keep [ordinary](../README.md) and `literal <text>` unchanged.\n";
+      await writeFile(join(source, "instructions/links.instructions.md"),
+        "---\ndescription: Link fixture\nmetadata:\n  wycats.context: persistent\n---\n" +
+        prose("../skills/target/SKILL.md"));
+      const { composition, diagnostics } = await loadCanonicalComposition(source, await discoverResourceFiles(source));
+      assert.deepEqual(diagnostics, []);
+      assert.ok(composition);
+      const built = join(temporary, "built");
+      const plan = createProjectionPlan(composition, target, built);
+      await writePersistentContext(built, plan, composition);
+      const skillOutput = plan.outputBySourcePath.get(skillSource);
+      assert.ok(skillOutput);
+      await mkdir(dirname(skillOutput), { recursive: true });
+      await writeFile(skillOutput, skill);
+
+      const installed = join(temporary, "installed plugin (relocated)");
+      await cp(built, installed, { recursive: true });
+      await rm(built, { recursive: true });
+      const destination = skillOutput.replace(built, installed).replaceAll("\\", "/");
+      const expected = prose(destination, `<${destination}>`);
+      let delivered: string;
+      if (target === "claude-code") {
+        const project = join(temporary, "project");
+        await mkdir(project);
+        await exec(process.execPath, [join(installed, "scripts/claude-guidance.mjs"), "install", "--project", project]);
+        delivered = await readFile(join(project, ".claude/wycats/persistent-instructions.md"), "utf8");
+      } else {
+        const { stdout } = await exec(process.execPath, [join(installed, "scripts/persistent-context-hook.mjs")]);
+        const result = JSON.parse(stdout) as { hookSpecificOutput: { additionalContext: string } };
+        delivered = result.hookSpecificOutput.additionalContext;
+      }
+      assert.equal(delivered, expected);
+      assert.equal(await readFile(destination, "utf8"), skill);
     } finally {
       await rm(temporary, { recursive: true, force: true });
     }

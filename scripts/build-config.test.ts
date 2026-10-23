@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
+import matter from "gray-matter";
 import { buildConfigJsonSchema, parseBuildConfig } from "./build-config.ts";
 
 const ROOT = resolve(import.meta.dirname, "..");
@@ -30,6 +31,51 @@ void test("custom roles survive parsing while omitted mappings remain absent", (
     { toolGroups: { custom: "read" } }, { thinkingLevels: { fast: false } },
     { hookMatchers: { terminal: [] } }, { toolGroup: {} },
   ]) assert.throws(() => parseBuildConfig({ ...config, ...change }), /Invalid build configuration/);
+});
+
+void test("Claude investigators can communicate without giving workers delegation tools", async () => {
+  const root = await mkdtemp(join(tmpdir(), "claude-communication-"));
+  try {
+    const config = JSON.parse(await readFile(join(ROOT, "config.claude-code.example.json"), "utf8")) as {
+      toolGroups: Record<string, string[]>;
+    };
+    const configPath = join(root, "config.json");
+    const build = async (variant: string) => {
+      const out = join(root, variant);
+      await writeFile(configPath, JSON.stringify(config));
+      await exec(process.execPath, [join(ROOT, "scripts/build.ts"), "--config", configPath, "--output", out], { cwd: ROOT });
+      const readTools = async (name: string): Promise<string[]> => {
+        const { data } = matter(await readFile(join(out, "agents", name + ".agent.md"), "utf8"));
+        assert.ok(Array.isArray(data.tools));
+        return data.tools as string[];
+      };
+      return { recon: await readTools("recon"), worker: await readTools("recon-worker") };
+    };
+
+    const current = await build("current");
+    for (const tools of [current.recon, current.worker]) {
+      assert.ok(tools.includes("SendMessage"));
+      assert.equal(tools.includes("communication"), false);
+      assert.equal(new Set(tools).size, tools.length);
+    }
+    for (const tool of ["Agent", "TaskStop"]) {
+      assert.ok(current.recon.includes(tool));
+      assert.equal(current.worker.includes(tool), false);
+    }
+
+    // Updating canonical agents must also work with a consumer's older config.
+    delete config.toolGroups.communication;
+    const legacy = await build("legacy");
+    for (const tools of [legacy.recon, legacy.worker]) {
+      assert.equal(tools.includes("communication"), false);
+      assert.equal(tools.includes("SendMessage"), false);
+      assert.ok(tools.includes("Read"));
+    }
+    assert.ok(legacy.recon.includes("Agent"));
+    assert.equal(legacy.worker.includes("Agent"), false);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });
 
 void test("invalid config and hook inputs preserve the previous generated output", async () => {

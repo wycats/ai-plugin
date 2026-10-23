@@ -34,7 +34,7 @@
           ]
         },
         "auxiliary": {
-          "description": "Cost-effective model for supporting tasks (slop-linter). Examples: 'GPT 5.4 (vercel)', 'haiku', null (platform default).",
+          "description": "Model for delegated editorial reading (editorial-reader). Examples: 'GPT 5.4 (vercel)', 'haiku', null (platform default).",
           "type": [
             "string",
             "null"
@@ -74,6 +74,13 @@
         },
         "agent": {
           "description": "Ability to dispatch subagents.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "communication": {
+          "description": "Messages to existing agents, including continuation where supported, without granting new-agent creation. Omitted mappings provide no tools for this group.",
           "type": "array",
           "items": {
             "type": "string"
@@ -149,7 +156,7 @@
           "type": "string"
         }
       },
-      "description": "Named groups of tool identifiers. Agent source files reference group names, and the build expands them to concrete tool lists. Any name in an agent's tools array that doesn't match a group key passes through as a literal."
+      "description": "Named groups of tool identifiers. Agent source files reference group names, and the build expands them to concrete tool lists. Names that don't match a group key pass through as literals, except communication, which contributes no tools when omitted."
     },
     "hookMatchers": {
       "description": "Claude Code hook matcher strings keyed by neutral hook tool name. Used when building consolidated hooks.json.",

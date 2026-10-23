@@ -12,129 +12,120 @@ metadata:
 
 # PER Cycle
 
-Prepare makes consequential expectations explicit. Execute works from them and
-records what the work reveals. Review examines the resulting artifacts and
-asks what the comparison teaches us about the change we wanted to make.
+Prepare an approach with expectations the implementer can test against the
+work. As implementation exposes details that preparation could not settle,
+bring them back to the people whose understanding may help. Review examines
+whether the resulting change serves its purpose, including assumptions that
+preparation and implementation may have come to share.
 
-The handoffs preserve different perspectives on the same work. A prediction
-gives execution something worth checking; an unexpected result may change the
-approach; review can discover that preparation and implementation shared an
-assumption that deserves another look. Each phase can investigate enough to
-understand its findings. Its responsibility determines what it brings back.
+As discoveries change the approach,
+[return to earlier observations whose meaning depended on the explanation being revised](../../stances/interpretive-synthesis/SKILL.md "composition:load context=activity").
 
-## Arrange the work
+## Establish the change and arrange the contributions
 
-As coordinator, keep the intended change and the reasoning across phases in
-view. Choose where delegation adds useful attention or independence. You may
-prepare a well-understood task yourself, delegate a difficult uncertainty, or
-keep implementation with an agent that already understands the code. Give
-review a fresh reader of the resulting artifacts so the implementation's
-explanation can itself be examined. When a separate reader is unavailable,
-make the limits of the review clear.
+As coordinator, decide which questions need another participant's attention.
+An implementer who encounters an unfamiliar protocol may need someone to
+investigate its guarantees while implementation continues elsewhere. A small
+correction to reviewed work may already have enough preparation to proceed
+directly to an edit and another review.
 
-Choose workers from the host's available agents and capabilities. Shape their
-assignments around the phase's purpose and the actual task; give them the
-relevant stance to read. Choose model, tools, and context according to the
-judgment and access the assignment needs. An existing specialist is useful when
-its responsibilities fit. A general agent with a situated assignment can also
-carry a phase.
+Give participants the intended outcome, relevant evidence, constraints and the
+question their contribution should resolve. Carry decisions with their reasons
+and distinguish assumptions they may need to revisit. Establish who owns edits
+and other effects, so exchanging an idea leaves responsibility for acting clear.
+Choose agents and tools available in the application running the work.
 
-Give each worker the intended outcome, relevant sources, constraints, and the
-question its work should resolve. Carry forward settled decisions with their
-reasons and keep assumptions recognizable as assumptions. A worker should be
-able to recognize when a discovery changes its assignment. Agree on the files
-or other effects it owns and which consequential changes need to return to you.
+Keep the person who developed an expectation available to discuss the reasoning
+behind it. For review, bring in a reader who can examine the artifacts before
+adopting the implementer's explanation. Where a separate reader is unavailable,
+state who performed the evaluation so the caller can judge how much independent
+examination the change has received.
 
-Balance the cost of another handoff against what a different perspective can
-reveal. Existing preparation may already supply useful expectations; a small
-correction may need only implementation and renewed review. Preserve what the
-earlier work established as you choose where to resume.
+## Prepare enough to act and recognize a surprise
 
-## Prepare: make expectations testable
+[Make consequential expectations explicit](../../stances/hypothesis-forming/SKILL.md "composition:load"). Explain what you expect to
+encounter, why you expect it, and how that expectation supports the proposed
+change. A calculation may be as expensive as predicted, yet turn out to run
+unnecessarily. Knowing that the purpose was to remove a pause lets execution
+reconsider whether to make the calculation faster or change when it runs.
 
-Use [hypothesis-forming](../../stances/hypothesis-forming/SKILL.md "composition:load")
-to identify the expectations whose failure would change the approach. Ground
-them in the available evidence: what do we expect to encounter, what supports
-that expectation, and what would we need to inspect or try? Keep confidence
-and consequence distinct. A doubtful assumption can deserve an inexpensive
-check when being wrong would redirect substantial work.
+Identify how execution and review can observe the intended improvement. If a
+check depends on a launcher, service, account or fixture, establish that it can
+reach the behavior being changed. Try an inexpensive experiment when an uncertain
+dependency would otherwise leave substantial work resting on an untested assumption.
 
-Include how the result will become observable. A test may exercise the changed
-code directly, or depend on a launcher, account, service, or fixture. Identify
-which dependencies must work for the observation to bear on the claim, and
-choose the shortest adequate way to establish that. Preparation is sufficient
-when execution can act on the expectations and recognize evidence that would
-change them.
+Preparation is sufficient when execution can make a useful advance and recognize
+evidence that deserves reconsideration.
 
-## Execute: let the work inform the approach
+## Develop the approach through the work
 
-Work from the intended outcome and the prepared expectations. Choose advances
-and checks that keep consequential decisions in contact with the actual
-workspace. Local discoveries can guide the next edit or inspection. Return a
-finding to the coordinator when it changes the assignment, affects another
-worker, or calls for a different approach to the whole task.
+Implement the prepared approach, checking its expectations against what you
+find. When a detail puzzles you, share it with someone whose understanding
+could help. You can investigate what it means together.
 
-Preserve discoveries that change how the result should be understood, including
-cases where an expected observation acquires a different significance. When
-it becomes unclear what an observation establishes, use
-[observational-grounding](../../stances/observational-grounding/SKILL.md "composition:load")
-to inspect that uncertainty while continuing to develop the explanation.
+While adding a cache, an implementer notices repeated calls with identical
+inputs. The preparer had assumed they came from separate edits. Comparing that
+assumption with the trace leads them to distinguish edits from the consumers
+responding to them. Several consumers need the same result for one edit, so
+sharing that result may solve the problem without a longer-lived cache.
 
-Report the changed artifacts, checks actually performed, and consequential
-revisions to the approach. If an attempt stops before reaching the behavior
-under test, record where it stopped and what that establishes about the
-dependency. For actions with external effects, preserve whether the action
-occurred so a retry can account for what the previous attempt already did.
-Repeated setup failures may warrant a bounded investigation of that dependency
-before returning to the original experiment.
+When agents can message one another, let them investigate together directly.
+Keep work that does not depend on the open question moving. If the approach
+changes, tell the coordinator and anyone relying on it what changed your
+understanding. Keep that evidence with the original expectation for review.
 
-## Review: examine the result and its explanation
+When a check's result is hard to interpret,
+[establish what the attempt actually reached](../../stances/observational-grounding/SKILL.md "composition:load"). A failure to launch the application
+leaves the changed behavior untested. Establish where the attempt stopped
+before deciding what to fix or try next.
 
-Give the reviewer the intended change, the original expectations, execution's
-account, and access to the resulting artifacts. Evaluate whether the result
-achieves the intended change, including consequences the predictions omitted.
-Within that review, use
-[hypothesis-evaluating](../../stances/hypothesis-evaluating/SKILL.md "composition:load")
-to understand what comparing expectations with outcomes reveals about the
-assumptions that guided the work. Inspect the artifacts and check consequential
-claims in the account.
+## Review with an account of your own
 
-Agreement with the predictions provides evidence while leaving the shared
-assumptions open to examination. Investigate consequential uncertainties far
-enough to judge the result; preserve that assessment before returning fixes to
-implementation. The host's review conventions govern how findings are reported.
+Give the reviewer the intended outcome, constraints, original expectations and
+access to the artifacts and execution evidence. Ask it to trace consequential
+behavior and examine the assumptions on which the change depends. Let it record
+questions from that examination before discussing the implementer's rationale.
+That gives the discussion an account grounded in the reviewer's own inspection,
+including details the implementation story may have left out.
 
-Distinguish evidence about the behavior from evidence about the setup needed
-to observe it. A successful build may establish implementation readiness while
-the intended improvement in ordinary use remains unobserved. Explain what the
-available evidence supports and what remains to be established. Bring back the
-findings that affect whether to proceed or how to continue.
+[Compare the result with the expectations that guided the work](../../stances/hypothesis-evaluating/SKILL.md "composition:load"). Investigate
+uncertainties with the people who prepared and implemented the change.
 
-## Continue from what was learned
+In the calculation example, review might find a consumer that runs outside the
+edit transaction. Asking how it obtains a result can expose a limit of sharing,
+even though the measured interaction improved. The implementer can address that
+path. After the exchange, the reviewer returns to the artifact and determines
+which concerns the evidence resolves and which remain.
 
-Connect the findings to the task as a whole. Resolve consequential
-disagreements against the artifacts and evidence without repeating every
-worker's investigation.
+Apply the project's review criteria and reporting conventions. Distinguish evidence
+for implementation readiness from evidence for the intended benefit. A build
+may pass while ordinary use remains unobserved. Explain what the available
+evidence supports before recommending whether to proceed.
+
+## Continue at the level the finding requires
 
 ```text
-repeat as needed:
-  prepare the expectations still needed to act
-  execute and let discoveries guide the next advance
-  review the result against the intended change and earlier expectations
-  continue with a local correction, reconsider the approach, or finish
+when a detail raises a question:
+  examine it in the current account
+  seek another perspective where it could help
+  let the exchange clarify what, if anything, needs reconsidering
+  follow that implication and evaluate the affected result
 ```
 
-A local correction can return to execution and then receive focused review.
-A finding that changes the approach calls for revised preparation. Use
-[steer-by-vision](../steer-by-vision/SKILL.md "composition:reference") when the
-findings create a choice among project directions. This can happen when work
-no longer appears to serve the intended outcome, or when a successful result
-makes a further capability practical. If steering already supplied a purpose
-and a condition for reconsidering the work, keep them attached to the cycle
-and recognize when that condition arrives.
+A local correction can receive focused review. When a finding changes the
+approach, identify which expectations now need to be worked out before proceeding.
+Earlier evidence may still apply, even if its significance has changed. Return
+to participants who can explain how it was obtained and what they made of it.
+If the difficulty is an assumption those participants have come to share, invite
+someone to examine its grounds afresh. When an agent cannot receive a follow-up,
+carry the relevant evidence and open question into the next assignment.
 
-Use [collaborative-grounding](../../stances/collaborative-grounding/SKILL.md "composition:load")
-when the consequential choice depends on the user's intent or experience.
+Use [steer by vision](../steer-by-vision/SKILL.md "composition:reference")
+when findings create a choice among project directions. Keep the user's purpose
+and any agreed conditions for reconsideration attached to the cycle.
+When a consequential choice depends on their intent or experience,
+[work through that choice with them](../../stances/collaborative-grounding/SKILL.md "composition:load").
+
 Finish when the intended change has adequate support, or explain the specific
-evidence or decision still needed. Across repeated cycles, a short working
-record can preserve what was learned and what it changes about the next move.
+evidence or decision still needed. Keep a working record when it lets participants
+resume with the reasons for the current approach and the unresolved questions.

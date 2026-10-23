@@ -18,9 +18,8 @@ next moves into one decision. The result should let work proceed with a clear
 reason for pursuing it and enough understanding to recognize when that reason
 needs reconsideration.
 
-Use [vision-steering](../../stances/vision-steering/SKILL.md "composition:load")
-throughout. Developing a possible next move can clarify the purpose it would
-serve. That revised understanding can change which possibilities deserve
+[Develop possible next moves in relation to the purpose they would serve](../../stances/vision-steering/SKILL.md "composition:load").
+Examining a move can clarify that purpose. That revised understanding can change which possibilities deserve
 further exploration.
 
 ```text
@@ -33,10 +32,10 @@ while the direction needs clarification:
 ## Begin from the current understanding
 
 Begin with the user's direction and the project's existing explanation of its
-purpose. Read current work and relevant results in that light. Use
-[interpretive synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load")
-to develop an account of what people should become able to do, what has
-already been established, and which uncertainty now affects the direction.
+purpose. Read current work and relevant results in that light.
+[Revise that account as the work changes your understanding](../../stances/interpretive-synthesis/SKILL.md "composition:load")
+of what people should become able to do, what has already been established,
+and which uncertainty now affects the direction.
 
 Keep the source of a commitment clear. The user's current steering can revise
 an earlier plan. A recent task or completed implementation supplies evidence
@@ -44,8 +43,8 @@ about what happened; changing the project's purpose requires a judgment that
 accounts for the commitments already made.
 
 Share a consequential ambiguity with your best reading and recommendation.
-Use [collaborative grounding](../../stances/collaborative-grounding/SKILL.md "composition:load")
-where the user's experience or priorities could change the choice. Continue
+[Work through the choice with the user](../../stances/collaborative-grounding/SKILL.md "composition:load")
+where their experience or priorities could change it. Continue
 from intent they have already made clear. If a decision needs their answer,
 keep that choice open while pursuing useful work that does not depend on it.
 
@@ -67,8 +66,7 @@ understanding: does it express what we meant, reveal a different possibility,
 or show that we have yet to resolve the choice? The answer can change which
 options to develop next.
 
-Use [gap-reading](../../stances/gap-reading/SKILL.md "composition:reference")
-when the visible plans may have lost a valuable possibility or commitment.
+[Return to possibilities or commitments the visible plans may have lost](../../stances/gap-reading/SKILL.md "composition:reference").
 Consider whether the current direction has already accomplished enough. A
 choice to finish can release attention for work with greater consequence.
 
@@ -101,8 +99,8 @@ serves the purpose, which evidence changed the choice, and which alternatives
 remain worth returning to. Link to the sources behind consequential claims so
 a future reader can reexamine them as circumstances change.
 
-[Relational continuity](../../stances/relational-continuity/SKILL.md "composition:reference")
-helps keep that account useful beyond this exchange. If the decision remains
+[Keep the account grounded in the work and reasons that produced it](../../stances/relational-continuity/SKILL.md "composition:reference")
+so it remains useful beyond this exchange. If the decision remains
 open, record the unresolved question and the possibility that brought it into
 focus. The next conversation can then continue the inquiry from where it
 became difficult.

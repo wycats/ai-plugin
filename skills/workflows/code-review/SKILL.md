@@ -2,8 +2,7 @@
 name: code-review
 description: "Use when reviewing a patch or pull request: examine how the code
   fulfills the change's purpose, and revisit earlier judgments when details
-  change your understanding of the design. For improving existing code's
-  expression, use implementation-quality; for reading together, use walkthrough."
+  change your understanding of the design."
 metadata:
   wycats.kind: workflow
   wycats.user-invocable: "true"
@@ -14,10 +13,8 @@ metadata:
 
 Read the change with an account of what someone should be able to do and how
 the code makes that possible. That account helps you judge individual details;
-the details can also reveal that you misunderstood the change. Keep
-[interpretive synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load")
-active throughout the review. When your understanding changes, return to the
-code and judgments that depended on the earlier understanding.
+the details can also reveal that you misunderstood the change. When your
+understanding changes, [return to the code and judgments that depended on it](../../stances/interpretive-synthesis/SKILL.md "composition:load").
 
 A locally convincing explanation can rest on an assumption nobody established.
 An element's cleanup resets its state so it can be reattached later. That makes
@@ -40,19 +37,16 @@ continue with that understanding.
 
 Code and tests show the behavior implemented; the intended behavior may also
 be established in the request, documentation, or earlier design discussion.
-Where a consequential choice remains with the author, use
-[collaborative grounding](../../stances/collaborative-grounding/SKILL.md "composition:load")
-to explain what the code does and which choice would change your judgment.
+Where a consequential choice remains with the author,
+[explain what the code does and work through the choice with them](../../stances/collaborative-grounding/SKILL.md "composition:load").
 During an unattended review, keep conclusions within what the available
 evidence establishes.
 
-Explain a concern so the author can reason about it before opening every
-referenced function. In the configuration example: consuming one update can
+[Explain a concern so the author can reason about it](../../stances/reader-orientation/SKILL.md "composition:reference")
+before opening every referenced function. In the configuration example: consuming one update can
 discard another update traveling in the same message. The relevant condition
 and execution path should substantiate that explanation. If those details
-force a different explanation, revise it. This is
-[reader orientation](../../stances/reader-orientation/SKILL.md "composition:reference")
-applied to the review itself.
+force a different explanation, revise it.
 
 Use the host's review instructions for finding criteria, priorities, and output
 format. Keep proposed changes within the review's scope; a revised

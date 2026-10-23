@@ -303,7 +303,7 @@ async function setup() {
     }
 
     const auxiliary = await p.text({
-      message: "Auxiliary model (slop-linter):",
+      message: "Auxiliary model (editorial-reader):",
       placeholder: "e.g. claude-haiku-3",
     });
     if (p.isCancel(auxiliary)) {

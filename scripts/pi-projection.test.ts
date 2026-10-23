@@ -103,7 +103,7 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
       for (const link of links.links) {
         const target = resolve(dirname(resource.sourcePath), link.destination);
         await readFile(target);
-        projectedEdges.push([resource.pluginPath, `./${relative(out, target).replaceAll("\\", "/")}`, link.title?.slice("composition:".length) ?? ""]);
+        projectedEdges.push([resource.pluginPath, `./${relative(out, target).replaceAll("\\", "/")}`, link.title?.slice("composition:".length).split(" ")[0] ?? ""]);
       }
     }
 
@@ -130,7 +130,10 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
       projectedEdges.sort(),
     );
     assert.equal(index.edges[0].canonicalSource, "./agents/recon.agent.md");
-    assert.equal(index.edges[0].canonicalLine, 18);
+    const reconSource = await readFile(join(ROOT, "agents/recon.agent.md"), "utf8");
+    const workflowLine = reconSource.split("\n").findIndex((line) => line.includes("[Recon workflow]"));
+    assert.ok(workflowLine >= 0);
+    assert.equal(index.edges[0].canonicalLine, workflowLine + 1);
     assert.equal(index.edges[0].generatedSource, "./agents/wycats-recon.agent.md");
     assert.equal("line" in index.edges[0], false);
 

@@ -10,9 +10,14 @@ import type {
 export const COMPOSITION_RELATIONS = ["reference", "load"] as const;
 export type CompositionRelation = (typeof COMPOSITION_RELATIONS)[number];
 
-const COMPOSITION_TITLES = new Map<string, CompositionRelation>([
-  ["composition:reference", "reference"],
-  ["composition:load", "load"],
+export type CompositionIntent =
+  | { relation: "reference"; context?: never }
+  | { relation: "load"; context: "passage" | "activity" };
+
+const COMPOSITION_TITLES = new Map<string, CompositionIntent>([
+  ["composition:reference", { relation: "reference" }],
+  ["composition:load", { relation: "load", context: "passage" }],
+  ["composition:load context=activity", { relation: "load", context: "activity" }],
 ]);
 
 export interface CompositionDiagnostic {
@@ -25,16 +30,15 @@ export interface CanonicalResource extends DiscoveredResource, CanonicalResource
   skillSidecar?: Record<string, unknown>;
 }
 
-export interface CompositionReference {
+export type CompositionReference = CompositionIntent & {
   source: CanonicalResource;
   target: CanonicalResource;
-  relation: CompositionRelation;
   line: number;
   label: string;
   destination: string;
   destinationStart: number;
   destinationEnd: number;
-}
+};
 
 export interface CanonicalComposition {
   root: string;
@@ -423,13 +427,13 @@ export async function loadCanonicalComposition(
     diagnostics.push(...parsed.diagnostics);
 
     for (const link of parsed.links) {
-      const relation =
+      const intent =
         link.title === undefined ? undefined : COMPOSITION_TITLES.get(link.title);
-      if (!relation) {
+      if (!intent) {
         diagnostics.push({
           file: displayPath(canonicalRoot, source.sourcePath),
           line: link.line,
-          message: `unsupported composition relationship title '${link.title ?? ""}'; expected exactly 'composition:load' or 'composition:reference'`,
+          message: `unsupported composition relationship title '${link.title ?? ""}'; expected 'composition:load', 'composition:load context=activity', or 'composition:reference'`,
         });
         continue;
       }
@@ -474,7 +478,12 @@ export async function loadCanonicalComposition(
         continue;
       }
 
-      if (relation === "load" && target.activation?.invocation === "explicit") {
+      if (intent.context === "activity" && !target.activation) {
+        diagnostics.push({ file: displayPath(canonicalRoot, source.sourcePath), line: link.line,
+          message: "context=activity requires a skill or stance target" });
+        continue;
+      }
+      if (intent.relation === "load" && target.activation?.invocation === "explicit") {
         diagnostics.push({ file: displayPath(canonicalRoot, source.sourcePath), line: link.line,
           message: `composition:load cannot target explicit-only skill '${target.name}'; use composition:reference` });
         continue;
@@ -483,7 +492,7 @@ export async function loadCanonicalComposition(
       references.push({
         source,
         target,
-        relation,
+        ...intent,
         line: link.line,
         label: link.label,
         destination: link.destination,

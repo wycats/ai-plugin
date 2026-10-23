@@ -5,8 +5,8 @@ This plugin provides a set of AI agents, skills, and workflow tools. It works wi
 ## Quick start
 
 ```sh
-git clone https://github.com/wycats/vscode-ai-plugin.git
-cd vscode-ai-plugin
+git clone https://github.com/wycats/ai-plugin.git
+cd ai-plugin
 pnpm install
 pnpm run setup
 ```
@@ -33,7 +33,16 @@ Agent source files (in `agents/`) use abstract names for models and tools instea
 
 Your `config.json` maps those abstract names to concrete values for your environment. The build reads the source files and your config, resolves the names, and writes ready-to-use files to the platform output directory: `out/wycats/` for VS Code, `out/claude-code/` for Claude Code, or `out/codex/` for Codex.
 
-This means the same agent definitions work for everyone — you just change the config.
+The target projection adapts these definitions to the discovery and execution
+surfaces each host supports. See the [projection contract](runtime-projection-contract.md)
+for differences in resource availability and invocation.
+
+## Pi Recon profile
+
+Pi has a bounded Recon profile. Build it with `pnpm build:pi`, then follow
+`out/pi/README.md` to install the generated package. This profile includes Recon
+and its selected supporting stances. The setup wizard currently offers the
+other three targets.
 
 ## VS Code local registration
 
@@ -167,7 +176,7 @@ Published Codex artifacts are generated from `main` and force-pushed to the
 `codex-plugin` branch. Install the remote marketplace from that branch:
 
 ```sh
-codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
+codex plugin marketplace add wycats/ai-plugin --ref codex-plugin
 codex plugin add wycats@wycats
 ```
 
@@ -182,8 +191,8 @@ re-add the plugin after upgrading the marketplace.
 
 ## Renaming an existing installation
 
-The public plugin and marketplace name is `wycats`; the repository remains
-`wycats/vscode-ai-plugin`. Host-qualified references now use `wycats:`, such as
+The public plugin and marketplace name is `wycats`; the repository is
+`wycats/ai-plugin`. Host-qualified references now use `wycats:`, such as
 `wycats:recon`. Update any saved references or enablement settings that name the
 old plugin. The old and new identities should not both remain enabled.
 
@@ -197,7 +206,7 @@ Remove the old plugin and marketplace, then register the generated marketplace:
 ```sh
 codex plugin remove wycats-ai-plugin@wycats-ai-plugin
 codex plugin marketplace remove wycats-ai-plugin
-codex plugin marketplace add wycats/vscode-ai-plugin --ref codex-plugin
+codex plugin marketplace add wycats/ai-plugin --ref codex-plugin
 codex plugin add wycats@wycats
 ```
 
@@ -212,7 +221,7 @@ install from the generated branch:
 
 ```sh
 claude plugin marketplace remove wycats-ai-plugin
-claude plugin marketplace add wycats/vscode-ai-plugin#cc-plugin
+claude plugin marketplace add wycats/ai-plugin#cc-plugin
 claude plugin install wycats@wycats
 ```
 
@@ -250,6 +259,7 @@ Which platform you're building for. This determines the output format and platfo
 - `"vscode"` — for VS Code with GitHub Copilot; builds to `out/wycats/`
 - `"claude-code"` — for Claude Code; builds to `out/claude-code/`
 - `"codex"` — for Codex; builds to `out/codex/`
+- `"pi"` — bounded Recon profile; builds to `out/pi/`
 
 ### `models`
 
@@ -259,7 +269,7 @@ Three roles that agents use, mapped to model strings for your provider:
 | ----------- | ------------------------------- | ------------------------------------- |
 | `fast`      | Strong reasoning, complex tasks | recon, recon-worker                   |
 | `balanced`  | Mid-tier model role             | Available for custom agent definitions |
-| `auxiliary` | Supporting tasks, lower cost    | slop-linter                           |
+| `auxiliary` | Delegated editorial reading    | editorial-reader                      |
 
 Set a role to `null` to leave the model unspecified — the platform picks its default.
 
@@ -301,12 +311,17 @@ Named sets of tool identifiers that agents reference. The defaults in `config.ex
 
 Each agent's source file lists the groups it needs (e.g., `tools: [core, agent, browser, memory]`). The build expands group names into concrete tool lists. If an agent lists a name that isn't a group, it passes through unchanged — so agents can mix groups and individual tools.
 
+The `communication` group is optional for existing configurations. If its mapping
+is absent, it contributes no tools. This lets agents request messaging without
+emitting an unknown tool name when built with an older configuration.
+
 The default groups:
 
 | Group              | What it provides                                                       |
 | ------------------ | ---------------------------------------------------------------------- |
 | `core`             | Basic capabilities: workspace access, file reading, search, web, todos |
 | `agent`            | Dispatching subagents                                                  |
+| `communication`    | Messaging existing agents, including continuation where supported     |
 | `browser`          | Browser interaction                                                    |
 | `edit`             | File editing for agents assigned to change artifacts                  |
 | `memory`           | Persistent memory across sessions                                      |
@@ -316,6 +331,17 @@ The default groups:
 | `testing`          | Running tests and inspecting failures                                  |
 | `tasks`            | Creating and running VS Code tasks                                     |
 | `github`           | GitHub PRs, issues, search, code review                                |
+
+The Claude example maps `communication` to `SendMessage` for both Recon and its
+worker. Recon also receives `Agent` and `TaskStop` through the `agent` group.
+This lets workers exchange findings without granting them new-agent creation or
+the `TaskStop` tool. `SendMessage` can resume an existing agent, and `TaskStop`
+controls background tasks more broadly than child agents. The mapping does not
+restrict messages to a particular recipient or stops to a particular owner.
+See Claude's [subagent documentation](https://code.claude.com/docs/en/sub-agents#resume-subagents)
+and [tools reference](https://code.claude.com/docs/en/tools-reference) for runtime
+availability and permissions. Other shipped profiles leave `communication`
+empty pending qualification of their mappings.
 
 ## Keeping up to date
 

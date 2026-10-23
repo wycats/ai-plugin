@@ -23,7 +23,7 @@ export async function publishPiOutput(output: string, remote: string): Promise<s
     throw new Error("Pi publication requires a generated Recon package manifest");
   }
   const packageName = manifest.name;
-  for (const path of ["skills/recon/SKILL.md", "agents/wycats-recon.agent.md", "stances", "composition-index.json", "projection-capabilities.json"]) {
+  for (const path of ["skills/recon/SKILL.md", "agents/wycats-recon.agent.md", "stances", "composition-index.json", "context-delivery.json", "projection-capabilities.json"]) {
     await access(join(output, path));
   }
 
@@ -32,7 +32,7 @@ export async function publishPiOutput(output: string, remote: string): Promise<s
     prepare: async (stage) => {
       await cp(output, stage, { recursive: true });
       await writeFile(join(stage, "README.md"), `# ${packageName} — Pi projection\n\nGenerated from the canonical resources in [wycats/vscode-ai-plugin](https://github.com/wycats/vscode-ai-plugin).\n\nRequires Node 24+, Pi, and pi-subagents for the delegated agent. This first projection exposes Recon and private constituent stances. See projection-capabilities.json for scope and runtime assumptions.\n\nInstall:\n\n\`\`\`sh\npi install git:github.com/wycats/vscode-ai-plugin@pi-plugin\n\`\`\`\n\nUpdate on Pi 0.85.1:\n\n\`\`\`sh\npi update git:github.com/wycats/vscode-ai-plugin@pi-plugin\n\`\`\`\n\nThen use /reload or restart pi. This branch is generated; edit canonical resources on main.\n`);
-      for (const path of ["skills/recon/SKILL.md", "agents/wycats-recon.agent.md", "stances", "composition-index.json", "projection-capabilities.json", "projection-resources.json"]) {
+      for (const path of ["skills/recon/SKILL.md", "agents/wycats-recon.agent.md", "stances", "composition-index.json", "context-delivery.json", "projection-capabilities.json", "projection-resources.json"]) {
         await access(join(stage, path));
       }
       const stagedManifest = JSON.parse(await readFile(join(stage, "package.json"), "utf8")) as { name?: string; version?: string };

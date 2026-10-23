@@ -106,7 +106,8 @@ fixture appear in slash completion; diagnostic questioning remains absent there.
 The Recon agent is selectable as `wycats:recon`: the VS Code adapter
 qualifies canonical agent names with the manifest name, preserving unambiguous
 name-based delegation across differently named plugins without exposing the
-`.agent` filename suffix. The explicitly named slop-linter is qualified too.
+`.agent` filename suffix. The explicitly named slop-linter was qualified too. This observation predates
+its replacement by editorial-reader and does not qualify the new role.
 
 In VS Code 1.141.1 with Copilot 0.69.0, a captured Local-harness model request
 contains the 32 contextual plugin skills, including hidden stances, in its

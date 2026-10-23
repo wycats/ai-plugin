@@ -117,6 +117,15 @@ export function claudeCodeInvocation(
   };
 }
 
+export class ClaudeCodeInvocationError extends Error {
+  readonly rawResponse: string | undefined;
+
+  constructor(message: string, rawResponse: string | undefined) {
+    super(message);
+    this.rawResponse = rawResponse;
+  }
+}
+
 export function parseClaudeCodeStream(
   output: string,
   resource: EvaluationResource,
@@ -186,8 +195,9 @@ export function parseClaudeCodeStream(
             invocation.toolUseId !== undefined && completedToolUses.has(invocation.toolUseId),
         );
   if (!resourceInvocation) {
-    throw new Error(
+    throw new ClaudeCodeInvocationError(
       `Claude Code did not complete a ${pluginName}:${resource.name} resource invocation.`,
+      launcherResult,
     );
   }
   if (launcherResult === undefined) {
@@ -287,7 +297,7 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
     return resolveProjectedResource(this.#projection, this.#resourceMap, resource.path);
   }
 
-  projectPrompt(suite: EvaluationSuite, canonicalPrompt: string): string {
+  projectPrompt(suite: Pick<EvaluationSuite, "resource">, canonicalPrompt: string): string {
     if (evaluationResourceKind(suite.resource) === "agent") return canonicalPrompt;
     return `Invoke the ${this.#pluginName}:${suite.resource.name} skill before answering the canonical request below.\n\n${canonicalPrompt}`;
   }
@@ -319,7 +329,7 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
         "--model",
         this.#launcherModel,
         "--max-turns",
-        "3",
+        String(request.maxTurns ?? 3),
       ],
       {
         cwd: this.#root,
@@ -350,6 +360,7 @@ export class ClaudeCodeCliAdapter implements EvaluationAdapter {
     } catch (error) {
       return {
         ...observation,
+        rawResponse: error instanceof ClaudeCodeInvocationError ? error.rawResponse ?? "" : observation.rawResponse,
         executionError: error instanceof Error ? error.message : String(error),
       };
     }

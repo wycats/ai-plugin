@@ -8,7 +8,7 @@ const modelMapping = z.string().nullable();
 const modelsSchema = z.object({
   "fast": modelMapping.optional().describe("High-capability model for agents that need strong reasoning (recon, recon-worker). Examples: 'Claude Opus 4.6 Fast (vercel)', 'opus', null (platform default)."),
   "balanced": modelMapping.optional().describe("Mid-tier model role available to agent definitions. Examples: 'Gemini 3.1 Pro Preview (vercel)', 'sonnet', null (platform default)."),
-  "auxiliary": modelMapping.optional().describe("Cost-effective model for supporting tasks (slop-linter). Examples: 'GPT 5.4 (vercel)', 'haiku', null (platform default)."),
+  "auxiliary": modelMapping.optional().describe("Model for delegated editorial reading (editorial-reader). Examples: 'GPT 5.4 (vercel)', 'haiku', null (platform default)."),
 }).catchall(modelMapping)
   .describe("Maps authored model roles to provider model names. Null or an omitted role uses the host default.");
 
@@ -16,6 +16,7 @@ const toolGroup = z.array(z.string());
 const toolGroupsSchema = z.object({
   "core": toolGroup.optional().describe("Base tools available to most agents (search, read, etc.)."),
   "agent": toolGroup.optional().describe("Ability to dispatch subagents."),
+  "communication": toolGroup.optional().describe("Messages to existing agents, including continuation where supported, without granting new-agent creation. Omitted mappings provide no tools for this group."),
   "browser": toolGroup.optional().describe("Browser interaction tools."),
   "edit": toolGroup.optional().describe("File editing tools for agents whose assignments include changing artifacts."),
   "memory": toolGroup.optional().describe("Persistent memory read/write."),
@@ -26,7 +27,7 @@ const toolGroupsSchema = z.object({
   "tasks": toolGroup.optional().describe("VS Code task creation and execution."),
   "github": toolGroup.optional().describe("GitHub API tools (PRs, issues, search)."),
 }).catchall(toolGroup)
-  .describe("Named groups of tool identifiers. Agent source files reference group names, and the build expands them to concrete tool lists. Any name in an agent's tools array that doesn't match a group key passes through as a literal.");
+  .describe("Named groups of tool identifiers. Agent source files reference group names, and the build expands them to concrete tool lists. Names that don't match a group key pass through as literals, except communication, which contributes no tools when omitted.");
 
 export const buildConfigSchema = z.strictObject({
   $schema: z.string().optional().describe("Path to this schema file. Enables editor validation and autocomplete."),

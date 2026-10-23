@@ -25,8 +25,8 @@ stance handle to keep its well active. The relevant question is where a change
 to the meaning belongs. A projection may reinforce or apply the canonical
 resource; it should not acquire independent authority to redefine it.
 
-Exact language matters. These resources shape a model's probability landscape,
-so semantic preservation is stronger than carrying the same topic or intent.
+Exact language matters because it directs attention and establishes relationships
+that a summary of the same topic or intent can leave out.
 Prefer copying authoritative language directly. Treat a rewritten projection
 as a semantic change unless the difference is confined to the host envelope.
 
@@ -38,8 +38,8 @@ The same relationship appears at several layers:
 | ---------- | --------------- | ------------------------------- |
 | Cross-domain example | Stance | A different subject that preserves the stance's relational invariant |
 | Workflow skill | Its own maneuver plus composed stances | Entry, sequencing, collaboration, output, and handoff for a situated task |
-| Agent | Its fused cognitive mode plus crystallized stances | Persistent operational behavior for a delegated role |
-| Project Orientation | User steering or the designated project-purpose surface | A current-bet view that carries purpose into sessions and coordination |
+| Agent | Its role responsibility and continuing stance orientation | Persistent operational behavior for a delegated role |
+| Project Orientation | User steering or the designated project-purpose surface | An account of purpose and current direction that carries into sessions and coordination |
 | Runtime package | Root source resources and build configuration | Host-specific location, discovery, model/tool names, hook envelopes, and supported surfaces |
 
 These projections are not interchangeable. A skill composes stances; it does
@@ -72,8 +72,10 @@ A canonical resource can make a relationship navigable with an ordinary
 relative Markdown link whose title is exactly one of these values:
 
 ```markdown
-[interpretive synthesis](../../stances/interpretive-synthesis/SKILL.md "composition:load")
-[collaborative grounding](../collaborative-grounding/SKILL.md "composition:reference")
+As discoveries change your understanding,
+[revisit the observations and questions that depended on it](../../stances/interpretive-synthesis/SKILL.md "composition:load").
+When the direction depends on the user's intent,
+[develop it with them](../../stances/collaborative-grounding/SKILL.md "composition:reference").
 ```
 
 `composition:reference` means the full resource remains available for
@@ -81,24 +83,24 @@ consultation. `composition:load` requests activation when the governing prose
 applies. The surrounding sentence owns the condition, timing, emphasis, and
 purpose; the title does not establish a separate activation state machine.
 The activation contract permits load edges into contextual resources and
-reference edges into either policy. Background guidance can therefore say
-“keep active throughout,” while a situated interruption can say “when surfaces conflict,” and both can use the
-same load relationship without losing their different shapes.
+reference edges into either policy. The sentence can guide attention throughout a workflow or introduce a
+judgment when a particular condition arises. Both can use the same load
+relationship while preserving their different timing.
 
-The supported grammar is an inline Markdown link with a relative destination
-and a single- or double-quoted title (parenthesized Markdown titles are also
-accepted). Composition destinations point directly to a discovered canonical
-Markdown resource; URL schemes, absolute paths, fragments, and query strings
-are outside this identity form. Validation reports malformed markers, exact
-`composition` namespaces with unsupported relationship values, likely
-namespace typos within edit distance two when paired with exact `load` or
-`reference`, identity collisions, and unresolved or invalid targets with
-source file and line. This bounded typo check catches plausible authoring
-mistakes without treating arbitrary documentation titles as markers; it does
-not promise to classify every possible misspelling. Top-level and blockquoted
-fenced code plus inline code remain literal examples. Ordinary documentation
-links and historical unmarked links remain ordinary Markdown and carry no
-inferred composition relationship.
+The [context-delivery extension](runtime-projection-contract.md#3-context)
+adds an optional `context=activity` qualifier to load links. It identifies
+supporting instructions that should accompany the source activity from its
+beginning. Unqualified loads retain passage-governed retrieval, and references
+remain available for consultation. This is a relationship-level choice: a
+stance can frame one workflow while supporting a particular judgment in another.
+The parser and activity-closure planner implement these meanings. The first
+runtime bridge targets a programmatically selected Copilot SDK agent. Its scope,
+examples, and remaining native mappings live in the contract, which owns the grammar.
+
+The contract owns the [link grammar](runtime-projection-contract.md#22-link-grammar)
+and its validation rules. The destination identifies a canonical resource,
+the label describes the linked work, and the title carries the relationship.
+Ordinary documentation links remain outside the composition graph.
 
 Builds validate both source resolution and target projection completeness
 before cleaning generated output. They retain the label, title, and all
@@ -109,6 +111,24 @@ the authoritative coordinate; `generatedSource` identifies the projected file
 without asserting that generated frontmatter retained the same line number.
 The index supports inspection and discovery; canonical prose remains the
 authority for what each relationship means.
+
+Package builds preserve the marker as a Markdown title and emit an intent-only
+`context-delivery.json` plan. Installing a package does not install a runtime
+consumer of that plan. The separate Copilot SDK bridge uses its activity closure
+for native agent preloading and resolves later skill names and readable paths. An executing agent can follow the projected path with its available
+reading tools. Native invocation metadata separately controls whether a skill
+is eligible for selection. Package checks establish that the target is
+available at the linked path. A runtime trial must establish whether the agent
+reads it when the governing condition arises.
+
+The delivery extension permits adapters to translate composition-link syntax
+and add a distinguishable delivery envelope while preserving the linked action
+and surrounding prose. It keeps the canonical relation in the composition
+index. This matters where native parsers treat a Markdown title as part of the
+path or eagerly attach every linked file. The projection must carry the
+intended context scope as well as a valid address. The contract’s
+[delivery mappings](runtime-projection-contract.md#44-context-delivery)
+distinguish tested mechanisms, documented capabilities, and read fallbacks.
 
 ## Projection plans and artifact addresses
 

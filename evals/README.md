@@ -1,83 +1,86 @@
-# Behavioral evaluations
+# Editorial readings
 
-The cases in this directory describe what a canonical resource should do. They
-do not describe how a particular host invokes it. Runtime adapters project the
-same request into each host and report the target, transport, model mapping,
-selected launcher model role and target model, source revision, raw response,
-and grade.
+The current evaluation contract is `editorial-reading/v1`, exercised by the
+[Editorial Reader development suite](editorial-reader/cases.json). It supplies a
+draft, its audience and purpose, the assignment's scope, and supporting context.
+The reader returns what helps the writer continue. That can be a supported
+revision, a consequential question, an investigation that changes the account,
+or evidence for retaining effective prose.
 
-The Claude Code adapter resolves resource addresses from the build's
-`projection-resources.json`. Reports include the captured map's path and digest
-alongside the projected resource digest. Invocation evidence and the canonical
-behavioral protocol remain independent of the generated file's location.
+The harness captures a **first encounter**. A nonempty response with a successful
+resource invocation is recorded as **awaiting human review**. This establishes
+that a reading was captured; it does not establish its editorial quality.
+Questions are a useful continuation point. The standalone CLI call cannot supply
+the writer's answer or assess the ensuing exchange.
 
-Every suite declares the behavioral protocol it exercises. Version one supports
-`document-review/v1`: the resource evaluates a document and returns structured
-findings plus the complete rewritten document. A resource with a different task
-needs another explicit protocol and grader rather than inheriting this response
-shape implicitly.
+The protocol imposes no findings table, labels, deletion requirement, complete
+rewrite, or JSON response schema. Assessment questions accompany each case in
+the report and stay out of the model's prompt. There is no numeric quality score
+or automatic editorial pass/fail decision. Execution and empty-response failures
+remain visible separately, with raw responses and transport output preserved.
 
-Finding actions are part of that protocol. Every action removes its exact quote
-from the rewrite. Each `TODO` action also adds one new `TODO(MISSING)` marker to
-the rewritten document.
+## Reading the evidence
 
-Each positive case should have a nearby counterexample. A phrase can be a useful
-clue without being a defect in every context. The paired case keeps the
-evaluation attached to the judgment the resource is meant to make.
+Read proposed prose before its explanation. Describe what the intended readers
+would understand, which implications or authorial judgments changed, whether the
+revision added unsupported material, and what consequential correction remains.
+Check source fidelity against the supplied material; bring choices about the
+writer's intent or relationship with readers back to the writer. Keep ties and
+uncertainty visible. An intervention earns its place through what it contributes.
 
-The slop-linter cases diagnose prose. They do not infer whether a person or a
-model wrote it. Sources such as Wikipedia's [Signs of AI
-writing](https://en.wikipedia.org/w/index.php?title=Wikipedia:Signs_of_AI_writing&oldid=1369699198)
-can suggest cases, but each case needs to name the underlying prose failure and
-include a counterexample where the same surface feature is doing real work.
+For a continuation, preserve the writer's exact feedback, the reader's response,
+and the revised passage alongside the first reading. Examine whether the reader
+carries the reason for a correction into other affected passages. The current
+runner captures only the first encounter; it makes no claim about this later
+exchange or the understanding of actual readers.
 
-A required finding names one unique exact passage in the document, and each
-passage appears once in the required findings. Every returned quote
-must also identify one occurrence. One finding can quote the complete passage,
-or several disjoint exact quotes can cover it together. Repeated and overlapping
-diagnoses fail. Add accepted labels when the classification itself is part of
-the contract; leave them out when the case is only about whether the passage
-receives a finding.
-Use `maximumFindings` when finding count is itself meaningful, including when
-the suite leaves the particular findings open. A zero limit requires an empty
-set of required findings. `rewriteExcludes` verifies that
-a diagnosed defect was removed; its case- and whitespace-normalized form must
-identify one input span. `rewritePreserves` keeps an exact span unchanged inside
-a larger rewrite; the span must identify one occurrence in the input.
-`rewriteEquals` names the complete expected result when the
-rewrite must remove a defect without changing or adding anything else, while
-`rewriteEqualsInput` protects a clean document as a whole.
+The small constructed cases are development probes, with inlined context for
+bounded source-grounded reading. They are not a held-out test of transfer. The
+[README pilot](editorial-reader/pilot/README.md) preserves a real reading and
+exchange that informed the role. Neither artifact establishes a ranking against
+other editorial methods.
 
-Suite and response JSON reject repeated object member names before schema
-validation, so one value cannot silently replace another. Responses also reject
-undeclared fields rather than hiding output-contract drift during grading.
+## Running a capture
 
-## Running the suite
-
-The deterministic tests exercise fixture validation, response parsing, and
-grading without calling a model:
+Deterministic tests check the suite contract, hidden assessment notes, capture
+status, invocation handling, and the legacy parser without calling a model:
 
 ```sh
 pnpm test:eval
 ```
 
-Inspect each canonical request beside the target's projected prompt:
+Inspect canonical requests and target projections without invoking the target:
 
 ```sh
 pnpm eval -- --adapter claude-code-cli --dry-run
 ```
 
-Run the suite through an authenticated Claude Code CLI:
+Capture readings through an authenticated standalone Claude Code CLI:
 
 ```sh
 pnpm eval -- --adapter claude-code-cli
 ```
 
-This adapter targets Claude Code through its standalone CLI transport. A Claude
-Code session running only as a VS Code extension does not provide that
-executable; it needs a different adapter, not different evaluation cases.
+The adapter selects the role directly with `--agent wycats:editorial-reader`.
+The role remains marked `user-invocable: false` for discovery. This invocation
+route has deterministic coverage, with live transport qualification still pending. Each editorial capture permits at most 12 CLI
+turns, including source and stance reads, with a 120-second process timeout.
+This bounded transport does not reproduce an open-ended editorial conversation.
 
-Live results are written under `.runtime/evals/`, which is ignored by git.
-Custom output paths select a new file inside `.runtime/evals/`. Existing files
-and paths redirected through symlinks are rejected, keeping source files and
-previous results intact.
+Reports record the protocol, prompts, suite and role digests, source revision
+and dirty status, runtime and model mappings, projection map and role digests,
+turn allowance, invocation evidence, raw output, and pending assessment questions.
+These receipts describe the observed run. They do not snapshot every piece of
+ambient runtime context or prove that every linked stance was loaded.
+
+Results go under `.runtime/evals/`, which is ignored by git. Custom output paths
+select a new file there. Existing files and paths redirected through symlinks are
+rejected, preserving sources and previous reports. The CLI's exit status reports
+capture failures; editorial judgment remains pending after a successful capture.
+
+## Historical document review
+
+The [Slop Linter suite and role](slop-linter/README.md) preserve the retired
+`document-review/v1` contract. Its deterministic parser and grader tests remain
+useful historical coverage. Its required deletion actions and exact rewrites do
+not apply to Editorial Reader.

@@ -1,9 +1,8 @@
 ---
 name: diagnostic-questioning
-description: Use when the next move depends on another person's intent,
-  priorities, or experience, and each answer will help you choose what to ask
-  next. Ground questions in what you already know; inspect observable system
-  behavior through tools.
+description: Use when a conversation can resolve uncertainty about another
+  person's intent, priorities, or experience. Let each answer revise your
+  understanding and guide the next question.
 metadata:
   wycats.kind: stance
   wycats.user-invocable: "false"

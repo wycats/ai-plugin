@@ -114,13 +114,32 @@ current files under `.claude/wycats/recovery/` before refreshing the export and
 an unambiguous marked import. Incomplete, duplicate, or out-of-order markers
 require manual reconciliation. Recovery copies remain after removal.
 
-Before writing, the installer records the old and intended contents in
-`.claude/wycats/pending.json`. A later invocation can finish an interrupted
-operation if every file still matches either version. It refuses concurrent
-operations and stops if an intervening edit matches neither version. A pending
-operation blocks `--dry-run`; the command reports that finishing it requires a
-write. The installer does not follow symlinks at its managed paths. `--dry-run` performs
-validation and reports destinations without writing. See [setup](setup.md#claude-code-persistent-guidance)
+The installer exclusively creates `.claude/wycats/operation.lock` before
+recovering an interrupted operation or reading the files for the requested
+change. It retains ownership through planning, any repair backup, and the
+requested write. A competing installer reports the owner and lock path. Normal
+completion or an ordinary error releases the lock.
+
+Before changing managed files, the installer records their old and intended
+contents in `.claude/wycats/pending.json`. A later invocation can finish an
+interrupted operation if every file still matches either version. It stops if
+an intervening edit matches neither version, preserving the files and journal
+for reconciliation.
+
+Abrupt termination can leave the lock behind. The installer reports whether its
+recorded process may still be running, has exited, or cannot be identified. It
+keeps the lock even when the recorded process has exited: checking a PID does
+not safely transfer ownership between competing recovery attempts. Verify that
+no guidance installer is running for this project, then remove only the reported
+`operation.lock` file and rerun the command. Keep `pending.json`; it contains the
+bytes needed to resume the interrupted write. An incomplete lock record needs
+the same manual verification before removal.
+
+A pending operation blocks `--dry-run`; the command reports that finishing it
+requires a write. Dry-run also refuses an existing lock, performs validation,
+and reports destinations without creating directories, a lock, or a journal.
+It is a preview rather than ownership of a later write. The installer does not
+follow symlinks at its managed paths. See [setup](setup.md#claude-code-persistent-guidance)
 for commands, local-state handling, and instruction-discovery considerations.
 
 This explicit installation is necessary because a plugin-root `CLAUDE.md` is
