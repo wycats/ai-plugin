@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   buildEditorialPrompt,
   loadBehavioralSuiteSnapshot,
@@ -63,7 +64,7 @@ void test("records retention, questions, investigation, and revisions without gr
 void test("validates the new protocol while keeping legacy document-review parsing available", async () => {
   const source = await readFile(suitePath, "utf8");
   assert.equal(parseBehavioralSuiteSource(source, "editorial.json").protocol, "editorial-reading/v1");
-  const legacy = await loadBehavioralSuiteSnapshot(new URL("../../evals/slop-linter/cases.json", import.meta.url).pathname);
+  const legacy = await loadBehavioralSuiteSnapshot(fileURLToPath(new URL("../../evals/slop-linter/cases.json", import.meta.url)));
   assert.equal(legacy.suite.protocol, "document-review/v1");
   assert.throws(() => parseBehavioralSuiteSource(source.replace('"schemaVersion": 1,', '"schemaVersion": 1, "schemaVersion": 1,'), "duplicate.json"), /duplicate member/);
   const suite = await editorialSuite();

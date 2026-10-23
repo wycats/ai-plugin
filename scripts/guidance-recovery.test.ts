@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, readFile, readdir, realpath, rm, writeFile } from "node
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import test from "node:test";
+import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
 
 const ROOT = resolve(import.meta.dirname, "..");
@@ -54,7 +55,7 @@ async function fixture() {
 
   function start(action: string, pause?: { method: string; path: string }, extra: string[] = []) {
     const child = fork(join(scripts, "claude-guidance.mjs"), [action, "--project", project, ...extra], {
-      execArgv: pause ? ["--import", hook] : [], silent: true,
+      execArgv: pause ? ["--import", pathToFileURL(hook).href] : [], silent: true,
       env: { ...process.env, PAUSE_METHOD: pause?.method, PAUSE_PATH: pause?.path },
     });
     let output = "";

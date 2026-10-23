@@ -27,16 +27,25 @@ passage return and focus. A narrow enlarged-text check exposed crowding between
 the map heading and Close tab, now corrected with measured clearance and visually
 rechecked.
 
-Current gate: finish publication of the reviewed tree to PR #64, request Codex
-review, and handle CI/review findings at the new head. No merge is authorized.
-Merging requires the user's approval after checks/review, and triggers plugin
-publication and reading-site deployment. The previous published head b32f9dd
-predates these local changes.
+Current gate: PR #64 is published and ready for review. Its five earlier
+agent-review threads are resolved against the published fixes. Codex review is
+requested. The first CI run passed the Linux checks/builds and Pi install/update
+exercise, then Windows exposed fixture-path and frozen-archive line-ending
+issues. Those fixture corrections are now committed; obtain green checks at
+the reviewed head before requesting merge approval.
+
+No merge is authorized. Merging requires the user's approval after checks and
+review, and triggers plugin publication and reading-site deployment. Use the PR's
+current head and checks rather than the older b32f9dd evidence.
 
 The full text review has released the font and navigation studies to begin.
 The user explicitly welcomes some of that work alongside PR checks/review.
-Keep visual changes identifiable for deciding whether they join this PR or a
-follow-up, and continue consultant review and identity-guide updates.
+The first isolated comparisons are at `http://127.0.0.1:8878/finishing-study/`,
+with durable sources in `.runtime/structural-review-2026-10-23/visual-study/`.
+Reduced capital proportions remain candidates. Dotless ii resembles u and is
+not recommended. A Contents origin reminder received a useful first reading;
+try it in full Contents at narrow width before promotion. Keep this work in a
+follow-up and continue consultant review and identity-guide updates.
 
 Writing and Revision, native Editorial Reader delivery, installed context
 integration, broader discovery experiments, and Leah's subset proposal retain
