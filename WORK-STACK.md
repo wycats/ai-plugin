@@ -28,11 +28,15 @@ the map heading and Close tab, now corrected with measured clearance and visuall
 rechecked.
 
 Current gate: PR #64 is published and ready for review. Its five earlier
-agent-review threads are resolved against the published fixes. Codex review is
-requested. The first CI run passed the Linux checks/builds and Pi install/update
-exercise, then Windows exposed fixture-path and frozen-archive line-ending
-issues. Those fixture corrections are now committed; obtain green checks at
-the reviewed head before requesting merge approval.
+agent-review threads are resolved against the published fixes. Linux and Windows
+checks passed after correcting fixture paths and preserving frozen archive
+bytes. Linux also passed the Pi install/update exercise.
+
+A further review found that Contents retained a stale passage-return query when
+selecting a section. It now navigates to the full link destination. Browser
+checks reproduced the old refresh failure and verified both resume and note
+routes after the correction. Obtain checks and completed Codex review at the
+final head before requesting merge approval.
 
 No merge is authorized. Merging requires the user's approval after checks and
 review, and triggers plugin publication and reading-site deployment. Use the PR's

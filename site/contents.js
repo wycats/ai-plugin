@@ -53,7 +53,7 @@ export function setupContents(openDialog) {
     event.preventDefault();
     dialog.dataset.focusTarget = target.id;
     dialog.close();
-    history.pushState(null, '', destination.hash);
+    history.pushState(null, '', destination.href);
     target.scrollIntoView();
     target.focus({ preventScroll: true });
   });
