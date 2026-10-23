@@ -65,7 +65,7 @@ async function checkDestination(root, source, href, pages) {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const directory = fileURLToPath(new URL('../out/reading-site/', import.meta.url));
+  const directory = process.argv[2] || fileURLToPath(new URL('../out/reading-site/', import.meta.url));
   const result = await checkSite(directory);
   console.log(`Checked ${result.pages} pages and ${result.links} links.`);
 }
