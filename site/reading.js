@@ -25,24 +25,38 @@ new ResizeObserver(() => {
 
 const returnAnchor = document.body.dataset.returnAnchor;
 const readingOrigins = new Set(document.body.dataset.readingOrigins.split(','));
-const origin = new URLSearchParams(location.search).get('from');
-if (readingOrigins.has(origin)) {
-  for (const link of document.querySelectorAll('a[href]')) {
+const story = document.body.classList.contains('story-reading');
+const params = new URLSearchParams(location.search);
+const origin = params.get('from');
+const noteOrigin = origin === returnAnchor && params.get('note') === origin ? origin : null;
+function carryOrigin(container, passage, note = null) {
+  for (const link of container.querySelectorAll('a[href]')) {
     const destination = new URL(link.href);
     if (destination.origin === location.origin && destination.pathname.startsWith(new URL('.', location.href).pathname) && /\/reference-\d+\.html$/.test(destination.pathname)) {
-      destination.searchParams.set('from', origin);
+      destination.searchParams.set('from', passage);
+      if (note) destination.searchParams.set('note', note);
+      else destination.searchParams.delete('note');
       link.href = destination.href;
     }
   }
+}
+if (!story && readingOrigins.has(origin)) {
+  carryOrigin(document, origin, noteOrigin);
   for (const link of document.querySelectorAll('[data-return-to-reading]')) {
-    link.href = origin === returnAnchor
+    link.href = noteOrigin
       ? `index.html?note=${origin}#${origin}`
       : `index.html?resume=${origin}#${origin}`;
-    link.textContent = 'Return to the passage';
+    (link.querySelector('[data-return-label]') || link).textContent = 'Return to the passage';
+  }
+  const reminder = document.querySelector('.contents-origin');
+  const excerpt = JSON.parse(document.body.dataset.readingExcerpts)[origin];
+  if (reminder && excerpt) {
+    reminder.querySelector('[data-origin-excerpt]').textContent = `“${excerpt}”`;
+    reminder.hidden = false;
   }
 }
 const resume = new URLSearchParams(location.search).get('resume');
-if (document.body.classList.contains('story-reading') && readingOrigins.has(resume)) {
+if (story && readingOrigins.has(resume)) {
   document.fonts.ready.then(() => {
     const passage = document.getElementById(resume);
     passage.scrollIntoView();
@@ -66,5 +80,16 @@ function openDialog(dialog, opener, beforeReturn = () => {}) {
 for (const button of document.querySelectorAll('[data-close-dialog]')) {
   button.addEventListener('click', () => button.closest('dialog').close());
 }
-setupContents(openDialog);
+function captureContentsOrigin(dialog) {
+  if (!story) return;
+  // Read the paragraph beneath the fixed tools before opening the modal.
+  // The annotation's wrapper also contains its note; measure only its prose.
+  const line = tools.getBoundingClientRect().bottom + 24;
+  const passages = [...readingOrigins].map(id => document.getElementById(id)).filter(Boolean);
+  const passage = passages.find(element =>
+    (element.querySelector('.passage') || element).getBoundingClientRect().bottom > line
+  ) || passages.at(-1);
+  if (passage) carryOrigin(dialog, passage.id);
+}
+setupContents(openDialog, captureContentsOrigin);
 setupMarginalia(openDialog);

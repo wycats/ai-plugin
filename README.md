@@ -216,6 +216,25 @@ A tool-call logging hook records every tool invocation as JSONL, providing an au
 
 ## Setup
 
+Choose the route for the application where you work. Codex can install the
+published package directly. The [local build](#build-locally) below lets you
+configure the plugin for your environment or work on its resources.
+
+### Install in Codex
+
+```sh
+codex plugin marketplace add wycats/ai-plugin --ref codex-plugin
+codex plugin add wycats@wycats
+```
+
+Review and trust the plugin's session-start hook; `/hooks` in the Codex CLI
+shows its status. Then start a fresh chat so the installed guidance is available.
+The [setup guide](docs/setup.md#try-a-first-investigation) describes a first
+investigation and what to look for. Existing installations using the old name
+should follow the [rename migration](docs/setup.md#renaming-an-existing-installation).
+
+### Build locally
+
 ```sh
 git clone https://github.com/wycats/ai-plugin.git
 cd ai-plugin
@@ -264,12 +283,7 @@ codex plugin marketplace add ./out/codex-marketplace
 codex plugin add wycats@wycats
 ```
 
-The published Codex marketplace lives on the generated `codex-plugin` branch:
-
-```sh
-codex plugin marketplace add wycats/ai-plugin --ref codex-plugin
-codex plugin add wycats@wycats
-```
+For the published package, use [Install in Codex](#install-in-codex).
 
 To update an installed Codex marketplace snapshot:
 

@@ -1,5 +1,16 @@
 # Work stack
 
+## Reading release · 2 November 2026
+
+PR #64 has merged. The current website and plugin release direction is in
+[the release orientation](docs/plans/website-and-plugin-release.md), with current
+implementation and verification in [the progress record](docs/plans/reading-release-progress.md).
+The accepted Fellowhand snapshot, passage-preserving Contents, and published
+Codex setup route are ready for repository review. Merge approval remains a
+separate step; merging triggers publication and site deployment.
+
+## Earlier checkpoint · 23 October 2026
+
 Updated 23 October 2026. This is the continuation checkpoint for the plugin
 revision and the reading-site work that grew out of it. The user's latest
 direction is to return from the accepted reading implementation and identity

@@ -22,6 +22,7 @@ const rendered = [];
 let annotatedParagraph;
 let annotationCount = 0;
 const readingOrigins = [];
+const readingExcerpts = {};
 
 for (let i = 0; i < queue.length; i++) {
   const file = queue[i];
@@ -60,12 +61,14 @@ for (let i = 0; i < queue.length; i++) {
         if (file === source && section === annotation.section && html.replace(/\s+/g, ' ').includes(annotation.quote)) {
           annotationCount++;
           readingOrigins.push(annotation.id);
+          readingExcerpts[annotation.id] = passageExcerpt(token.tokens);
           annotatedParagraph = passageLinks(html, annotation.id);
           return '<!--marginal-note-->';
         }
         if (file === source) {
           const id = `passage-${readingOrigins.length + 1}`;
           readingOrigins.push(id);
+          readingExcerpts[id] = passageExcerpt(token.tokens);
           return `<p id="${id}" tabindex="-1">${passageLinks(html, id)}</p>`;
         }
         return `<p>${html}</p>`;
@@ -96,6 +99,14 @@ function passageLinks(html, origin) {
   return html.replace(/href="(reference-\d+\.html)(#[^"]*)?"/g,
     (_, page, hash = '') => `href="${page}?from=${origin}${hash}"`);
 }
+function passageExcerpt(tokens) {
+  const plain = passageExcerptText(tokens);
+  const words = plain.trim().split(/\s+/);
+  return words.slice(0, 8).join(' ') + (words.length > 8 ? '…' : '');
+}
+function passageExcerptText(tokens) {
+  return tokens.map(token => token.tokens ? passageExcerptText(token.tokens) : token.text || '').join('');
+}
 function readingConnections(current, link) {
   const story = current === rendered[0];
   const key = path.relative(repo, current.file).split(path.sep).join('/');
@@ -121,7 +132,7 @@ function navigation(current) {
   }).join('');
   return `<button class="contents-toggle folio-action" aria-label="Contents" aria-controls="contents" aria-expanded="false" aria-haspopup="dialog" hidden>${folio}<span>Contents</span></button>
 <dialog id="contents" aria-labelledby="contents-title"><div class="contents-heading"><h2 id="contents-title">Contents</h2><button class="edge-close" data-close-dialog aria-label="Close contents">${closeMark}</button></div>
-<div class="contents-index"><nav aria-label="Site"><div class="contents-column"><div class="story-link">${link(story)}</div>${outline}</div><div class="contents-column">${readingConnections(current, link)}<button class="folio-action" id="explore-relationships" aria-controls="contents-map">${folio}<span>Explore the relationships</span></button></div><div class="contents-collections">${groups}</div></nav></div>
+<div class="contents-index">${current === story ? '' : '<p class="contents-origin" hidden><a data-return-to-reading href="index.html"><span data-return-label>Return to the passage</span><small data-origin-excerpt></small></a></p>'}<nav aria-label="Site"><div class="contents-column"><div class="story-link">${link(story)}</div>${outline}</div><div class="contents-column">${readingConnections(current, link)}<button class="folio-action" id="explore-relationships" aria-controls="contents-map">${folio}<span>Explore the relationships</span></button></div><div class="contents-collections">${groups}</div></nav></div>
 <section id="contents-map" aria-label="Relationships between stances" hidden><button class="folio-action" id="return-to-contents"><span aria-hidden="true">‹</span><span>Back to contents</span></button><p class="map-introduction">An understanding can open to revision wherever we are in the work.</p><figure><a class="illustration-link" href="${artwork.map}-light.png" data-art-link="${artwork.map}" aria-label="Open the relationship map at full size">${themeImage(artwork.map, 'Eight stances connected through illuminated and sketched lettering, with an established understanding returning to an open question.', 'width="1536" height="1024"')}</a><figcaption>Open the image to inspect the lettering. Follow a stance below into its reading.</figcaption></figure><div class="map-reading-links">${mapStances.map(key => link(bySource.get(key))).join('')}</div></section></dialog>`;
 }
 // Resolve and validate the annotation before replacing the previous generated pages.
@@ -136,7 +147,7 @@ for (const page of rendered) {
   const origin = story ? '' : '<p class="reading-origin"><a data-return-to-reading href="index.html">Return to Building together</a></p>';
   fs.writeFileSync(path.join(out, pages.get(page.file)), `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escape(page.title)}</title><meta name="description" content="How shared understanding develops through conversation, implementation, and use."><script src="${asset('theme.js')}"></script><link rel="stylesheet" href="${asset('reading.css')}"><link rel="stylesheet" href="${asset('contents.css')}"><link rel="stylesheet" href="${asset('marginalia.css')}"><script type="module" src="${asset('reading.js')}"></script></head>
-<body class="${story ? 'story-reading' : 'reference-reading'}" data-return-anchor="${annotation.id}" data-reading-origins="${readingOrigins.join(',')}"><a class="skip-link" href="#reading">Skip to text</a><div class="reading-tools"><button class="paper-choice" hidden>Use dark paper</button>${navigation(page)}</div><main id="reading" tabindex="-1">${origin}<article>${body}</article>${story ? relationshipDialog(url, annotation.id) : ''}<footer>${story ? 'Linked references are included for reading alongside the text.' : '<a data-return-to-reading href="index.html">Return to Building together</a>'}<noscript><details><summary>Contents</summary><ul>${rendered.map(p => `<li><a href="${pages.get(p.file)}">${escape(p.title)}</a></li>`).join('')}</ul></details></noscript></footer></main></body></html>`);
+<body class="${story ? 'story-reading' : 'reference-reading'}" data-return-anchor="${annotation.id}" data-reading-origins="${readingOrigins.join(',')}" data-reading-excerpts="${escape(JSON.stringify(readingExcerpts))}"><a class="skip-link" href="#reading">Skip to text</a><div class="reading-tools"><button class="paper-choice" hidden>Use dark paper</button>${navigation(page)}</div><main id="reading" tabindex="-1">${origin}<article>${body}</article>${story ? relationshipDialog(url, annotation.id) : ''}<footer><p>${story ? 'Linked references are included for reading alongside the text.' : '<a data-return-to-reading href="index.html">Return to Building together</a>'}</p><p><a href="https://github.com/wycats/ai-plugin#setup">Install the plugin</a> · <a href="https://github.com/wycats/ai-plugin">Source and documentation</a></p><noscript><details><summary>Contents</summary><ul>${rendered.map(p => `<li><a href="${pages.get(p.file)}">${escape(p.title)}</a></li>`).join('')}</ul></details></noscript></footer></main></body></html>`);
 }
 fs.cpSync(path.join(site, 'assets'), path.join(out, 'assets'), { recursive: true, filter: file => path.basename(file) !== 'README.md' });
 for (const name of ['reading.css', 'contents.css', 'marginalia.css', 'theme.js', 'reading.js', 'contents.js', 'marginalia.js', 'vercel.json']) fs.copyFileSync(path.join(site, name), path.join(out, name));

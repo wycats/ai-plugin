@@ -1,8 +1,49 @@
 # Setup
 
-This plugin provides a set of AI agents, skills, and workflow tools. It works with VS Code (via Copilot), Claude Code, and Codex — you configure it for your environment once, and a build step produces the files your platform needs.
+This plugin provides agents, skills, and workflow guidance for your coding
+application. Codex can install a published package directly; local builds let
+you configure the resources for VS Code, Claude Code, or Codex. Pi has a
+[bounded Recon profile](#pi-recon-profile).
 
-## Quick start
+## Install in Codex
+
+Run these commands in a terminal with the Codex CLI available:
+
+```sh
+codex plugin marketplace add wycats/ai-plugin --ref codex-plugin
+codex plugin add wycats@wycats
+```
+
+Review and trust the plugin's session-start hook. Use `/hooks` in the Codex CLI
+to inspect its status, then start a fresh chat in a project you want to work on.
+The hook delivers [Building together](../instructions/building-together.instructions.md)
+as guidance for the session. Skills such as Recon are available for particular
+tasks. See [How it works](#how-it-works) for delivery details.
+
+If you already have the earlier `wycats-ai-plugin` package, use the
+[rename migration](#renaming-an-existing-installation).
+
+## Try a first investigation
+
+Choose a question in a project you know: something where understanding the
+answer would help you decide what to do. For example:
+
+> Use the wycats Recon workflow to investigate why this calculation runs several
+> times for one edit. I want to understand which callers need it before deciding
+> what to change. Start with [the relevant file or reproduction].
+
+Replace the example with your own question and starting evidence. The agent
+should consult Recon, follow the evidence, and bring back an explanation you can
+check against the code. If it discovers that the callers serve different
+consumers, that should affect its recommendation. You can correct its account
+as you learn together. A useful first result gives you grounds for a decision
+and makes any remaining uncertainty clear.
+
+If the agent cannot find the workflow, check that the plugin is enabled and
+start a fresh chat after installation. Seeing a skill load confirms that it is
+available; judge its contribution by how the investigation develops.
+
+## Build locally
 
 ```sh
 git clone https://github.com/wycats/ai-plugin.git
@@ -172,13 +213,8 @@ codex plugin marketplace add ./out/codex-marketplace
 codex plugin add wycats@wycats
 ```
 
-Published Codex artifacts are generated from `main` and force-pushed to the
-`codex-plugin` branch. Install the remote marketplace from that branch:
-
-```sh
-codex plugin marketplace add wycats/ai-plugin --ref codex-plugin
-codex plugin add wycats@wycats
-```
+Published Codex artifacts are generated from `main` on the `codex-plugin`
+branch. Use [Install in Codex](#install-in-codex) for that route.
 
 To refresh the configured Git marketplace after updates:
 
