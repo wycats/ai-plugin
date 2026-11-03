@@ -22,7 +22,7 @@ export const mapStances = [
 ].map(name => `skills/stances/${name}/SKILL.md`);
 
 export function relationshipDialog(url, returnId) {
-  const link = (name, title) => `<a href="${url(`skills/stances/${name}/SKILL.md`)}?from=${returnId}">${title}</a>`;
+  const link = (name, title) => `<a href="${url(`skills/stances/${name}/SKILL.md`)}?from=${returnId}&amp;note=${returnId}">${title}</a>`;
   return `<dialog id="encounter" aria-labelledby="encounter-title">
 <div class="encounter-head"><h2 id="encounter-title">What follows from the result</h2><button class="edge-close" data-close-dialog aria-label="Close the map and return to the passage">${closeMark}</button></div>
 <p>What a result establishes can become the starting point for a new expectation. Here the finished lettering of ${link('hypothesis-evaluating', 'Hypothesis Evaluating')} returns to the sketched ${link('hypothesis-forming', 'Hypothesis Forming')}.</p>

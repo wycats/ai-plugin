@@ -1,4 +1,4 @@
-export function setupContents(openDialog) {
+export function setupContents(openDialog, beforeOpen = () => {}) {
   const dialog = document.querySelector('#contents');
   const toggle = document.querySelector('.contents-toggle');
   const title = dialog.querySelector('#contents-title');
@@ -18,6 +18,7 @@ export function setupContents(openDialog) {
 
   toggle.hidden = false;
   toggle.addEventListener('click', () => {
+    beforeOpen(dialog);
     openDialog(dialog, toggle);
     fitHeading();
     toggle.setAttribute('aria-expanded', 'true');

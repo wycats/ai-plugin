@@ -7,6 +7,9 @@
 .contents-heading{padding-top:var(--close-clearance,62px);padding-right:0}
 #contents nav{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);gap:30px 52px;font-size:18px}
 .contents-column{min-width:0}.contents-column:first-child{padding-left:24px}
+.contents-origin{margin:0 0 28px;padding-left:17px;border-left:1px solid var(--pen);font:400 18px/1.45 Newsreader,serif}
+#contents .contents-origin a{color:var(--link);padding:5px 0}
+.contents-origin small{display:block;margin-top:5px;font:400 16px/1.45 Newsreader,serif;color:var(--muted)}
 #contents ul{list-style:none;padding:0;margin:0}
 #contents a{display:block;text-decoration:none;color:var(--ink);overflow-wrap:normal}
 #contents a:hover{color:var(--green);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}

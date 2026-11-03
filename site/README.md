@@ -27,9 +27,20 @@ illustrations, and a small set of editorial annotations.
 
 The representative route is **Working through a change → Interpretive Synthesis
 → return to the passage**, with a focused relationship map available from the
-note. A return parameter is carried through subsequent reference navigation;
-returning reopens the note and locates its paragraph. Contents opens a centered
+note. The passage origin and explicit annotation context are carried through
+subsequent reference navigation. Returning from a note reopens it; returning
+from a prose link or Contents locates and focuses the paragraph. Contents opens a centered
 leaf at every width, with an optional relationship view and expandable catalogs.
+On reference readings reached from a known story passage, Contents also offers
+a compact return link with the opening eight words of that passage. It uses the
+same validated origin and return address as the reading's existing return links.
+Opening Contents on the story captures the paragraph crossing the reading line
+below the fixed tools, or the next paragraph if that line is in a gap. It uses
+the last paragraph when the reader is beyond the prose. Each opening captures
+the location anew. Reference links carry it through the catalog, related readings,
+and relationship map; local section links retain their normal navigation.
+Opening a reference directly does not infer a passage origin. The footer links to the repository's installation instructions
+and source without changing the authored story.
 The prose and reference links remain available without JavaScript, with the note
 in flow and a plain catalog at the end of the page.
 
