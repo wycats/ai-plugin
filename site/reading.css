@@ -5,7 +5,7 @@
 :root[data-theme="dark"]{color-scheme:dark;--paper:#24211d;--ink:#e9e3d7;--muted:#b9b1a4;--green:#b5c59b;--red:#d29379;--link:#9bc1ca;--rule:#625b4e;--wash:#302c25;--folio-fill:#36382c;--folio-ink:#d8dfc4;--folio-edge:#7d8067;--tab-fill:#484535;--tab-ink:#eee3c9;--tab-edge:#82775c;--pen:#84946b;--tether:#bc6150}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--paper);color:var(--ink);font:400 24px/1.58 Newsreader,Georgia,serif;font-optical-sizing:auto}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 24px/1.58 Newsreader,Georgia,serif;font-optical-sizing:auto;text-wrap:pretty}
 main{max-width:800px;margin:0 auto;padding:calc(var(--tools-height,66px) + 34px) 44px 70px}
 .story-reading main{max-width:1180px}
 .story-reading article>:is(p,h1,h2,h3,blockquote,ul,ol){max-width:680px}
@@ -36,13 +36,59 @@ figure{margin:28px 0 32px}
 .manuscript-cycle figcaption{font:400 16px/1.4 Newsreader,serif;text-align:right;margin-top:12px}
 .cycle-reprise{max-width:760px}
 footer{font:400 16px/1.5 Newsreader,serif;max-width:680px;margin-top:56px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted)}
-.reading-origin{font-size:17px;color:var(--muted);margin-bottom:24px}
+/* A reference page: the argument occupies the column; orientation keeps to
+   its edges; relationships annotate the material they illuminate.
+   - The edges (head and foot) hold the way back into the book, in one voice:
+     the book's name, or the actual return once the address names a passage.
+   - The arrival is the reading's Fellowhand title and opening paragraph, with
+     its kind as a quiet small-caps label on the title line.
+   - The questions it belongs to annotate that opening, in the margin when
+     there is room and after it otherwise, in the words Contents gives them.
+   Type roles: Fellowhand names titles and questions; Newsreader carries
+   explanation and navigation; small caps label the apparatus; italics quote
+   the story; red numerals name chapters, as in Contents. */
+.reading-edge{margin:0;font:400 17px/1.5 Newsreader,serif;color:var(--muted)}
+.reading-edge-head{margin:0 0 40px}
+.reading-edge a,.contents-origin a{text-decoration:none;color:var(--muted)}
+.edge-label{color:var(--link);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+[data-return-to-reading]:hover .edge-label{text-decoration-thickness:2px}
+.cue-chapter{font:400 1.2em/1 Manuscript,serif;color:var(--red);margin:0 .3em 0 .25em}
+.cue-excerpt{font-style:italic}
+.reading-arrival{margin:0 0 30px}
+.arrival-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 18px;margin:0 0 22px}
+.arrival-title h1{margin:0}
+.reading-kind{margin:0;font:400 15px/1.2 Newsreader,serif;letter-spacing:.06em;font-variant-caps:all-small-caps;color:var(--muted)}
+.arrival-intro{position:relative}
+.arrival-intro>p{margin-bottom:0}
+.reading-beside{margin:26px 0 0;padding-left:18px;border-left:1px solid var(--pen);font:400 16px/1.5 Newsreader,serif}
+.beside-group+.beside-group{margin-top:22px}
+.beside-label{margin:0 0 4px;font-size:15px;letter-spacing:.06em;font-variant-caps:all-small-caps;color:var(--muted)}
+.beside-question+.beside-question{margin-top:18px}
+.beside-text{margin:0;font:400 22px/1.3 Manuscript,serif;text-transform:lowercase;color:var(--green)}
+.beside-role{margin:6px 0 0;color:var(--ink)}
+.beside-open{display:inline-flex;align-items:center;gap:7px;margin:8px 0 0;min-height:32px;padding:2px 0;border:0;background:none;font:400 15px/1.3 Newsreader,serif;color:var(--link);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.beside-open:hover{background:none;text-decoration-thickness:2px}
+.beside-open .folded-tab{width:9px;height:12px}
+@media(min-width:1320px){
+ .reading-beside{position:absolute;top:.35em;left:calc(100% + 48px);width:228px;margin:0;padding:0;border:0}
+}
+footer .reading-edge{margin:0 0 6px}
+/* A resumed passage carries the reading mark in its margin. It is also the
+   focus indicator until the reader moves on. */
+[data-arrival]{outline:none!important}
+:is([data-arrival]:not(.annotated),.annotated[data-arrival] .passage){position:relative}
+:is([data-arrival]:not(.annotated),.annotated[data-arrival] .passage)::before{content:'';position:absolute;left:-34px;top:.2em;width:18px;height:38px;background:url('assets/reading-mark.svg') center/contain no-repeat}
+:is([data-arrival]:not(.annotated),.annotated[data-arrival] .passage)::after{content:'';position:absolute;left:-12px;top:.3em;bottom:.3em;width:2px;background:var(--pen);border-radius:1px}
+[data-theme="dark"] :is([data-arrival]:not(.annotated),.annotated[data-arrival] .passage)::before{filter:brightness(1.65) saturate(.7)}
+.plain-index h2{font-size:30px;margin-top:20px}.plain-index h4{font:400 24px/1.3 Manuscript,serif;margin:20px 0 6px}
+.plain-index ul{list-style:none;padding:0}.plain-index li{margin:0 0 14px}.plain-index p{margin:0}
+.plain-index .index-entry{display:flex;align-items:baseline;justify-content:space-between;gap:4px 14px}.plain-index .index-locators a{margin-left:6px;font-family:Manuscript,serif;color:var(--red);text-decoration:none}.plain-index :is(.index-gloss,.index-see){padding-left:1.1em}
 .skip-link{position:fixed;top:-100px;left:20px;z-index:10;background:var(--paper);padding:10px}
 .skip-link:focus{top:18px}
 button,summary{-webkit-tap-highlight-color:transparent;cursor:pointer}
 button{font:500 16px/1.3 Newsreader,serif;color:var(--ink);background:var(--paper);border:1px solid var(--rule)}
 button:hover{background:var(--wash)}
-.paper-choice{position:fixed;top:11px;right:30px;z-index:4;min-height:44px;padding:7px 14px;border-radius:2px;color:var(--muted)}
+.paper-choice{position:fixed;top:11px;right:30px;z-index:4;min-height:44px;padding:7px 14px;border:1px solid var(--tab-edge);border-radius:9px 2px 2px 2px;background:var(--paper);color:var(--muted);box-shadow:-2px 2px 0 #0001}
 .reading-tools{position:fixed;inset:0 0 auto;z-index:4;display:flex;flex-wrap:wrap;align-items:start;justify-content:space-between;gap:10px 16px;padding:11px 24px;pointer-events:none}
 .reading-tools>button{position:static;pointer-events:auto;max-width:100%}
 .reading-tools>.contents-toggle{order:1}.reading-tools>.paper-choice{order:2;margin-left:auto}
@@ -64,7 +110,27 @@ body.dialog-open{overflow:hidden}
  .reading-tools{padding-inline:18px}
  h1{font-size:42px}.story-reading h1{font-size:46px;margin-bottom:28px}
  h2{font-size:32px;margin-top:48px}h3{font-size:27px}
+ :is([data-arrival]:not(.annotated),.annotated[data-arrival] .passage)::before{display:none}
+ :is([data-arrival]:not(.annotated),.annotated[data-arrival] .passage)::after{left:-10px}
  .manuscript-cycle{margin:30px -10px 38px}.paper-choice{right:18px;font-size:14px;padding-inline:10px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 @media print{body{font-size:12pt}.paper-choice,.contents-toggle,.skip-link,dialog,footer{display:none!important}main{padding:0}h1{font-size:28pt}h2{font-size:19pt;break-after:avoid}p{orphans:3;widows:3}figure{break-inside:avoid}}
+
+.editorial-reading table{display:table;table-layout:fixed;width:100%}
+.editorial-reading th,.editorial-reading td{vertical-align:top;padding:12px}
+
+/* Rubrics and annotations stay with their passages when the
+   available reading measure calls for a single column. */
+.prose-comparison{container-type:inline-size;margin:34px 0 40px;padding:22px 0 18px;border-block:1px solid var(--rule)}
+.comparison-examples{display:grid;gap:24px}
+.comparison-rubric{margin:0 0 10px;color:var(--red);font-size:18px;line-height:1.35;font-variant-caps:small-caps;letter-spacing:.035em}
+.comparison-example blockquote{margin:0;padding:0;border:0;font-size:24px;line-height:1.5}
+.comparison-example blockquote p{margin:0}
+.comparison-example+.comparison-example{border-top:1px solid var(--rule);padding-top:20px}
+.comparison-mark{text-decoration:underline;text-decoration-color:var(--red);text-decoration-thickness:1px;text-underline-offset:.18em}
+.comparison-note{margin:18px 0 0;color:var(--red);font-size:18px;line-height:1.45}
+@container(min-width:620px){
+ .comparison-examples{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px}
+ .comparison-example+.comparison-example{border-top:0;border-left:1px solid var(--rule);padding:0 0 0 32px}
+}

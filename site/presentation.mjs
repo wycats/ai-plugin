@@ -15,12 +15,11 @@ export function cycleIllustration(id, reprise = false) {
   const alt = 'Our understanding of what we are building guides what we notice and pursue. What we encounter can revise that understanding. The lettering and returning penwork form a continuous composition.';
   return `<figure id="${id}" class="manuscript-cycle${reprise ? ' cycle-reprise' : ''}"><a class="illustration-link" href="${artwork.opening}-light.png" data-art-link="${artwork.opening}" aria-label="Open the understanding diagram at full size">${themeImage(artwork.opening, alt, 'width="1536" height="1024"')}</a><figcaption><a href="${artwork.opening}-light.png" data-art-link="${artwork.opening}">Open the illustration</a></figcaption></figure>`;
 }
-export const mapStances = [
-  'socratic-elicitation', 'collaborative-grounding', 'gap-reading',
-  'interpretive-synthesis', 'hypothesis-forming', 'observational-grounding',
-  'hypothesis-evaluating', 'vision-steering',
-].map(name => `skills/stances/${name}/SKILL.md`);
-
+/** The relationship plate, cropped to the result opening a new question. */
+export function questionPlate() {
+  const alt = 'Hypothesis Evaluating, asking what the result establishes, in finished ink. Beneath it Hypothesis Forming, asking what this now leads us to expect, in sketched lettering. Beside them Vision Steering asks what is worth pursuing now.';
+  return `<figure class="question-plate"><a class="illustration-link" href="${artwork.map}-light.png" data-art-link="${artwork.map}" aria-label="Open the whole illustrated plate">${themeImage(artwork.map, alt, 'width="1536" height="1024" loading="lazy"')}</a><figcaption>The finished lettering marks a result we have checked; the sketch marks a new hypothesis. Later evidence can change our reading of either. <a href="${artwork.map}-light.png" data-art-link="${artwork.map}">Open the whole plate</a>.</figcaption></figure>`;
+}
 export function relationshipDialog(url, returnId) {
   const link = (name, title) => `<a href="${url(`skills/stances/${name}/SKILL.md`)}?from=${returnId}&amp;note=${returnId}">${title}</a>`;
   return `<dialog id="encounter" aria-labelledby="encounter-title">

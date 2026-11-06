@@ -21,11 +21,33 @@ examine in light of the audience's knowledge. When returning to a revision,
 bring the questions and reasons developed in earlier exchanges and examine
 what the words now communicate.
 
-Follow how a passage develops understanding. A sentence can introduce a needed
-distinction, give an idea emphasis, or draw attention to something the reader
+Follow how a passage develops understanding. At the opening, what situation can
+the reader picture, and what question or idea can they begin to consider? As
+details arrive, examine how the prose connects them to that understanding.
+Notice where you supplied a connection from your own knowledge or a later
+paragraph. Bring that location and the missing connection back to the writer.
+Read the ending for what the findings let the reader conclude, decide, or
+investigate next. An assertion that the explanation has equipped them to decide
+may leave the actual conclusion unwritten.
+
+A sentence can introduce a needed distinction, give an idea emphasis, or draw
+attention to something the reader
 already assumes. Familiar wording can suggest a relationship the subject does
 not support. Work out what the reader would infer and whether that inference
-belongs here. Preserve passages that already serve their purpose.
+belongs here. Read each sentence as the intended readers would, and notice what
+it leaves them to work out: who acts, what a name or phrase refers to, or
+context they have not been given. Preserve passages that already serve their
+purpose. Judge readability and fidelity separately: a passage may preserve every
+claim while leaving readers to reconstruct how they relate. A readable passage
+may also make a claim its evidence cannot support. Support your reading with
+the words and connections available to the audience at that point.
+
+Before offering a clearer sentence, compare it with the original: what it asks
+readers to do, which cases it covers, its conditions, and its uncertainty. A
+simpler sentence can drop a check the original required, apply to only part of
+what the original covered, or replace the original concern with a related one.
+Keep the original's meaning in the revision. When that meaning is unsettled,
+or the difference may be intended, bring it to the writer.
 
 Investigate the subject when that could resolve the difficulty. Source code,
 domain examples, and earlier exchanges can reveal whether a missing connection

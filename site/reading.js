@@ -1,5 +1,7 @@
 import { setupContents } from './contents.js';
 import { setupMarginalia } from './marginalia.js';
+import { arrivalFrom, carry, returnAction } from './origin.js';
+import { setupGuides } from './guide.js';
 
 const root = document.documentElement;
 const paper = document.querySelector('.paper-choice');
@@ -24,44 +26,82 @@ new ResizeObserver(() => {
 }).observe(tools);
 
 const returnAnchor = document.body.dataset.returnAnchor;
-const readingOrigins = new Set(document.body.dataset.readingOrigins.split(','));
+const passages = JSON.parse(document.body.dataset.passages);
+const readingOrigins = new Set(Object.keys(passages));
 const story = document.body.classList.contains('story-reading');
 const params = new URLSearchParams(location.search);
-const origin = params.get('from');
-const noteOrigin = origin === returnAnchor && params.get('note') === origin ? origin : null;
-function carryOrigin(container, passage, note = null) {
+const questionIds = [...document.querySelectorAll('#contents details.question')].map(question => question.id.replace(/^question-/, ''));
+const arrival = story
+  ? { passage: null, note: false, question: null }
+  : arrivalFrom(location.search, { passages, noteAnchor: returnAnchor, questions: questionIds });
+function carryOrigin(container, context) {
   for (const link of container.querySelectorAll('a[href]')) {
-    const destination = new URL(link.href);
-    if (destination.origin === location.origin && destination.pathname.startsWith(new URL('.', location.href).pathname) && /\/reference-\d+\.html$/.test(destination.pathname)) {
-      destination.searchParams.set('from', passage);
-      if (note) destination.searchParams.set('note', note);
-      else destination.searchParams.delete('note');
-      link.href = destination.href;
-    }
+    const carried = carry(link.href, location.href, context);
+    if (carried !== link.href) link.href = carried;
   }
 }
-if (!story && readingOrigins.has(origin)) {
-  carryOrigin(document, origin, noteOrigin);
+for (const button of document.querySelectorAll('[data-beside]')) button.hidden = false;
+if (!story) {
+  carryOrigin(document, arrival);
+  showReturn(returnAction(arrival, passages));
+  showChosenQuestion(arrival.question);
+}
+
+// The edges of a reading name the book until the address shows where the
+// reader left it; then they offer that actual return, with its place.
+function showReturn(action) {
+  if (!action) return;
   for (const link of document.querySelectorAll('[data-return-to-reading]')) {
-    link.href = noteOrigin
-      ? `index.html?note=${origin}#${origin}`
-      : `index.html?resume=${origin}#${origin}`;
-    (link.querySelector('[data-return-label]') || link).textContent = 'Return to the passage';
+    link.href = action.href;
+    link.querySelector('[data-return-label]').textContent = action.label;
+    const numeral = Object.assign(document.createElement('span'), { className: 'cue-chapter', textContent: action.chapter || 'opening' });
+    const section = Object.assign(document.createElement('span'), { className: 'visually-hidden', textContent: `, ${action.section}: ` });
+    const excerpt = Object.assign(document.createElement('span'), { className: 'cue-excerpt', textContent: `“${action.excerpt}”` });
+    link.querySelector('[data-origin-cue]').replaceChildren(' ', numeral, section, excerpt);
   }
-  const reminder = document.querySelector('.contents-origin');
-  const excerpt = JSON.parse(document.body.dataset.readingExcerpts)[origin];
-  if (reminder && excerpt) {
-    reminder.querySelector('[data-origin-excerpt]').textContent = `“${excerpt}”`;
-    reminder.hidden = false;
-  }
+  for (const note of document.querySelectorAll('[data-edge-note]')) note.hidden = true;
+  for (const reminder of document.querySelectorAll('[data-origin]')) reminder.hidden = false;
 }
-const resume = new URLSearchParams(location.search).get('resume');
+
+// The question the reader chose this reading from, possibly several readings
+// ago. Its annotation offers the way back to it, and Contents opens there.
+function showChosenQuestion(id) {
+  if (!id) return;
+  const notes = document.querySelector('[data-beside-notes]');
+  if (!notes) return;
+  let entry = notes.querySelector(`[data-question="${id}"]`);
+  if (!entry) {
+    // A later hop: this reading is not part of that question. Name the
+    // question the reader came from, without a role it does not have here.
+    const group = document.createElement('div');
+    group.className = 'beside-group beside-chosen';
+    group.innerHTML = `<p class="beside-label">From the question</p><section class="beside-question"><p class="beside-text"></p><button type="button" class="beside-open">${document.querySelector('.folded-tab')?.outerHTML || ''}<span data-open-label></span></button></section>`;
+    entry = group.querySelector('.beside-question');
+    entry.dataset.question = id;
+    entry.querySelector('.beside-text').textContent = document.querySelector(`#question-${id} .question-text`).textContent;
+    entry.querySelector('button').dataset.openQuestion = `question-${id}`;
+    notes.prepend(group);
+    notes.hidden = false;
+  }
+  entry.querySelector('[data-open-label]').textContent = 'Back to this question';
+  const question = document.getElementById(`question-${id}`);
+  for (const other of document.querySelectorAll('#contents details.question')) other.open = other === question;
+}
+
+// Resuming lands on the passage itself. When it opens a chapter, the chapter
+// heading comes into view with it. The arrival mark identifies the passage in
+// the book's own terms and serves as its focus indicator until focus moves on.
+function arrive(passage) {
+  const heading = passage.previousElementSibling?.matches('h1, h2') ? passage.previousElementSibling : null;
+  (heading || passage).scrollIntoView();
+  passage.dataset.arrival = '';
+  passage.addEventListener('blur', () => delete passage.dataset.arrival, { once: true });
+  passage.focus({ preventScroll: true });
+}
+// A return lands on its passage, or on the passage whose note it reopens.
+const resume = params.get('resume') ?? (params.get('note') === returnAnchor ? returnAnchor : null);
 if (story && readingOrigins.has(resume)) {
-  document.fonts.ready.then(() => {
-    const passage = document.getElementById(resume);
-    passage.scrollIntoView();
-    passage.focus({ preventScroll: true });
-  });
+  document.fonts.ready.then(() => arrive(document.getElementById(resume)));
 }
 
 function openDialog(dialog, opener, beforeReturn = () => {}) {
@@ -85,11 +125,15 @@ function captureContentsOrigin(dialog) {
   // Read the paragraph beneath the fixed tools before opening the modal.
   // The annotation's wrapper also contains its note; measure only its prose.
   const line = tools.getBoundingClientRect().bottom + 24;
-  const passages = [...readingOrigins].map(id => document.getElementById(id)).filter(Boolean);
-  const passage = passages.find(element =>
+  const elements = [...readingOrigins].map(id => document.getElementById(id)).filter(Boolean);
+  const passage = elements.find(element =>
     (element.querySelector('.passage') || element).getBoundingClientRect().bottom > line
-  ) || passages.at(-1);
-  if (passage) carryOrigin(dialog, passage.id);
+  ) || elements.at(-1);
+  if (passage) carryOrigin(dialog, { passage: passage.id, note: false, question: null });
+  return passage?.id;
 }
-setupContents(openDialog, captureContentsOrigin);
+setupContents(openDialog, captureContentsOrigin, passages, arrive, (dialog, passage) => {
+  carryOrigin(dialog, { passage, note: false, question: null });
+});
 setupMarginalia(openDialog);
+setupGuides();

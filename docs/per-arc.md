@@ -57,7 +57,3 @@ If evidence calls the direction into question, record the finding and the
 choice it creates. Return project-level selection to vision steering when
 needed. Once a direction is chosen, update the account so the next cycle begins
 from that choice and the reasons for it.
-
-The [archived pipeline-hardening arc](../PER-ARC.md) records an earlier use of
-this approach. Its historical decisions and format belong to that effort;
-current work should use the amount of continuity it needs.
