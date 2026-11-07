@@ -102,6 +102,12 @@ complete after resume and compaction. Its removal command restored the original
 project instructions, and the next resumed request omitted the story. The
 selected output style remained active throughout.
 
+On November 2, 2026, the published Codex package delivered the complete
+expanded story, 16,105 characters, through Codex CLI 0.160.1's native app-server.
+That is longer than the hook's `additionalContextLimit` of 16000, so the check
+does not establish the limit's units or how the host enforces it. Recheck
+complete delivery when the story or the host changes.
+
 ## Claude installation contract
 
 The generated command requires an explicit project. It appends one marked import

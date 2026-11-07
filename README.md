@@ -75,17 +75,15 @@ connects the skills and stances through the work they support. The
 host receives it and the current delivery limits.
 
 The foundational documents develop the working model and writing principles.
-Supporting documents describe the package contracts and setup, preserve
-workflow decisions, and explore emerging concepts.
+Supporting documents describe the package contracts and setup, continuity
+across PER cycles, and a proposal for curated subsets that awaits direction.
 
 - [FOUNDATIONS.md](https://github.com/wycats/ai-plugin/blob/main/FOUNDATIONS.md) — the working model: probability landscapes, stances, information boundaries, generation and evaluation, and selection across timescales.
 - [QUALITY.md](https://github.com/wycats/ai-plugin/blob/main/QUALITY.md) — practical principles for writing and reviewing skills, agents, instructions, and hooks.
 - [docs/canonical-resources-and-runtime-projections.md](https://github.com/wycats/ai-plugin/blob/main/docs/canonical-resources-and-runtime-projections.md) — semantic authority across stance, workflow, project-state, and runtime projections.
 - [docs/runtime-projection-contract.md](https://github.com/wycats/ai-plugin/blob/main/docs/runtime-projection-contract.md) — precise skill activation semantics, package locations, native mappings, and conformance requirements.
 - [docs/curated-upstream-subset-consumption.md](https://github.com/wycats/ai-plugin/blob/main/docs/curated-upstream-subset-consumption.md) — host-neutral downstream selection, dependency closure, provenance, and honest projection across every supported target.
-- [docs/per-arc.md](https://github.com/wycats/ai-plugin/blob/main/docs/per-arc.md) — lightweight reference note for preserving current-bet orientation and evidence across repeated PER cycles.
-- [docs/exo-composition.md](https://github.com/wycats/ai-plugin/blob/main/docs/exo-composition.md) — exploratory brief for how stance-shaped cognition composes with durable project state and operational steering surfaces.
-- [docs/lane-centered-ai-workbench.md](https://github.com/wycats/ai-plugin/blob/main/docs/lane-centered-ai-workbench.md) — thought experiment for a workbench where project vision, a current bet, visible lanes, and PER-sized goals share one project reality.
+- [docs/per-arc.md](https://github.com/wycats/ai-plugin/blob/main/docs/per-arc.md) — what a later PER cycle needs from earlier ones: the direction, evidence, and unresolved questions.
 - [docs/setup.md](https://github.com/wycats/ai-plugin/blob/main/docs/setup.md) — configuration, local registration, and build setup details.
 
 ## Stances

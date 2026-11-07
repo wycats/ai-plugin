@@ -16,9 +16,12 @@ When adding or editing repo artifacts:
 
 ## Repository workflows
 
-For the ongoing plugin revision and reading-site work, start with
-[WORK-STACK.md](WORK-STACK.md). It records the current work, deliberate deferrals,
-the outer plugin-review frame, and where the local studies can be resumed.
+For work in progress, start with [WORK-STACK.md](WORK-STACK.md). It records the
+current work, the follow-ups deliberately left open, and where local working
+material lives.
+
+Prose the reading edition adds around the canonical texts, such as question
+guides, notes, and navigation labels, follows [site/STYLE.md](site/STYLE.md).
 
 Contributor skills live in `.agents/skills/`, separately from the published
 plugin resources in `skills/`. For generated reading-site artwork and visual

@@ -64,6 +64,111 @@
         "If the reading asks the author a question, does it identify a choice whose answer would affect this introduction?",
         "Does it preserve uncertainty about the intended emphasis instead of deciding the author's purpose by inference?"
       ]
+    },
+    {
+      "id": "compressed-obligation",
+      "description": "A design guide whose second sentence leaves its required check for readers to reconstruct.",
+      "audience": "Developers who reached this guide from a table of contents, without reading the workflow it introduces.",
+      "purpose": "Explain how to check a redesign against what the team has learned about the existing system.",
+      "assignment": "Read the paragraph alongside the workflow excerpts. You may propose a revision; keep proposed prose in your response.",
+      "document": "Before replacing the old code, write down what you understand about the system, including the cases it must handle and why they differ. The new structure answers to a written account of what was learned, keeping the distinctions experience has proved. Before removing old structures, return to the cases and decisions they preserved.",
+      "context": [
+        {
+          "name": "Workflow excerpts",
+          "content": "Read the account against representative behavior, historical failures, and cases that initially looked alike but proved different. A fluent explanation can still omit the condition that made a safeguard necessary. If a proposed architecture exposes a missing constraint, revise the learned model and revisit the design."
+        }
+      ],
+      "reviewQuestions": [
+        "What does the second sentence leave unclear about the proposed design’s relation to the account? Does the reading distinguish that difficulty from the grammatical form alone?",
+        "Does any revision keep the obligation to check the proposed structure against the account, instead of only asking readers to write one?",
+        "Does the revision keep the claim's scope across the resulting design and avoid requirements the workflow excerpts do not support?",
+        "Does the reading preserve sentences that already help these readers, including the advice to return to the cases and decisions?"
+      ]
+    },
+    {
+      "id": "prose-that-works",
+      "description": "A short handout with abstract subjects, a short delayed object, and shared we; judgments depend on the audience.",
+      "audience": "Two engineers about to investigate a production bug together.",
+      "purpose": "Help them start the investigation by sharing what each notices.",
+      "assignment": "Read the handout. Return what helps the writer decide whether and how to revise it.",
+      "document": "A new detail can change your explanation. When it does, reread the code you summarized earlier; you may understand it differently now. Keep separate what you saw and what you guessed. Where do we begin? With the detail that surprised one of us.",
+      "context": [],
+      "reviewQuestions": [
+        "Which sentences can these two engineers follow without further explanation? Does the reading give reasons for keeping or revising them?",
+        "If it proposes changes, does each address a burden these readers would actually experience, rather than rewriting abstract subjects, verb–object order, or the shared we by rule?",
+        "Does it preserve the invitation in the question to begin the inquiry together?"
+      ]
+    },
+    {
+      "id": "example-without-its-story",
+      "description": "A guide entry that refers to an example from an essay its readers may not have read.",
+      "audience": "Readers who open this guide entry directly from a table of contents, without having read the essay it draws on.",
+      "purpose": "Suggest how to respond when a user says a design feels wrong.",
+      "assignment": "Read the entry alongside the essay passage it draws on. You may propose a revision; keep proposed prose in your response.",
+      "document": "Offer a tentative explanation of the six choices. You might suggest that the screen asks people to assemble a complete setup instead of choosing one.",
+      "context": [
+        {
+          "name": "Essay passage",
+          "content": "We are adding a configuration setting. As we look at the screen together, the user says the six independent choices feel wrong. Each made sense as we added it. We offer a reading of what's bothering them: the arrangement asks people to assemble something they expected the product to understand. Their response helps us develop the idea. They want to choose a coherent setup, adapt it to their work, and share it with someone facing similar choices."
+        }
+      ],
+      "reviewQuestions": [
+        "Does the reading notice that the six choices depend on a situation these readers have not met, and supply enough of it?",
+        "Does any revision keep what the user wanted (to choose a coherent setup, adapt it to their work, and share it) rather than substituting a nearby idea such as completeness?",
+        "Does it keep the suggestion tentative, as an explanation offered for the user to develop or correct?"
+      ]
+    },
+    {
+      "id": "shifting-names",
+      "description": "A ward handoff note whose names for one relative change between sentences.",
+      "audience": "The nurse taking over the next shift.",
+      "purpose": "Pass on a relative's request about the discharge discussion.",
+      "assignment": "Read the handoff note alongside the ward record. You may propose a revision; keep proposed prose in your response.",
+      "document": "Mr. Alvarez's daughter called at 3 p.m. asking about discharge. The family member wants to be present when the plan is discussed. The visitor said mornings work best.",
+      "context": [
+        {
+          "name": "Ward record",
+          "content": "One relative has contacted the ward today: the patient's daughter, Ana Alvarez, by phone at 15:00. No discharge time has been set."
+        }
+      ],
+      "reviewQuestions": [
+        "Does the reading notice that the changing names could suggest more than one relative was involved?",
+        "Does any revision choose a name that suits this ward and these readers, rather than importing a convention from another setting?",
+        "Does it keep the facts the note gives, without adding a plan, a time, or certainty that the record does not support?"
+      ]
+    },
+    {
+      "id": "obligation-left-open",
+      "description": "The compressed design paragraph without evidence settling the intended obligation.",
+      "audience": "Developers who reached this guide from a table of contents, without reading the workflow it introduces.",
+      "purpose": "Introduce a redesign process; the author has not specified how to use the written account.",
+      "assignment": "Read the paragraph. Return what helps the writer decide whether and how to revise it. No supporting workflow is available.",
+      "document": "Before replacing the old code, write down what you understand about the system, including the cases it must handle and why they differ. The new structure answers to a written account of what was learned, keeping the distinctions experience has proved. Before removing old structures, return to the cases and decisions they preserved.",
+      "context": [],
+      "reviewQuestions": [
+        "Does the reading distinguish an interpretation it can propose from an obligation the author has actually specified?",
+        "Does it ask a useful question or offer explicitly conditional wording where the intended relationship remains unsettled?",
+        "Does it retain the concrete advice that already works while investigating the ambiguous sentence?"
+      ]
+    },
+    {
+      "id": "example-with-its-story",
+      "description": "The same guide entry for readers who have just read the source story.",
+      "audience": "Readers who have just read the essay passage supplied below and now continue to this guide entry.",
+      "purpose": "Suggest how to respond when a user says a design feels wrong.",
+      "assignment": "Read the entry alongside the essay passage it draws on. You may propose a revision; keep proposed prose in your response.",
+      "document": "Offer a tentative explanation of the six choices. You might suggest that the screen asks people to assemble a complete setup instead of choosing one.",
+      "context": [
+        {
+          "name": "Essay passage",
+          "content": "We are adding a configuration setting. As we look at the screen together, the user says the six independent choices feel wrong. Each made sense as we added it. We offer a reading of what's bothering them: the arrangement asks people to assemble something they expected the product to understand. Their response helps us develop the idea. They want to choose a coherent setup, adapt it to their work, and share it with someone facing similar choices."
+        }
+      ],
+      "reviewQuestions": [
+        "Does the reading use the audience’s knowledge to judge whether the six choices need reintroduction?",
+        "Does it still examine whether complete setup preserves the user’s desire to choose a coherent setup, adapt it, and share it?",
+        "Does it preserve the tentative suggestion rather than reporting it as a proven diagnosis?"
+      ]
     }
   ]
 }
