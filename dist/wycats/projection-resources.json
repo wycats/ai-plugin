@@ -117,15 +117,15 @@
       "exposure": "public"
     },
     {
-      "canonicalSource": "./skills/workflows/colleague-review/SKILL.md",
-      "generatedSource": "./skills/colleague-review/SKILL.md",
-      "identity": "skill:colleague-review",
+      "canonicalSource": "./skills/workflows/collaborative-rereading/SKILL.md",
+      "generatedSource": "./skills/collaborative-rereading/SKILL.md",
+      "identity": "skill:collaborative-rereading",
       "exposure": "public"
     },
     {
-      "canonicalSource": "./skills/workflows/dangling-thread-review/SKILL.md",
-      "generatedSource": "./skills/dangling-thread-review/SKILL.md",
-      "identity": "skill:dangling-thread-review",
+      "canonicalSource": "./skills/workflows/colleague-review/SKILL.md",
+      "generatedSource": "./skills/colleague-review/SKILL.md",
+      "identity": "skill:colleague-review",
       "exposure": "public"
     },
     {

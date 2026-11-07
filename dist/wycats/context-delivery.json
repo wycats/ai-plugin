@@ -162,6 +162,24 @@
       "edges": []
     },
     {
+      "source": "skill:collaborative-rereading",
+      "generatedSource": "./skills/collaborative-rereading/SKILL.md",
+      "activity": [
+        {
+          "identity": "skill:relational-continuity",
+          "generatedSource": "./skills/relational-continuity/SKILL.md"
+        }
+      ],
+      "edges": [
+        {
+          "source": "skill:collaborative-rereading",
+          "target": "skill:relational-continuity",
+          "canonicalSource": "./skills/workflows/collaborative-rereading/SKILL.md",
+          "canonicalLine": 87
+        }
+      ]
+    },
+    {
       "source": "skill:colleague-review",
       "generatedSource": "./skills/colleague-review/SKILL.md",
       "activity": [
@@ -188,12 +206,6 @@
           "canonicalLine": 22
         }
       ]
-    },
-    {
-      "source": "skill:dangling-thread-review",
-      "generatedSource": "./skills/dangling-thread-review/SKILL.md",
-      "activity": [],
-      "edges": []
     },
     {
       "source": "skill:gh-resolve-review-threads",

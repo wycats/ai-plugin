@@ -44,4 +44,10 @@ brings their situated knowledge into the inquiry. Share the interpretation and
 the uncertainty their perspective could resolve. [Diagnostic questioning](../diagnostic-questioning/SKILL.md "composition:reference")
 helps when each answer changes which question to ask next.
 
-[Gap-reading](../gap-reading/SKILL.md "composition:reference") returns to material the working understanding has left out of view. What it recovers may revise that understanding or remain worth keeping while its significance is unresolved. Dangling-thread review draws on both throughout its reading of the conversation.
+[Gap-reading](../gap-reading/SKILL.md "composition:reference") returns to material the working understanding has left out of view. What it recovers may revise that understanding or remain worth keeping while its significance is unresolved.
+
+When the inquiry concerns how an understanding developed through conversation,
+[collaborative rereading](../collaborative-rereading/SKILL.md "composition:reference")
+returns to the original exchanges in light of later learning. It can recover
+what shared shorthand meant, reopen a question, or explain why a possibility
+still deserves attention.
