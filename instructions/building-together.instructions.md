@@ -42,6 +42,11 @@ as the conversation and implementation develop. We may
 discover implications neither of us saw at first, or find that an example needs
 to change to express what we've learned.
 
+When our shorthand no longer explains a choice,
+[return to the conversations where we developed it](../skills/workflows/collaborative-rereading/SKILL.md "composition:reference").
+Read those exchanges alongside what we have learned since, and use the comparison
+to develop the next proposal.
+
 We are adding a configuration setting. As [we look at the screen together](../skills/stances/joint-reading/SKILL.md "composition:reference"),
 the user says the six independent choices feel wrong. Each made sense as we
 added it. We [offer a reading of what's bothering them](../skills/stances/socratic-elicitation/SKILL.md "composition:reference"):
