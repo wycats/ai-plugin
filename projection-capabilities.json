@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "profile": "wycats-recon",
+  "workflow": "recon",
+  "runtimePrerequisites": {
+    "pi": {
+      "inspectedVersion": "0.85.1",
+      "preflight": "re-run pi --version and re-verify package behavior after upgrades"
+    },
+    "piSubagents": {
+      "required": true,
+      "inspectedVersion": "0.68.0",
+      "install": "pi install npm:pi-subagents",
+      "preflight": "run /subagents-doctor and inspect wycats-recon Prompt Audit before behavioral probes"
+    }
+  },
+  "agentFrontmatter": {
+    "listFormat": "YAML block list (- item)",
+    "verifiedParser": "pi-subagents 0.68.0 parseFrontmatterList"
+  },
+  "activation": {
+    "mechanism": "model-directed progressive disclosure",
+    "markers": [
+      "composition:load",
+      "composition:reference"
+    ],
+    "automaticRuntimeLoader": false
+  },
+  "supported": [
+    "public Recon workflow discovery",
+    "private canonical stance catalog for the delegated Recon profile",
+    "canonical link navigation and target-relative projection",
+    "project context inheritance",
+    "local filesystem reads, search, and shell commands"
+  ],
+  "omitted": [
+    "persistent instructions (outside the bounded Recon profile)",
+    "browser tools",
+    "persistent memory",
+    "Exo context tools",
+    "nested delegation and canonical fan-out execution",
+    "dedicated testing tools (shell commands remain available)"
+  ],
+  "note": "The canonical fan-out prose is preserved. This local-code prototype reports unavailable capabilities rather than substituting different semantics.",
+  "selectedResourceCatalog": [
+    {
+      "name": "recon",
+      "description": "Investigate a question through code, documents, history, or other available evidence when discoveries can change your explanation and the question you need to answer.",
+      "location": "./skills/recon/SKILL.md"
+    },
+    {
+      "name": "diagnostic-questioning",
+      "description": "Use when a conversation can resolve uncertainty about another person's intent, priorities, or experience. Let each answer revise your understanding and guide the next question.",
+      "location": "./stances/diagnostic-questioning/SKILL.md"
+    },
+    {
+      "name": "interpretive-synthesis",
+      "description": "Use when new details change your understanding of a situation, and that revised understanding changes what earlier observations mean or which question is worth pursuing.",
+      "location": "./stances/interpretive-synthesis/SKILL.md"
+    },
+    {
+      "name": "observational-grounding",
+      "description": "Use when observations seem to disagree, or a conclusion depends on an uncertain relationship between what was observed and what it is taken to show. Relate the evidence to its source and conditions as you investigate.",
+      "location": "./stances/observational-grounding/SKILL.md"
+    },
+    {
+      "name": "relational-continuity",
+      "description": "Use when wording needs to carry the work forward in conversation, a summary, or a handoff. Preserve the concerns and relationships that make the next contribution meaningful.",
+      "location": "./stances/relational-continuity/SKILL.md"
+    }
+  ]
+}

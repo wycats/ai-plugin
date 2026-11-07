@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "target": "pi",
+  "status": "intent-only",
+  "sources": [
+    {
+      "source": "agent:recon",
+      "generatedSource": "./agents/wycats-recon.agent.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:authorial-continuity",
+      "generatedSource": "./stances/authorial-continuity/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:collaborative-grounding",
+      "generatedSource": "./stances/collaborative-grounding/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:diagnostic-questioning",
+      "generatedSource": "./stances/diagnostic-questioning/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:gap-reading",
+      "generatedSource": "./stances/gap-reading/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:hypothesis-evaluating",
+      "generatedSource": "./stances/hypothesis-evaluating/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:hypothesis-forming",
+      "generatedSource": "./stances/hypothesis-forming/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:interpretive-synthesis",
+      "generatedSource": "./stances/interpretive-synthesis/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:joint-reading",
+      "generatedSource": "./stances/joint-reading/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:observational-grounding",
+      "generatedSource": "./stances/observational-grounding/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:public-design-reasoning",
+      "generatedSource": "./stances/public-design-reasoning/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:reader-orientation",
+      "generatedSource": "./stances/reader-orientation/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:relational-continuity",
+      "generatedSource": "./stances/relational-continuity/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:socratic-elicitation",
+      "generatedSource": "./stances/socratic-elicitation/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:vision-steering",
+      "generatedSource": "./stances/vision-steering/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:recon",
+      "generatedSource": "./skills/recon/SKILL.md",
+      "activity": [
+        {
+          "identity": "skill:relational-continuity",
+          "generatedSource": "./stances/relational-continuity/SKILL.md"
+        }
+      ],
+      "edges": [
+        {
+          "source": "skill:recon",
+          "target": "skill:relational-continuity",
+          "canonicalSource": "./skills/workflows/recon/SKILL.md",
+          "canonicalLine": 18
+        }
+      ]
+    },
+    {
+      "source": "skill:dangling-thread-review",
+      "generatedSource": "./references/workflows/dangling-thread-review/SKILL.md",
+      "activity": [],
+      "edges": []
+    }
+  ]
+}
