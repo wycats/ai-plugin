@@ -107,7 +107,7 @@ void test("Pi projection exposes only Recon publicly and keeps canonical bodies 
       }
     }
 
-    assert.ok(plan.resources.some(({ resource, exposure, pluginPath }) => resource.name === "dangling-thread-review" && exposure === "reference" && pluginPath.startsWith("./references/")));
+    assert.ok(plan.resources.some(({ resource, exposure, pluginPath }) => resource.name === "collaborative-rereading" && exposure === "reference" && pluginPath.startsWith("./references/")));
     // Private references preserve navigation without joining the public catalog.
     const expectedReferences = canonical.composition.references.filter(
       ({ source }) => plan.outputBySourcePath.has(source.sourcePath),

@@ -20,10 +20,10 @@ Focused work generates material beyond its own scope. Conversations produce asid
 
 As you develop an understanding of the work, some details acquire a place and others fall out of view. Gap-reading returns to the material that has fallen out: an aside, an anomaly, a possibility that never developed. What you recover may change how you understand the work, or it may remain worth keeping before you can explain how it fits. Interpretive synthesis and gap-reading can recur throughout the same investigation.
 
-When a conversation has moved far enough that you want to take stock of what
-it left behind, [dangling-thread-review](../../workflows/dangling-thread-review/SKILL.md "composition:reference")
-gives that inquiry room. It follows unfinished ideas and decisions through the
-conversation, including threads whose significance changed as the work developed.
+When unfinished ideas or decisions warrant a return to the conversation,
+[collaborative rereading](../../workflows/collaborative-rereading/SKILL.md "composition:reference")
+follows what prompted them and what happened afterward. Later learning can
+change which threads deserve attention and what they mean for the work now.
 
 Some threads resolve within a session. Others persist across sessions — they weren't resolved last time, and they might not be resolved this time either, but they shouldn't be silently dropped. Keeping them visible is an act of intellectual honesty.
 

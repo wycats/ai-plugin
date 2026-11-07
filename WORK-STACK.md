@@ -1,14 +1,37 @@
 # Work stack
 
-Updated 6 November 2026. This file records the work in progress, the follow-ups
+Updated 7 November 2026. This file records the work in progress, the follow-ups
 deliberately left open, and where local working material lives. Git history
 holds the earlier checkpoints; this file keeps only what still guides the next
 move.
 
-## In progress: reading navigation polish
+## In progress: Collaborative Rereading
 
-Branch `wycats/reading-navigation-polish` develops the next reading edition. Its
-changes are being prepared for a pull request:
+Branch `wycats/collaborative-rereading` brings the personal rereading practice
+into the plugin as [Collaborative Rereading](skills/workflows/collaborative-rereading/SKILL.md).
+It subsumes Dangling Thread Review, whose tactical use is a brief invitation
+inside the workflow. The new resource replaces `dangling-thread-review`; callers
+using the old skill name or path need to use `collaborative-rereading`.
+
+The workflow connects original exchanges, later learning, and a judgment about
+the present work. It preserves unresolved ideas without requiring each one to
+fit the emerging account. Gap Reading, Interpretive Synthesis, and Building
+together now point to it. Source and package checks do not establish how readily
+an installed agent will recognize or use the practice; that remains to be tried.
+
+Opus and Luna completed independent understanding and standards reviews. The
+follow-up revision clarifies rereading within the current conversation, makes
+the connection between differently worded exchanges concrete, and explains how
+new evidence can warrant reconsidering a settled decision. The brief
+dangling-thread invitation remains part of the same workflow. Local review
+reports are in `.runtime/rereading-review/`; the rebuilt book is available at
+<http://127.0.0.1:8883/reference-5.html>. The user reviewed the revised workflow
+in the book and approved preparing a PR. Next: complete repository checks and
+Codex PR review, then return for merge approval.
+
+## Reading navigation polish: merged
+
+PR [#66](https://github.com/wycats/ai-plugin/pull/66) merged the reading edition:
 
 - Contents begins from four questions, each with an authored guide that explains
   how its readings bear on the situation.
@@ -28,10 +51,8 @@ narrow layouts, light and dark paper, and the reading-and-return journey. The
 finishing review and validation records are in
 `.runtime/reading-finish-2026-11-06/`.
 
-Next: review the finished guides with the user and approve the PR description.
-GitHub checks and Codex review follow once the PR is open.
 [site/STYLE.md](site/STYLE.md) records the editorial conventions these guides
-follow. The previous edition is published at <https://ai.wycats.fun/> (#65).
+follow. The site is <https://ai.wycats.fun/>.
 
 Merging to `main` publishes the plugin and deploys the site, so a merge needs
 the user's approval after checks and review.
@@ -41,6 +62,19 @@ the user's approval after checks and review.
 Each of these was deliberately left open. Where a tracked record explains what
 is established, it is linked.
 
+- **Expertise and shared vocabulary.** Investigate how naming relevant expertise
+  and expressing confidence helps the current agent contribute possibilities
+  and judgment within the user's uncertainty. Consider short, shared names for
+  useful combinations: the primary use directs the same generalist's attention;
+  briefing a separate agent is secondary. Names and meanings can develop through
+  examples and corrections. This is a hypothesis to explore, not an established
+  causal result or a selected persona system. The injected description and index
+  are part of the inquiry into how those contributions become available in work.
+- **Bookkeeping and tools.** Consider more generally what understanding should
+  persist at workspace scope, user scope, or both; how those records should relate;
+  and where tools would help agents discover, apply, and revise them. Named
+  expertise combinations provide one case. The structure remains open, with
+  lightweight use and useful judgment as the aims.
 - **Supporting-context delivery.** The Copilot SDK bridge is programmatic and
   checkout-based. Installed-session integration and other hosts are not yet
   qualified. See the [runtime projection contract](docs/runtime-projection-contract.md).

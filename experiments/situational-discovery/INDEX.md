@@ -24,9 +24,9 @@ those assumptions.
 An explanation can become coherent while leaving something consequential
 behind. [Gap-reading](../../skills/stances/gap-reading/SKILL.md) returns to the
 underlying material to find what was omitted or never found a place. When the
-question concerns unfinished work across a conversation,
-[dangling-thread review](../../skills/workflows/dangling-thread-review/SKILL.md)
-provides a way to examine it. What you recover may change the explanation;
+question concerns earlier thinking or unfinished work across a conversation,
+[collaborative rereading](../../skills/workflows/collaborative-rereading/SKILL.md)
+examines the original exchanges in light of later learning. What you recover may change the explanation;
 [interpretive synthesis](../../skills/stances/interpretive-synthesis/SKILL.md)
 continues that revision.
 

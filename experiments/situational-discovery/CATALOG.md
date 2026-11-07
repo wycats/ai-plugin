@@ -4,19 +4,21 @@ Generated from canonical descriptions by `node experiments/situational-discovery
 
 - [architectural-distillation](../../skills/workflows/architectural-distillation/SKILL.md): Restructure mature code so it directly expresses what the system has learned through use and evolution, preserving meaningful constraints and distinctions while removing historical residue and accidental complexity.
 
-- [authorial-continuity](../../skills/stances/authorial-continuity/SKILL.md): Use when drafting or revising language that will be attributed to a user, especially public prose where editorial help must preserve the author's judgment, ownership, and relationship with the readers.
+- [authorial-continuity](../../skills/stances/authorial-continuity/SKILL.md): Use when developing language that will be attributed to someone, preserving how their judgment takes shape in words and in their relationship with the people who will read them.
 
-- [code-review](../../skills/workflows/code-review/SKILL.md): Use when reviewing a patch or pull request: examine how the code fulfills the change's purpose, and revisit earlier judgments when details change your understanding of the design. For improving existing code's expression, use implementation-quality; for reading together, use walkthrough.
+- [code-review](../../skills/workflows/code-review/SKILL.md): Use when reviewing a patch or pull request: examine how the code fulfills the change's purpose, and revisit earlier judgments when details change your understanding of the design.
 
-- [collaborative-grounding](../../skills/stances/collaborative-grounding/SKILL.md): Use when working with the user on tasks requiring their situated knowledge — priorities, intent, energy, context the agent can't see. Describes the relational structure of productive human-agent collaboration.
+- [collaborative-grounding](../../skills/stances/collaborative-grounding/SKILL.md): Use when the user's priorities, experience, or intent could change how the work should proceed. Bring what you have learned into the conversation so their judgment can shape the next move.
 
-- [dangling-thread-review](../../skills/workflows/dangling-thread-review/SKILL.md): Use when taking stock of a conversation for ideas, questions, or decisions the work has left behind, especially after a change of direction. Recover what deserves renewed attention and what remains unresolved.
+- [collaborative-rereading](../../skills/workflows/collaborative-rereading/SKILL.md): Revisit original exchanges in the current or earlier conversations to recover how an understanding developed and what deserves attention now. Use when shared language has lost its specificity, the user asks about earlier thinking or dangling threads, or new learning makes earlier exchanges worth reading again.
 
-- [diagnostic-questioning](../../skills/stances/diagnostic-questioning/SKILL.md): Use when the next move depends on another person's intent, priorities, or experience, and each answer will help you choose what to ask next. Ground questions in what you already know; inspect observable system behavior through tools.
+- [colleague-review](../../skills/workflows/colleague-review/SKILL.md): Develop an artifact through a colleague's reading, questions, and attempts to apply it. Use when an explanation, interface, design, or guide needs to be examined from another participant's starting point and revised through discussion.
+
+- [diagnostic-questioning](../../skills/stances/diagnostic-questioning/SKILL.md): Use when a conversation can resolve uncertainty about another person's intent, priorities, or experience. Let each answer revise your understanding and guide the next question.
 
 - [gap-reading](../../skills/stances/gap-reading/SKILL.md): Use when an explanation or direction of work has left details, possibilities, or unfinished threads out of view. Return to the underlying material to recover what may change your understanding or remain worth keeping before you can explain how it fits.
 
-- [gh-resolve-review-threads](../../skills/workflows/gh-resolve-review-threads/SKILL.md): Use when PR review or diff comments are supplied as actionable feedback to implement, including UI flows that send comments without an explicit typed request. Completing this work includes verifying the fix and resolving matching GitHub/Copilot review threads; observation-only requests should leave threads open.
+- [gh-resolve-review-threads](../../skills/workflows/gh-resolve-review-threads/SKILL.md): Use when asked to address PR review or diff comments, including comments supplied through a review UI. Investigate the concern, establish what the published PR supports, and resolve threads when the evidence and project conventions support closure. Read-only review leaves threads open.
 
 - [gh-write-pr-description](../../skills/workflows/gh-write-pr-description/SKILL.md): Use when drafting, updating, or reviewing a GitHub pull request title or body. Build the reviewer's intuition for the change, preserve the author's judgment and relationship with the readers, follow the repository template, and keep evidence at the strength it supports.
 
@@ -28,7 +30,7 @@ Generated from canonical descriptions by `node experiments/situational-discovery
 
 - [interpretive-synthesis](../../skills/stances/interpretive-synthesis/SKILL.md): Use when new details change your understanding of a situation, and that revised understanding changes what earlier observations mean or which question is worth pursuing.
 
-- [joint-reading](../../skills/stances/joint-reading/SKILL.md): Use when walking through code, documents, or changes with the user where both perspectives contribute — the agent sees structural patterns, the user sees design intent.
+- [joint-reading](../../skills/stances/joint-reading/SKILL.md): Use when reading code, documents, or other shared material with another participant, including the user or an agent colleague. Develop an understanding together as each participant's observations and questions change what the other sees in the work.
 
 - [observational-grounding](../../skills/stances/observational-grounding/SKILL.md): Use when observations seem to disagree, or a conclusion depends on an uncertain relationship between what was observed and what it is taken to show. Relate the evidence to its source and conditions as you investigate.
 
@@ -36,15 +38,15 @@ Generated from canonical descriptions by `node experiments/situational-discovery
 
 - [per-cycle](../../skills/workflows/per-cycle/SKILL.md): Use when organizing a consequential change into preparation, implementation, and independent evaluation, or when the user asks for PER. Preserve expectations so the result can revise the understanding that guided the work.
 
-- [public-design-reasoning](../../skills/stances/public-design-reasoning/SKILL.md): Use when writing durable public design prose for RFCs, proposals, architecture notes, and canonization summaries where the document must serve users, implementers, maintainers, educators, and future readers.
+- [public-design-reasoning](../../skills/stances/public-design-reasoning/SKILL.md): Use when an RFC, proposal, or architecture account needs to explain a design to people outside the originating conversation. Carry its reasoning, consequences, and commitments into an account they can build on and revisit.
 
 - [reader-orientation](../../skills/stances/reader-orientation/SKILL.md): Use when shaping code, explanations, interfaces, or instructions around what someone can know where they encounter them, so they can reason locally and investigate deeper without losing the larger idea.
 
-- [recon](../../skills/workflows/recon/SKILL.md): Investigate code or system behavior when developing an explanation requires following discoveries that can change your understanding and the question you need to answer.
+- [recon](../../skills/workflows/recon/SKILL.md): Investigate a question through code, documents, history, or other available evidence when discoveries can change your explanation and the question you need to answer.
 
-- [relational-continuity](../../skills/stances/relational-continuity/SKILL.md): Background guidance for all plugin work: keep language inside the work, focus on what we're doing, and use precise and meaningful language that stays attached to the work underway.
+- [relational-continuity](../../skills/stances/relational-continuity/SKILL.md): Use when wording needs to carry the work forward in conversation, a summary, or a handoff. Preserve the concerns and relationships that make the next contribution meaningful.
 
-- [rfc-writing](../../skills/workflows/rfc-writing/SKILL.md): Use when drafting, revising, reviewing, or promoting RFCs and design proposals, including Exo-managed RFCs, staged RFC lifecycle work, Rust/Ember-style RFC prose, and canonization or recommendation work for related RFCs.
+- [rfc-writing](../../skills/workflows/rfc-writing/SKILL.md): Use when developing or revising an RFC or design proposal, assessing its readiness for a decision, or reconciling it with implementation and experience. Carry the design's reasoning and commitments through the work.
 
 - [socratic-elicitation](../../skills/stances/socratic-elicitation/SKILL.md): Use when the user recognizes something they cannot yet explain, or their examples and reactions suggest an intuition worth developing together. Offer reflections that help them examine and articulate their thinking, letting their response change the conversation.
 
