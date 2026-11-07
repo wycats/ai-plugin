@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "target": "codex",
+  "status": "intent-only",
+  "sources": [
+    {
+      "source": "agent:editorial-reader",
+      "generatedSource": "./agents/editorial-reader.agent.md",
+      "activity": [
+        {
+          "identity": "skill:reader-orientation",
+          "generatedSource": "./skills/reader-orientation/SKILL.md"
+        },
+        {
+          "identity": "skill:authorial-continuity",
+          "generatedSource": "./skills/authorial-continuity/SKILL.md"
+        }
+      ],
+      "edges": [
+        {
+          "source": "agent:editorial-reader",
+          "target": "skill:reader-orientation",
+          "canonicalSource": "./agents/editorial-reader.agent.md",
+          "canonicalLine": 13
+        },
+        {
+          "source": "agent:editorial-reader",
+          "target": "skill:authorial-continuity",
+          "canonicalSource": "./agents/editorial-reader.agent.md",
+          "canonicalLine": 14
+        }
+      ]
+    },
+    {
+      "source": "agent:recon-worker",
+      "generatedSource": "./agents/recon-worker.agent.md",
+      "activity": [
+        {
+          "identity": "skill:recon",
+          "generatedSource": "./skills/recon/SKILL.md"
+        },
+        {
+          "identity": "skill:relational-continuity",
+          "generatedSource": "./skills/relational-continuity/SKILL.md"
+        }
+      ],
+      "edges": [
+        {
+          "source": "agent:recon-worker",
+          "target": "skill:recon",
+          "canonicalSource": "./agents/recon-worker.agent.md",
+          "canonicalLine": 18
+        },
+        {
+          "source": "skill:recon",
+          "target": "skill:relational-continuity",
+          "canonicalSource": "./skills/workflows/recon/SKILL.md",
+          "canonicalLine": 18
+        }
+      ]
+    },
+    {
+      "source": "agent:recon",
+      "generatedSource": "./agents/recon.agent.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:authorial-continuity",
+      "generatedSource": "./skills/authorial-continuity/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:collaborative-grounding",
+      "generatedSource": "./skills/collaborative-grounding/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:diagnostic-questioning",
+      "generatedSource": "./skills/diagnostic-questioning/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:gap-reading",
+      "generatedSource": "./skills/gap-reading/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:hypothesis-evaluating",
+      "generatedSource": "./skills/hypothesis-evaluating/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:hypothesis-forming",
+      "generatedSource": "./skills/hypothesis-forming/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:interpretive-synthesis",
+      "generatedSource": "./skills/interpretive-synthesis/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:joint-reading",
+      "generatedSource": "./skills/joint-reading/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:observational-grounding",
+      "generatedSource": "./skills/observational-grounding/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:public-design-reasoning",
+      "generatedSource": "./skills/public-design-reasoning/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:reader-orientation",
+      "generatedSource": "./skills/reader-orientation/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:relational-continuity",
+      "generatedSource": "./skills/relational-continuity/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:socratic-elicitation",
+      "generatedSource": "./skills/socratic-elicitation/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:vision-steering",
+      "generatedSource": "./skills/vision-steering/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:architectural-distillation",
+      "generatedSource": "./skills/architectural-distillation/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:code-review",
+      "generatedSource": "./skills/code-review/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:colleague-review",
+      "generatedSource": "./skills/colleague-review/SKILL.md",
+      "activity": [
+        {
+          "identity": "skill:joint-reading",
+          "generatedSource": "./skills/joint-reading/SKILL.md"
+        },
+        {
+          "identity": "skill:reader-orientation",
+          "generatedSource": "./skills/reader-orientation/SKILL.md"
+        }
+      ],
+      "edges": [
+        {
+          "source": "skill:colleague-review",
+          "target": "skill:joint-reading",
+          "canonicalSource": "./skills/workflows/colleague-review/SKILL.md",
+          "canonicalLine": 21
+        },
+        {
+          "source": "skill:colleague-review",
+          "target": "skill:reader-orientation",
+          "canonicalSource": "./skills/workflows/colleague-review/SKILL.md",
+          "canonicalLine": 22
+        }
+      ]
+    },
+    {
+      "source": "skill:dangling-thread-review",
+      "generatedSource": "./skills/dangling-thread-review/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:gh-resolve-review-threads",
+      "generatedSource": "./skills/gh-resolve-review-threads/SKILL.md",
+      "activity": [
+        {
+          "identity": "skill:observational-grounding",
+          "generatedSource": "./skills/observational-grounding/SKILL.md"
+        }
+      ],
+      "edges": [
+        {
+          "source": "skill:gh-resolve-review-threads",
+          "target": "skill:observational-grounding",
+          "canonicalSource": "./skills/workflows/gh-resolve-review-threads/SKILL.md",
+          "canonicalLine": 20
+        }
+      ]
+    },
+    {
+      "source": "skill:gh-write-pr-description",
+      "generatedSource": "./skills/gh-write-pr-description/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:implementation-quality",
+      "generatedSource": "./skills/implementation-quality/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:pause-and-ground",
+      "generatedSource": "./skills/pause-and-ground/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:per-cycle",
+      "generatedSource": "./skills/per-cycle/SKILL.md",
+      "activity": [
+        {
+          "identity": "skill:interpretive-synthesis",
+          "generatedSource": "./skills/interpretive-synthesis/SKILL.md"
+        }
+      ],
+      "edges": [
+        {
+          "source": "skill:per-cycle",
+          "target": "skill:interpretive-synthesis",
+          "canonicalSource": "./skills/workflows/per-cycle/SKILL.md",
+          "canonicalLine": 22
+        }
+      ]
+    },
+    {
+      "source": "skill:recon",
+      "generatedSource": "./skills/recon/SKILL.md",
+      "activity": [
+        {
+          "identity": "skill:relational-continuity",
+          "generatedSource": "./skills/relational-continuity/SKILL.md"
+        }
+      ],
+      "edges": [
+        {
+          "source": "skill:recon",
+          "target": "skill:relational-continuity",
+          "canonicalSource": "./skills/workflows/recon/SKILL.md",
+          "canonicalLine": 18
+        }
+      ]
+    },
+    {
+      "source": "skill:rfc-writing",
+      "generatedSource": "./skills/rfc-writing/SKILL.md",
+      "activity": [
+        {
+          "identity": "skill:public-design-reasoning",
+          "generatedSource": "./skills/public-design-reasoning/SKILL.md"
+        }
+      ],
+      "edges": [
+        {
+          "source": "skill:rfc-writing",
+          "target": "skill:public-design-reasoning",
+          "canonicalSource": "./skills/workflows/rfc-writing/SKILL.md",
+          "canonicalLine": 19
+        }
+      ]
+    },
+    {
+      "source": "skill:steer-by-vision",
+      "generatedSource": "./skills/steer-by-vision/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:thread-coordinator",
+      "generatedSource": "./skills/thread-coordinator/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "skill:walkthrough",
+      "generatedSource": "./skills/walkthrough/SKILL.md",
+      "activity": [],
+      "edges": []
+    },
+    {
+      "source": "instruction:building-together",
+      "generatedSource": "./instructions/building-together.instructions.md",
+      "activity": [],
+      "edges": []
+    }
+  ]
+}

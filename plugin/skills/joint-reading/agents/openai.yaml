@@ -1,0 +1,8 @@
+interface:
+  display_name: joint-reading
+  short_description: Use when reading code, documents, or other shared material
+    with another participant, including the user or an agent colleague. Develop
+    an understanding together as each participant's observations and questions
+    change what the other sees in the work.
+policy:
+  allow_implicit_invocation: true

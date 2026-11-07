@@ -1,0 +1,8 @@
+interface:
+  display_name: per-cycle
+  short_description: Use when organizing a consequential change into preparation,
+    implementation, and independent evaluation, or when the user asks for PER.
+    Preserve expectations so the result can revise the understanding that guided
+    the work.
+policy:
+  allow_implicit_invocation: true

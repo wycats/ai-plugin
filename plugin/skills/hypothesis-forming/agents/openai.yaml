@@ -1,0 +1,7 @@
+interface:
+  display_name: hypothesis-forming
+  short_description: Use when an emerging explanation, analogy, or plan suggests
+    something worth checking. Make the expectation specific enough that an
+    observation or attempt can change your understanding and the next move.
+policy:
+  allow_implicit_invocation: true
