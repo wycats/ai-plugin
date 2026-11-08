@@ -1,6 +1,7 @@
 @font-face{font-family:Newsreader;src:url('assets/fonts/newsreader-roman.ttf');font-weight:200 800;font-style:normal;font-display:swap}
 @font-face{font-family:Newsreader;src:url('assets/fonts/newsreader-italic.ttf');font-weight:200 800;font-style:italic;font-display:swap}
-@font-face{font-family:Manuscript;src:url('assets/fonts/fellowhand-reading-2026-11-02-t-release.woff2');font-weight:400;font-display:swap;unicode-range:U+20,U+42,U+4F,U+53,U+57,U+61-7A}
+@font-face{font-family:Manuscript;src:url('assets/fonts/fellowhand-reading-2026-11-02-t-release.woff2');font-weight:400;font-display:swap;unicode-range:U+42,U+4F,U+53,U+57}
+@font-face{font-family:Manuscript;src:url('assets/fonts/fellowhand-reading-2026-11-07-integrated.woff2');font-weight:400;font-display:swap;unicode-range:U+20,U+61-7A}
 :root{color-scheme:light;--paper:#f8f5ed;--ink:#302b25;--muted:#686055;--green:#4e643d;--red:#9e4636;--link:#285c68;--rule:#bcb3a3;--wash:#efeadf;--folio-fill:#e9eddf;--folio-ink:#35452b;--folio-edge:#8a9575;--tab-fill:#e3dac4;--tab-ink:#493c26;--tab-edge:#a39476;--pen:#74865d;--tether:#9e4636}
 :root[data-theme="dark"]{color-scheme:dark;--paper:#24211d;--ink:#e9e3d7;--muted:#b9b1a4;--green:#b5c59b;--red:#d29379;--link:#9bc1ca;--rule:#625b4e;--wash:#302c25;--folio-fill:#36382c;--folio-ink:#d8dfc4;--folio-edge:#7d8067;--tab-fill:#484535;--tab-ink:#eee3c9;--tab-edge:#82775c;--pen:#84946b;--tether:#bc6150}
 *{box-sizing:border-box}

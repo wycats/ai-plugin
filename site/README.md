@@ -114,6 +114,21 @@ The current manuscript face covers lowercase letters and B, O, S, W. Most
 manuscript headings use lowercase while Building together keeps its authored B.
 Quieter capitals and additional glyph coverage remain later font work.
 
+Lowercase letters and spaces use the pinned 7 November 2026 integrated Fellowhand
+review baseline (`assets/fonts/fellowhand-reading-2026-11-07-integrated.woff2`).
+B, O, S and W continue to use the 2 November t-release snapshot: the new export
+does not include capitals. Both snapshots use the same units per em and vertical
+metrics.
+
+The new snapshot combines optical placement, coordinated tall heads and the
+separated-arm fyg construction. Fellowhand remains in development; crowded
+`ef/et/en` encounters and wide `f`–ascender encounters remain under review.
+This asset is a fixed copy, so later font experiments do not change the edition.
+
+Source: Fellowhand's `out/reading-site/spacing-audit/fellowhand-baseline/fonts/fellowhand-baseline.woff2`,
+from the integrated baseline reviewed on 7 November 2026.
+SHA-256: `ece8adb80437eb1c567bf026c9ca1818b8c74000fb0b1a1e68fa9be75713cd48`.
+
 ## Build and check
 
 ```sh
