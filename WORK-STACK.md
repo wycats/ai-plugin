@@ -52,7 +52,7 @@ finishing review and validation records are in
 `.runtime/reading-finish-2026-11-06/`.
 
 [site/STYLE.md](site/STYLE.md) records the editorial conventions these guides
-follow. The site is <https://ai.wycats.fun/>.
+follow. The site is <https://ai.wycats.dev/>.
 
 Merging to `main` publishes the plugin and deploys the site, so a merge needs
 the user's approval after checks and review.

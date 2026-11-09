@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: reading-site-production
-      url: https://ai.wycats.fun
+      url: https://ai.wycats.dev
     steps:
       - uses: actions/setup-node@v4
         with:
