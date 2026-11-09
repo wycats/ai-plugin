@@ -54,6 +54,14 @@ test('canonical build preserves every story paragraph and has self-contained des
     const body = descendants(document, n => n.tagName === 'body')[0];
     const passages = JSON.parse(body.attrs.find(a => a.name === 'data-passages').value);
     const attr = (node, name) => node.attrs?.find(a => a.name === name)?.value;
+    for (const [id, paragraph] of [['opening-cycle', expected[0]], ['return-cycle', expected.find(p => p.startsWith('We return to the larger idea'))]]) {
+      const drawing = descendants(article, n => attr(n, 'id') === id)[0];
+      assert.ok(descendants(drawing.parentNode, n => n.tagName === 'p' && normalized(n) === paragraph).length,
+        `${id}: drawing accompanies its source passage`);
+      const image = descendants(drawing, n => n.tagName === 'img')[0];
+      assert.equal(attr(image, 'width'), '1536');
+      assert.equal(attr(image, 'height'), '1024', 'The complete cycle returns, rather than a cropped ornament');
+    }
     const storyPassages = descendants(article, n => (n.tagName === 'p' && attr(n, 'id')) || attr(n, 'class') === 'annotated');
     assert.deepEqual(Object.keys(passages), storyPassages.map(n => attr(n, 'id')), 'Every story paragraph can be an origin');
     for (const [origin, { excerpt }] of Object.entries(passages)) {
@@ -238,7 +246,7 @@ test('Contents offers questions, a complete index, and a place for every reading
         const guide = descendants(question, n => hasClass(n, 'question-guide'))[0];
         assert.ok(guide, `${id}: guide`);
         assert.doesNotMatch(text(guide), /[{}]/, `${id}: no editorial markup left in the guide`);
-        for (const svg of descendants(guide, n => n.tagName === 'svg')) assert.equal(attr(svg, 'aria-hidden'), 'true', `${id}: drawn marks are hidden`);
+        for (const svg of descendants(guide, n => n.tagName === 'svg' && attr(n, 'role') !== 'img')) assert.equal(attr(svg, 'aria-hidden'), 'true', `${id}: drawn marks are hidden`);
         const quotes = descendants(guide, n => hasClass(n, 'guide-quote'));
         quotes.forEach((quote, index) => {
           const [paragraph] = quote.childNodes.filter(n => n.tagName);
@@ -382,4 +390,56 @@ test('a guide quotes only the essay and links each phrase to its note', async ()
   assert.throws(() => resolveGuide(unit(0, { text: ['Write {an account of it.'] }), context), /unbalanced braces/);
   assert.throws(() => resolveGuide({ ...valid, closing: 'Return to {the start}.' }, context), /plain prose/);
   assert.throws(() => resolveGuide(unit(0, { note: ['z', 'Unknown.'] }), context), /unread z/);
+});
+
+test('returning to the opening includes its title without moving later passages', async () => {
+  const { arrivalTarget } = await import('./origin.js');
+  const title = { matches: selector => selector === 'h1, h2' };
+  const opening = { previousElementSibling: title };
+  const first = { matches: () => true, closest: () => opening, previousElementSibling: null };
+  const second = { matches: () => false, previousElementSibling: { matches: () => false } };
+  const chapter = { matches: () => false, previousElementSibling: title };
+  assert.equal(arrivalTarget(first), title);
+  assert.equal(arrivalTarget(second), second);
+  assert.equal(arrivalTarget(chapter), title);
+});
+
+test('hidden relationship artwork waits for visibility and uses the current paper choice', async () => {
+  const { applyArtworkTheme, observeDeferredArtwork } = await import('./artwork.js');
+  const { questionPlate, relationshipDialog } = await import('./presentation.mjs');
+  for (const html of [questionPlate(), relationshipDialog(x => x, 'result-understanding')]) {
+    const image = descendants(parseFragment(html), node => node.tagName === 'image')[0];
+    assert.ok(image.attrs.some(attr => attr.name === 'data-art-deferred'));
+    assert.ok(!image.attrs.some(attr => attr.name === 'href'), 'The HTML parser must not start the request');
+  }
+  const attributes = new Map([['data-art-deferred', '']]);
+  const image = {
+    tagName: 'image', dataset: { art: 'assets/illustrations/return-map' },
+    hasAttribute: name => attributes.has(name),
+    removeAttribute: name => attributes.delete(name),
+    setAttribute: (name, value) => attributes.set(name, value),
+    closest: () => frame,
+  };
+  const frame = { querySelectorAll: () => attributes.has('data-art-deferred') ? [image] : [] };
+  const link = { dataset: { artLink: image.dataset.art } };
+  const scope = { querySelectorAll: selector => selector === '[data-art-link]' ? [link] : [image] };
+  let report, observed, unobserved, theme = 'light';
+  class Observer {
+    constructor(callback) { report = callback; }
+    observe(target) { observed = target; }
+    unobserve(target) { unobserved = target; }
+  }
+  observeDeferredArtwork(scope, () => theme, Observer);
+  assert.equal(observed, frame);
+  applyArtworkTheme(scope, theme);
+  theme = 'dark';
+  applyArtworkTheme(scope, theme);
+  report([{ target: frame, isIntersecting: false }]);
+  assert.equal(attributes.has('href'), false, 'Theme changes must not load a closed guide');
+  assert.equal(link.href, 'assets/illustrations/return-map-dark.png');
+  report([{ target: frame, isIntersecting: true }]);
+  assert.equal(attributes.get('href'), 'assets/illustrations/return-map-dark.png');
+  assert.equal(unobserved, frame);
+  applyArtworkTheme(scope, 'light');
+  assert.equal(attributes.get('href'), 'assets/illustrations/return-map-light.png');
 });

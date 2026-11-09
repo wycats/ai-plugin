@@ -87,8 +87,9 @@
 .also-in button{display:inline-flex;align-items:baseline;gap:5px;min-height:0;padding:0;border:0;background:none;font:inherit;font-style:italic;color:var(--link);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
 .also-in button:hover{background:none;text-decoration-thickness:2px}
 .also-in .folded-tab{width:9px;height:12px;align-self:center}
-.question-plate{margin:8px 0 24px}
-.question-plate img{display:block;width:100%;aspect-ratio:1536/650;object-fit:cover;object-position:0 0;height:auto}
+.question-plate{margin:0 0 30px;max-width:560px}
+.question-plate svg{display:block;width:100%;height:auto;mix-blend-mode:multiply}
+[data-theme="dark"] .question-plate svg{mix-blend-mode:screen}
 .question-plate figcaption{font:400 15px/1.5 Newsreader,serif;color:var(--muted);margin-top:10px;max-width:60ch}
 #contents .question-plate a{display:inline}
 #contents .question-plate .illustration-link{display:block}
@@ -96,6 +97,11 @@
  .guide-unit{display:grid;grid-template-columns:minmax(0,1fr) 225px;gap:68px;align-items:start}
  .guide-note{margin:0;padding:0;border:0}
  .guide-threads{display:block}
+ .guide-illustrated{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:36px;align-items:start}
+ .guide-illustrated .question-plate{position:sticky;top:calc(var(--contents-heading-height,120px) + 20px)}
+ .guide-illustrated .guide-unit{display:block}
+ .guide-illustrated .guide-note{margin:18px 0 0 22px;padding-left:16px;border-left:1px solid var(--pen)}
+ .guide-illustrated .guide-threads{display:none}
 }
 
 /* The index is an annotated table in two independently flowing columns, one

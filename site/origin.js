@@ -78,3 +78,11 @@ export function questionAt(passage, cues, passages) {
   });
   return found;
 }
+
+/** Include the opening heading when returning to its first paragraph. */
+export function arrivalTarget(passage) {
+  const opening = passage.matches('.cycle-copy > p:first-child')
+    ? passage.closest('.cycle-opening') : null;
+  const previous = (opening || passage).previousElementSibling;
+  return previous?.matches('h1, h2') ? previous : passage;
+}

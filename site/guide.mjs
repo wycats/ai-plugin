@@ -83,9 +83,10 @@ const arrow = '<svg class="reading-arrow" viewBox="0 0 44 20" aria-hidden="true"
  * Renders a resolved guide. `href(page)` is a reading's address when chosen
  * from this question, and `link(page, html, className)` a link to it;
  * `also(page)` names its other questions; `citation(passage)` gives the
- * `{ href, label }` of an essay passage. `after` follows the closing.
+ * `{ href, label }` of an essay passage. An optional illustration accompanies
+ * the account, with its notes following their passages in the remaining column.
  */
-export function guideMarkup(question, guide, { href, link, also, citation, after = '' }) {
+export function guideMarkup(question, guide, { href, link, also, citation, illustration = '' }) {
   const id = suffix => `question-${question.id}-${suffix}`;
   const prose = (parts, page) => parts.map(part => part.phrase
     ? link(page, escape(part.phrase), 'guide-phrase')
@@ -104,7 +105,8 @@ export function guideMarkup(question, guide, { href, link, also, citation, after
   const next = guide.main
     ? `<p class="guide-next">${link(guide.main.page, `<span>Read ${escape(guide.main.page.title)}</span>${arrow}`, 'reading-onward')}</p>`
     : '';
+  const account = `<div class="guide-account" data-guide-account>${units}<svg class="guide-threads" aria-hidden="true" focusable="false"></svg></div>`;
   return `<div class="question-guide"><p class="guide-lead">${escape(guide.lead)}</p>${main}
-<div class="guide-account" data-guide-account>${units}<svg class="guide-threads" aria-hidden="true" focusable="false"></svg></div>
-<p class="guide-closing">${escape(guide.closing)}</p>${after}${next}</div>`;
+${illustration ? `<div class="guide-illustrated">${illustration}${account}</div>` : account}
+<p class="guide-closing">${escape(guide.closing)}</p>${next}</div>`;
 }

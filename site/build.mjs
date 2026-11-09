@@ -8,6 +8,7 @@ import { escape, cycleIllustration, questionPlate, relationshipDialog, folio, fo
 import { annotation, marginalNote } from './marginalia.mjs';
 import { resolveGuide, guideMarkup } from './guide.mjs';
 import { questions } from './questions.mjs';
+import { composeIllustrations } from './illustration-layout.mjs';
 
 const site = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(site, '..');
@@ -94,7 +95,8 @@ function renderSource(file) {
     for (const [, href] of linked.matchAll(/href="(reference-\d+\.html)/g)) cite(href, id);
     return linked;
   }
-  const body = marked.parse(markdown);
+  const parsed = marked.parse(markdown);
+  const body = file === source ? composeIllustrations(parsed) : parsed;
   rendered.push({ file, title, body, sections, kind: data.metadata?.['wycats.kind'], description: data.description });
 }
 // Discover canonical readings first so their existing addresses stay stable.
@@ -201,7 +203,7 @@ function navigation(current) {
       return elsewhere.length ? `<p class="also-in">Also in ${elsewhere.map(other => `<button type="button" data-open-question="question-${other.id}">${fold}<span>${escape(other.short)}</span></button>`).join(', ')}</p>` : '';
     };
     const citation = passage => ({ href: resumeHref(passage), label: `Building together · ${placeName(passage)}` });
-    const guide = guideMarkup(question, question.guide, { href: page => pages.get(page.file), link, also, citation, after: question.plate ? questionPlate() : '' });
+    const guide = guideMarkup(question, question.guide, { href: page => pages.get(page.file), link, also, citation, illustration: question.plate ? questionPlate() : '' });
     return `<details class="question" name="contents-question" id="question-${question.id}" data-passage="${question.passage}"${question === open ? ' open' : ''}><summary><span class="question-text">${escape(question.question)}</span>${fold}</summary>
 <div class="question-spread">${guide}</div></details>`;
   };
@@ -270,5 +272,5 @@ for (const page of rendered) {
 <body class="${story ? 'story-reading' : 'reference-reading'}${page.file === styleSource ? ' editorial-reading' : ''}" data-return-anchor="${annotation.id}" data-passages="${passageData}"><a class="skip-link" href="#reading">Skip to text</a><div class="reading-tools"><button class="paper-choice" hidden>Use dark paper</button>${navigation(page)}</div><main id="reading" tabindex="-1">${story ? '' : readingEdge('head')}<article>${story ? page.body : arrival(page)}</article>${story ? relationshipDialog(url, annotation.id) : ''}<footer>${story ? '<p>Linked references are included for reading alongside the text.</p>' : readingEdge('foot')}<p><a href="https://github.com/wycats/ai-plugin#setup">Install the plugin</a> · <a href="https://github.com/wycats/ai-plugin">Source and documentation</a> · <a href="style.html">Style of this edition</a></p><noscript><section class="plain-index"><h2>Index of readings</h2><p><a href="index.html">Building together</a></p>${readingIndex(page, false)}</section></noscript></footer></main></body></html>`);
 }
 fs.cpSync(path.join(site, 'assets'), path.join(out, 'assets'), { recursive: true, filter: file => path.basename(file) !== 'README.md' });
-for (const name of ['reading.css', 'contents.css', 'marginalia.css', 'theme.js', 'reading.js', 'contents.js', 'marginalia.js', 'origin.js', 'guide.js', 'vercel.json']) fs.copyFileSync(path.join(site, name), path.join(out, name));
+for (const name of ['reading.css', 'contents.css', 'marginalia.css', 'theme.js', 'artwork.js', 'reading.js', 'contents.js', 'marginalia.js', 'origin.js', 'guide.js', 'vercel.json']) fs.copyFileSync(path.join(site, name), path.join(out, name));
 console.log(`Rendered ${pages.size} pages in ${out}`);
