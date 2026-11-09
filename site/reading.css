@@ -31,11 +31,25 @@ hr{border:0;border-top:1px solid var(--rule);margin:30px 0}
 table{border-collapse:collapse;font-size:19px;max-width:100%;display:block;overflow:auto}
 th,td{padding:8px;border-bottom:1px solid var(--rule);text-align:left}
 figure{margin:28px 0 32px}
-.manuscript-cycle{max-width:940px;margin:40px 0 54px}
+.manuscript-cycle{max-width:940px;margin:40px 0 54px;scroll-margin-top:calc(var(--tools-height,66px) + 24px)}
 .illustration-link{display:block;cursor:zoom-in}
 .manuscript-cycle img{display:block;width:100%;height:auto}
 .manuscript-cycle figcaption{font:400 16px/1.4 Newsreader,serif;text-align:right;margin-top:12px}
 .cycle-reprise{max-width:760px}
+/* The drawing accompanies the intuition at the opening and the reflection
+   at the close. Its complete cycle stays legible when the columns stack. */
+.cycle-spread{display:grid;gap:26px;margin:32px 0 48px;align-items:center}
+.cycle-copy{min-width:0;max-width:680px}
+.cycle-copy>:last-child,.cycle-return>p{margin-bottom:0}
+.cycle-spread .manuscript-cycle{width:100%;max-width:700px;margin:0}
+.cycle-spread img{mix-blend-mode:multiply;mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent),linear-gradient(to bottom,transparent,#000 5%,#000 95%,transparent);mask-composite:intersect}
+[data-theme="dark"] .cycle-spread img{mix-blend-mode:screen}
+.cycle-return>p{max-width:680px}
+@media(min-width:1100px){
+ .cycle-opening{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:38px}
+ .cycle-return{grid-template-columns:minmax(0,1.35fr) minmax(0,.85fr);gap:44px}
+ [data-note-layout="inline"] .cycle-spread{grid-template-columns:1fr}
+}
 footer{font:400 16px/1.5 Newsreader,serif;max-width:680px;margin-top:56px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted)}
 /* A reference page: the argument occupies the column; orientation keeps to
    its edges; relationships annotate the material they illuminate.

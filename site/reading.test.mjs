@@ -54,6 +54,14 @@ test('canonical build preserves every story paragraph and has self-contained des
     const body = descendants(document, n => n.tagName === 'body')[0];
     const passages = JSON.parse(body.attrs.find(a => a.name === 'data-passages').value);
     const attr = (node, name) => node.attrs?.find(a => a.name === name)?.value;
+    for (const [id, paragraph] of [['opening-cycle', expected[0]], ['return-cycle', expected.find(p => p.startsWith('We return to the larger idea'))]]) {
+      const drawing = descendants(article, n => attr(n, 'id') === id)[0];
+      assert.ok(descendants(drawing.parentNode, n => n.tagName === 'p' && normalized(n) === paragraph).length,
+        `${id}: drawing accompanies its source passage`);
+      const image = descendants(drawing, n => n.tagName === 'img')[0];
+      assert.equal(attr(image, 'width'), '1536');
+      assert.equal(attr(image, 'height'), '1024', 'The complete cycle returns, rather than a cropped ornament');
+    }
     const storyPassages = descendants(article, n => (n.tagName === 'p' && attr(n, 'id')) || attr(n, 'class') === 'annotated');
     assert.deepEqual(Object.keys(passages), storyPassages.map(n => attr(n, 'id')), 'Every story paragraph can be an origin');
     for (const [origin, { excerpt }] of Object.entries(passages)) {
@@ -238,7 +246,7 @@ test('Contents offers questions, a complete index, and a place for every reading
         const guide = descendants(question, n => hasClass(n, 'question-guide'))[0];
         assert.ok(guide, `${id}: guide`);
         assert.doesNotMatch(text(guide), /[{}]/, `${id}: no editorial markup left in the guide`);
-        for (const svg of descendants(guide, n => n.tagName === 'svg')) assert.equal(attr(svg, 'aria-hidden'), 'true', `${id}: drawn marks are hidden`);
+        for (const svg of descendants(guide, n => n.tagName === 'svg' && attr(n, 'role') !== 'img')) assert.equal(attr(svg, 'aria-hidden'), 'true', `${id}: drawn marks are hidden`);
         const quotes = descendants(guide, n => hasClass(n, 'guide-quote'));
         quotes.forEach((quote, index) => {
           const [paragraph] = quote.childNodes.filter(n => n.tagName);

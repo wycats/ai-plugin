@@ -89,7 +89,7 @@ export function setupMarginalia(openDialog) {
     map.setAttribute('viewBox', wholeMap ? '0 0 1536 1024' : '0 0 1050 680');
     if (wholeMap) map.querySelector('image').removeAttribute('mask');
     else map.querySelector('image').setAttribute('mask', 'url(#relationship-window)');
-    dialog.querySelector('#map-title').textContent = wholeMap
+    map.querySelector('title').textContent = wholeMap
       ? 'Eight connected stances. Finished penwork and sketching coexist as understanding returns to questioning.'
       : 'Hypothesis Evaluating asks what the result establishes. Hypothesis Forming asks what this now leads us to expect.';
     dialog.querySelector('.map-window').scrollTo(0, 0);
