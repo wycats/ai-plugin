@@ -1,6 +1,10 @@
 # Building together reading edition
 
-Public URL: <https://ai.wycats.fun/>
+Public URL: <https://ai.wycats.dev/>
+
+The previous address, `ai.wycats.fun`, redirects permanently to this domain,
+preserving paths and query strings. The redirect is configured on the
+`building-together` project in Vercel.
 
 The site renders `instructions/building-together.instructions.md` and the
 repository Markdown pages reachable through its links. Canonical Markdown owns
