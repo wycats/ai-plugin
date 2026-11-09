@@ -391,3 +391,55 @@ test('a guide quotes only the essay and links each phrase to its note', async ()
   assert.throws(() => resolveGuide({ ...valid, closing: 'Return to {the start}.' }, context), /plain prose/);
   assert.throws(() => resolveGuide(unit(0, { note: ['z', 'Unknown.'] }), context), /unread z/);
 });
+
+test('returning to the opening includes its title without moving later passages', async () => {
+  const { arrivalTarget } = await import('./origin.js');
+  const title = { matches: selector => selector === 'h1, h2' };
+  const opening = { previousElementSibling: title };
+  const first = { matches: () => true, closest: () => opening, previousElementSibling: null };
+  const second = { matches: () => false, previousElementSibling: { matches: () => false } };
+  const chapter = { matches: () => false, previousElementSibling: title };
+  assert.equal(arrivalTarget(first), title);
+  assert.equal(arrivalTarget(second), second);
+  assert.equal(arrivalTarget(chapter), title);
+});
+
+test('hidden relationship artwork waits for visibility and uses the current paper choice', async () => {
+  const { applyArtworkTheme, observeDeferredArtwork } = await import('./artwork.js');
+  const { questionPlate, relationshipDialog } = await import('./presentation.mjs');
+  for (const html of [questionPlate(), relationshipDialog(x => x, 'result-understanding')]) {
+    const image = descendants(parseFragment(html), node => node.tagName === 'image')[0];
+    assert.ok(image.attrs.some(attr => attr.name === 'data-art-deferred'));
+    assert.ok(!image.attrs.some(attr => attr.name === 'href'), 'The HTML parser must not start the request');
+  }
+  const attributes = new Map([['data-art-deferred', '']]);
+  const image = {
+    tagName: 'image', dataset: { art: 'assets/illustrations/return-map' },
+    hasAttribute: name => attributes.has(name),
+    removeAttribute: name => attributes.delete(name),
+    setAttribute: (name, value) => attributes.set(name, value),
+    closest: () => frame,
+  };
+  const frame = { querySelectorAll: () => attributes.has('data-art-deferred') ? [image] : [] };
+  const link = { dataset: { artLink: image.dataset.art } };
+  const scope = { querySelectorAll: selector => selector === '[data-art-link]' ? [link] : [image] };
+  let report, observed, unobserved, theme = 'light';
+  class Observer {
+    constructor(callback) { report = callback; }
+    observe(target) { observed = target; }
+    unobserve(target) { unobserved = target; }
+  }
+  observeDeferredArtwork(scope, () => theme, Observer);
+  assert.equal(observed, frame);
+  applyArtworkTheme(scope, theme);
+  theme = 'dark';
+  applyArtworkTheme(scope, theme);
+  report([{ target: frame, isIntersecting: false }]);
+  assert.equal(attributes.has('href'), false, 'Theme changes must not load a closed guide');
+  assert.equal(link.href, 'assets/illustrations/return-map-dark.png');
+  report([{ target: frame, isIntersecting: true }]);
+  assert.equal(attributes.get('href'), 'assets/illustrations/return-map-dark.png');
+  assert.equal(unobserved, frame);
+  applyArtworkTheme(scope, 'light');
+  assert.equal(attributes.get('href'), 'assets/illustrations/return-map-light.png');
+});

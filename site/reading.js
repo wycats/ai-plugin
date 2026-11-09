@@ -1,17 +1,15 @@
 import { setupContents } from './contents.js';
 import { setupMarginalia } from './marginalia.js';
-import { arrivalFrom, carry, returnAction } from './origin.js';
+import { arrivalFrom, carry, returnAction, arrivalTarget } from './origin.js';
 import { setupGuides } from './guide.js';
+import { applyArtworkTheme, observeDeferredArtwork } from './artwork.js';
 
 const root = document.documentElement;
 const paper = document.querySelector('.paper-choice');
 function applyPaper() {
   const theme = root.dataset.theme === 'dark' ? 'dark' : 'light';
   paper.textContent = theme === 'dark' ? 'Use light paper' : 'Use dark paper';
-  for (const image of document.querySelectorAll('[data-art]')) {
-    image.setAttribute(image.tagName.toLowerCase() === 'image' ? 'href' : 'src', `${image.dataset.art}-${theme}.png`);
-  }
-  for (const link of document.querySelectorAll('[data-art-link]')) link.href = `${link.dataset.artLink}-${theme}.png`;
+  applyArtworkTheme(document, theme);
 }
 paper.hidden = false;
 paper.addEventListener('click', () => {
@@ -20,6 +18,7 @@ paper.addEventListener('click', () => {
   applyPaper();
 });
 applyPaper();
+observeDeferredArtwork(document, () => root.dataset.theme === 'dark' ? 'dark' : 'light');
 const tools = document.querySelector('.reading-tools');
 new ResizeObserver(() => {
   root.style.setProperty('--tools-height', `${tools.getBoundingClientRect().height}px`);
@@ -92,8 +91,7 @@ function showChosenQuestion(id) {
 // heading comes into view with it. The arrival mark identifies the passage in
 // the book's own terms and serves as its focus indicator until focus moves on.
 function arrive(passage) {
-  const heading = passage.previousElementSibling?.matches('h1, h2') ? passage.previousElementSibling : null;
-  (heading || passage).scrollIntoView();
+  arrivalTarget(passage).scrollIntoView();
   passage.dataset.arrival = '';
   passage.addEventListener('blur', () => delete passage.dataset.arrival, { once: true });
   passage.focus({ preventScroll: true });
