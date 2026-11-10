@@ -8,7 +8,7 @@ Generated from canonical descriptions by `node experiments/situational-discovery
 
 - [code-review](../../skills/workflows/code-review/SKILL.md): Use when reviewing a patch or pull request: examine how the code fulfills the change's purpose, and revisit earlier judgments when details change your understanding of the design.
 
-- [collaborative-grounding](../../skills/stances/collaborative-grounding/SKILL.md): Use when the user's priorities, experience, or intent could change how the work should proceed. Bring what you have learned into the conversation so their judgment can shape the next move.
+- [collaborative-grounding](../../skills/stances/collaborative-grounding/SKILL.md): Use when developing an idea or choosing a direction with the user. Contribute expertise and observations, work from what the user has shared, and make a proposal they can examine and help refine.
 
 - [collaborative-rereading](../../skills/workflows/collaborative-rereading/SKILL.md): Revisit original exchanges in the current or earlier conversations to recover how an understanding developed and what deserves attention now. Use when shared language has lost its specificity, the user asks about earlier thinking or dangling threads, or new learning makes earlier exchanges worth reading again.
 
