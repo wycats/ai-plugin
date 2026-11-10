@@ -1,33 +1,42 @@
 # Work stack
 
-Updated 7 November 2026. This file records the work in progress, the follow-ups
+Updated 10 November 2026. This file records the work in progress, the follow-ups
 deliberately left open, and where local working material lives. Git history
 holds the earlier checkpoints; this file keeps only what still guides the next
 move.
 
-## In progress: Collaborative Rereading
+## In progress: the agent's contribution to collaboration
 
-Branch `wycats/collaborative-rereading` brings the personal rereading practice
-into the plugin as [Collaborative Rereading](skills/workflows/collaborative-rereading/SKILL.md).
-It subsumes Dangling Thread Review, whose tactical use is a brief invitation
-inside the workflow. The new resource replaces `dangling-thread-review`; callers
-using the old skill name or path need to use `collaborative-rereading`.
+Branch `wycats/collaborative-contribution` drafts
+[Building together](instructions/building-together.instructions.md) and
+[Collaborative Grounding](skills/stances/collaborative-grounding/SKILL.md)
+together. The proposal develops how the agent brings relevant knowledge and
+craft to the user's examples and uncertainty, contributes something concrete
+for the user to judge, and carries what they learn into later choices. The
+introduction describes how stances remain useful as the work changes.
 
-The workflow connects original exchanges, later learning, and a judgment about
-the present work. It preserves unresolved ideas without requiring each one to
-fit the emerging account. Gap Reading, Interpretive Synthesis, and Building
-together now point to it. Source and package checks do not establish how readily
-an installed agent will recognize or use the practice; that remains to be tried.
+The user reviewed the draft and its editorial revision. Next: complete PR
+checks and Codex review, then return for merge approval. The guidance has not
+yet been evaluated in use; named expertise combinations and discovery remain
+open follow-ups.
 
-Opus and Luna completed independent understanding and standards reviews. The
-follow-up revision clarifies rereading within the current conversation, makes
-the connection between differently worded exchanges concrete, and explains how
-new evidence can warrant reconsidering a settled decision. The brief
-dangling-thread invitation remains part of the same workflow. Local review
-reports are in `.runtime/rereading-review/`; the rebuilt book is available at
-<http://127.0.0.1:8883/reference-5.html>. The user reviewed the revised workflow
-in the book and approved preparing a PR. Next: complete repository checks and
-Codex PR review, then return for merge approval.
+The continuing-agent experiments are parked for a dedicated effort. They
+exposed useful contrasts between explaining an existing arrangement and
+offering to reconsider it, without establishing a reliable guidance remedy.
+The last two-case pilot observed successful local implementation after an
+explicit concern and assent. Protocols, results, and reviews are preserved in
+`.runtime/implications-followthrough-2026-11-10/` in the primary checkout
+`/Users/wycats/Code/vscode-ai-plugin`. No new run is queued.
+
+## Collaborative Rereading: merged
+
+PR [#67](https://github.com/wycats/ai-plugin/pull/67) integrated
+[Collaborative Rereading](skills/workflows/collaborative-rereading/SKILL.md)
+and subsumed Dangling Thread Review. Its tactical use remains a brief invitation
+inside the workflow. Callers using the old skill name or path should use
+`collaborative-rereading`. The workflow connects original exchanges, later
+learning, and a judgment about the present work, including unresolved ideas
+whose place is still uncertain.
 
 ## Reading navigation polish: merged
 
@@ -78,11 +87,10 @@ is established, it is linked.
 - **Supporting-context delivery.** The Copilot SDK bridge is programmatic and
   checkout-based. Installed-session integration and other hosts are not yet
   qualified. See the [runtime projection contract](docs/runtime-projection-contract.md).
-- **A consequential work episode.** Reconstruct an episode where the user
-  supplied an important implication, such as the Glade ordinary-workflow
-  example. Read it beside PER and Architectural Distillation to decide whether
-  the missing relationship belongs in canonical language, delivery, or
-  discovery.
+- **Learning from consequential work.** The Demand Files episode has been
+  reconstructed and the resulting experiments are parked above. The Glade
+  ordinary-workflow example remains a possible further case when it could
+  answer a different question about language, delivery, or discovery.
 - **Curated subsets.** [Leah's proposal](docs/curated-upstream-subset-consumption.md)
   awaits direction.
 - **Writing and Revision.** The workflow remains a provisional draft, not a
