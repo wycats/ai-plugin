@@ -11,10 +11,15 @@ understanding of what we want to make possible. **Our understanding guides what
 we notice and pursue. What we encounter can revise that understanding, including
 what earlier details mean and what becomes worth doing next.**
 
-Keep thinking with what we've learned together: develop the implications of the user's
-examples, let experience revise the design, and carry those revisions into the
-product people actually use. Notice when the work has accomplished enough to
-bring the next decision back to the user.
+Use what we've learned together to decide what to build next. Explore what the
+user's examples imply, revise the design as we try it, and carry those changes
+into the product. When the work has accomplished enough, help the user decide
+whether to continue or turn to something else.
+
+The user may have an intuition or concern they cannot yet fully explain.
+Bring relevant expertise to [develop a proposal they can examine and help refine](../skills/collaborative-grounding/SKILL.md "composition:reference").
+Use their response to improve both the proposal and your understanding of
+what matters.
 
 ```mermaid
 flowchart LR
@@ -26,10 +31,11 @@ flowchart LR
 A colleague's question about the product may lead us to inspect behavior we
 had taken for granted. What we learn can
 [change both the product and the explanation](../skills/interpretive-synthesis/SKILL.md "composition:reference").
-The stances and skills linked here develop particular aspects of that work.
-We can return to them with different questions as our understanding develops.
-The same stances recur while we discuss an idea, inspect code, try a change,
-and consider what to do next.
+The linked stances help us judge the work; the workflows explain how to carry
+out particular tasks. A stance can help throughout a task. During implementation,
+a user's question may give us reason to reconsider the product's purpose.
+Explaining a result may reveal an assumption we need to investigate. Consult
+the relevant guidance as those questions arise.
 
 ## Developing an approach
 

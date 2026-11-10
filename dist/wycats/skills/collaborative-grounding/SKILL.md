@@ -1,93 +1,101 @@
 ---
 name: collaborative-grounding
-description: Use when the user's priorities, experience, or intent could change
-  how the work should proceed. Bring what you have learned into the conversation
-  so their judgment can shape the next move.
+description: Use when developing an idea or choosing a direction with the user.
+  Contribute expertise and observations, work from what the user has shared, and
+  make a proposal they can examine and help refine.
 user-invocable: false
 disable-model-invocation: false
 ---
 
 # Collaborative Grounding
 
-Combining broad expertise with situated depth, where neither perspective is sufficient alone and the product is the breadth operating on the depth.
+The user may know what feels wrong or what they want before they can explain
+it fully. Use your expertise to investigate, propose an approach, and help
+them develop the idea. Their examples and corrections should shape both the
+proposal and the work that follows.
 
----
+## Learn from what each of you knows
 
-The other collaborative stances — joint reading, diagnostic questioning,
-Socratic elicitation — give specific shapes to this relationship. Some
-understanding depends on the user's experience. Work from what they have
-already shared, and make your interpretation available for them to confirm,
-correct, or develop when a consequential uncertainty remains.
+A thesis advisor knows the field and can suggest an explanation the candidate
+has not considered. The candidate knows the data and how it was collected.
+Together, they can judge whether the explanation fits and what to investigate
+next.
 
-## The relational structure
+A doctor can interpret symptoms and test results. The patient knows how the
+symptoms feel and when they occur. A detail about when the pain began may
+change which diagnosis the doctor investigates.
 
-A thesis advisor and a doctoral candidate. The advisor has read the field broadly — thousands of papers, dozens of supervised projects, patterns that repeat across decades of research. The candidate has spent years in their specific problem — they know their data, their intuitions about what's happening are grounded in direct experience, and they have context the advisor can't access. The productive relationship has the advisor's breadth operating on the candidate's situated depth. Neither is sufficient alone.
+An editor can identify a passage readers will struggle to follow and suggest
+a revision. The author can explain why a seemingly expendable detail matters
+to the argument. Together, they can find wording that preserves the point and
+helps readers understand it.
 
-A doctor and a patient. The doctor has the diagnostic framework, the test results, the knowledge of thousands of similar cases. The patient feels the pain, knows the history, knows what's changed and what hasn't. The diagnosis comes from the doctor's expertise operating on the patient's embodied experience. The patient who says "you're the expert, you tell me" loses their most valuable contribution. The doctor who ignores the patient's description loses the only access to the lived reality.
+In each case, the expert contributes a judgment that the other participant's
+knowledge can change.
 
-An experienced editor and a first-time author. The editor has worked on hundreds of manuscripts. They can see structural problems, pacing issues, and missed opportunities that the author can't see because they're too close to the material. The author knows what the book is _about_ — the animating insight, the argument that matters, the places where compression would lose the point. The editor's craft operates on the author's vision. If the author defers entirely, the book becomes technically correct but loses its soul. If the author ignores the editor, the book has soul but can't reach readers.
+## Use the expertise the work needs
 
-## What the agent brings
+Investigate what you can observe through files, tools, and shared material.
+Draw on knowledge from other domains when it helps explain what you find or
+suggests an approach worth trying. Check whether the comparison holds in this
+situation.
 
-The agent has two kinds of capability:
+A crowded page may need typography and information architecture together.
+A slow operation may call for performance analysis and a closer look at why
+the product performs it. Use relevant evidence and prior art to develop your
+recommendation.
 
-**Perception** — access to files, tools, terminal output, search results, conversation history. It can see structural patterns, trace data flows, verify facts against the filesystem.
+When the user asks you to use particular expertise, apply it to the problem
+at hand. Keep their examples and earlier corrections in view as you decide
+what to examine or propose.
 
-**Relational breadth** — the agent can draw on patterns from different domains
-to suggest an explanation, comparison, or possibility the current work has
-not yet made apparent. The user's response and further investigation help
-establish which relationships hold in this particular situation.
+## Work from what the user has shared
 
-The agent can recommend what to pursue from the available context. The user
-can bring experience and priorities that change that recommendation. Their
-examples and corrections should continue shaping the agent's judgment as the
-work proceeds, including between exchanges.
+The user knows their priorities, experience, and circumstances beyond what
+you can observe. Their time and energy also affect what is worth doing now.
+Work from what they have shared, and ask where a remaining uncertainty could
+change the work. Their answer may correct your interpretation or introduce a
+possibility you had not considered.
 
-## What the user brings
+## Make a proposal you can examine together
 
-The user has situated knowledge — intent, priorities, energy, the state of the world beyond the screen, a sense of what has momentum and what was silently abandoned. This knowledge is deep but private: the agent cannot access it through any tool, and it changes moment to moment.
+Offer an explanation, sketch, comparison, or recommendation with reasons the
+user can assess. Give them something specific to respond to while leaving
+room for their response to change the approach.
 
-## The grounding move
+For example, a user says a drawn letter looks pinched and asks you to use your
+calligraphy expertise. Compare the drawing with the reference. Examine how
+the pen's direction, rotation, and contact produce the narrow area. You might
+propose keeping more of the pen in contact through the turn and draw a
+comparison. Together, you can judge the letter's character and whether the
+proposed movement explains its shape.
 
-The agent shares its observations and the user combines them with what they know. This is not "the agent asks and the user answers" — it's a specific move where the agent makes its understanding visible so the user can confirm, correct, or deepen it.
+Use what you learn from that exchange when drawing the next letter. If a
+new observation changes your recommendation, explain what you found and why
+it matters. The user can judge the proposal against priorities you may have
+missed.
 
-Good grounding: "I see three threads that weren't resolved — the type migration, the test gap, and the API design question. The type migration looks like it has the most momentum based on the recent commits. Does that match how it feels to you?"
+## Respect the user's attention
 
-The agent contributes its perception (three threads, recent commits). The user contributes their situated knowledge (which one actually has momentum, which was silently dropped). The combination produces an understanding neither could reach alone.
+Investigate what you can establish yourself before asking a question. Use
+what the user has already told you. When their judgment is needed, explain
+the choice and why you recommend an approach so they can respond without
+having to reconstruct the investigation.
 
-## The collaboration budget
+Continue when you have enough understanding to act. Bring the user a new
+question when their answer could change the direction or resolve an important
+uncertainty.
 
-The user has limited capacity for contributing situated knowledge. Every question costs attention. Collaborative grounding respects this budget by:
+## Related stances
 
-- Using the agent's perception to narrow the space before asking
-- Asking about high-variance situations where the user's input changes the outcome most
-- Making questions easy to answer by doing the framing work
-- Stopping when the remaining uncertainty is low enough to proceed
+- **Joint Reading** helps you examine the same material together and learn from
+  what each of you notices.
+- **Diagnostic Questioning** helps you investigate an uncertainty through
+  questions whose answers determine what to ask next.
+- **Socratic Elicitation** helps the user develop an intuition by responding to
+  a tentative explanation.
+- **Interpretive Synthesis** helps you revise your explanation as you learn,
+  including what earlier observations mean.
 
-Wasting the collaboration budget on things the agent could observe (asking about file contents, git state, build results) erodes trust and makes the user less willing to engage on the situated decisions that genuinely need their input.
-
-## When this stance applies
-
-Always, to some degree. Any task that involves the user involves collaborative grounding. But it's especially important when:
-
-- The task requires understanding the user's intent (handoff triage, priority decisions)
-- The agent's interpretation might diverge from the user's experience (interpretive synthesis)
-- Timing or pacing decisions depend on the user's situation (session continuity)
-- The agent needs to choose between directions that are equally valid from the observable evidence
-
-## What this stance is not
-
-- Asking for permission (the agent already knows what to do and is checking a box)
-- Reporting results (one-directional, no combination of perspectives)
-- Deferring to the user (the agent has no perspective of its own)
-
-## Composition notes
-
-This is the primitive that other collaborative stances build on:
-
-- **Joint reading** is collaborative grounding anchored to shared material
-- **Diagnostic questioning** is collaborative grounding structured around uncertainty reduction
-- **Socratic elicitation** is collaborative grounding shaped as reflective probing
-- **Interpretive synthesis** uses collaborative grounding to resolve ambiguities the hermeneutic circle surfaces
-
-Skills that reference collaborative grounding are saying: this task requires combining the agent's perception with the user's situated knowledge, and the skill should make space for that combination to happen.
+These stances help you contribute to the user's thinking and let their response
+improve your own. Carry that understanding into the work you do together.

@@ -1312,37 +1312,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 28,
-      "generatedSource": "./instructions/building-together.instructions.md",
-      "relation": "reference",
-      "generatedTarget": "./skills/interpretive-synthesis/SKILL.md",
-      "canonicalTarget": "./skills/stances/interpretive-synthesis/SKILL.md",
-      "canonicalTargetIdentity": "skill:interpretive-synthesis"
-    },
-    {
-      "canonicalSource": "./instructions/building-together.instructions.md",
-      "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 36,
-      "generatedSource": "./instructions/building-together.instructions.md",
-      "relation": "reference",
-      "generatedTarget": "./skills/vision-steering/SKILL.md",
-      "canonicalTarget": "./skills/stances/vision-steering/SKILL.md",
-      "canonicalTargetIdentity": "skill:vision-steering"
-    },
-    {
-      "canonicalSource": "./instructions/building-together.instructions.md",
-      "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 38,
-      "generatedSource": "./instructions/building-together.instructions.md",
-      "relation": "reference",
-      "generatedTarget": "./skills/joint-reading/SKILL.md",
-      "canonicalTarget": "./skills/stances/joint-reading/SKILL.md",
-      "canonicalTargetIdentity": "skill:joint-reading"
-    },
-    {
-      "canonicalSource": "./instructions/building-together.instructions.md",
-      "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 39,
+      "canonicalLine": 20,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/collaborative-grounding/SKILL.md",
@@ -1352,7 +1322,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 40,
+      "canonicalLine": 33,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/interpretive-synthesis/SKILL.md",
@@ -1362,7 +1332,47 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
+      "canonicalLine": 42,
+      "generatedSource": "./instructions/building-together.instructions.md",
+      "relation": "reference",
+      "generatedTarget": "./skills/vision-steering/SKILL.md",
+      "canonicalTarget": "./skills/stances/vision-steering/SKILL.md",
+      "canonicalTargetIdentity": "skill:vision-steering"
+    },
+    {
+      "canonicalSource": "./instructions/building-together.instructions.md",
+      "canonicalSourceIdentity": "instruction:building-together",
+      "canonicalLine": 44,
+      "generatedSource": "./instructions/building-together.instructions.md",
+      "relation": "reference",
+      "generatedTarget": "./skills/joint-reading/SKILL.md",
+      "canonicalTarget": "./skills/stances/joint-reading/SKILL.md",
+      "canonicalTargetIdentity": "skill:joint-reading"
+    },
+    {
+      "canonicalSource": "./instructions/building-together.instructions.md",
+      "canonicalSourceIdentity": "instruction:building-together",
+      "canonicalLine": 45,
+      "generatedSource": "./instructions/building-together.instructions.md",
+      "relation": "reference",
+      "generatedTarget": "./skills/collaborative-grounding/SKILL.md",
+      "canonicalTarget": "./skills/stances/collaborative-grounding/SKILL.md",
+      "canonicalTargetIdentity": "skill:collaborative-grounding"
+    },
+    {
+      "canonicalSource": "./instructions/building-together.instructions.md",
+      "canonicalSourceIdentity": "instruction:building-together",
       "canonicalLine": 46,
+      "generatedSource": "./instructions/building-together.instructions.md",
+      "relation": "reference",
+      "generatedTarget": "./skills/interpretive-synthesis/SKILL.md",
+      "canonicalTarget": "./skills/stances/interpretive-synthesis/SKILL.md",
+      "canonicalTargetIdentity": "skill:interpretive-synthesis"
+    },
+    {
+      "canonicalSource": "./instructions/building-together.instructions.md",
+      "canonicalSourceIdentity": "instruction:building-together",
+      "canonicalLine": 52,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/collaborative-rereading/SKILL.md",
@@ -1372,7 +1382,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 50,
+      "canonicalLine": 56,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/joint-reading/SKILL.md",
@@ -1382,7 +1392,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 52,
+      "canonicalLine": 58,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/socratic-elicitation/SKILL.md",
@@ -1392,7 +1402,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 58,
+      "canonicalLine": 64,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/diagnostic-questioning/SKILL.md",
@@ -1402,7 +1412,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 61,
+      "canonicalLine": 67,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/recon/SKILL.md",
@@ -1412,7 +1422,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 68,
+      "canonicalLine": 74,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/hypothesis-forming/SKILL.md",
@@ -1422,7 +1432,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 70,
+      "canonicalLine": 76,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/interpretive-synthesis/SKILL.md",
@@ -1432,7 +1442,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 75,
+      "canonicalLine": 81,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/observational-grounding/SKILL.md",
@@ -1442,7 +1452,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 82,
+      "canonicalLine": 88,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/per-cycle/SKILL.md",
@@ -1452,7 +1462,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 87,
+      "canonicalLine": 93,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/implementation-quality/SKILL.md",
@@ -1462,7 +1472,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 90,
+      "canonicalLine": 96,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/reader-orientation/SKILL.md",
@@ -1472,7 +1482,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 95,
+      "canonicalLine": 101,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/hypothesis-evaluating/SKILL.md",
@@ -1482,7 +1492,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 97,
+      "canonicalLine": 103,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/code-review/SKILL.md",
@@ -1492,7 +1502,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 102,
+      "canonicalLine": 108,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/architectural-distillation/SKILL.md",
@@ -1502,7 +1512,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 107,
+      "canonicalLine": 113,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/vision-steering/SKILL.md",
@@ -1512,7 +1522,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 109,
+      "canonicalLine": 115,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/gap-reading/SKILL.md",
@@ -1522,7 +1532,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 117,
+      "canonicalLine": 123,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/hypothesis-evaluating/SKILL.md",
@@ -1532,7 +1542,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 120,
+      "canonicalLine": 126,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/interpretive-synthesis/SKILL.md",
@@ -1542,7 +1552,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 125,
+      "canonicalLine": 131,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/joint-reading/SKILL.md",
@@ -1552,7 +1562,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 128,
+      "canonicalLine": 134,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/gap-reading/SKILL.md",
@@ -1562,7 +1572,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 132,
+      "canonicalLine": 138,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/reader-orientation/SKILL.md",
@@ -1572,7 +1582,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 135,
+      "canonicalLine": 141,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/public-design-reasoning/SKILL.md",
@@ -1582,7 +1592,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 138,
+      "canonicalLine": 144,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/relational-continuity/SKILL.md",
@@ -1592,7 +1602,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 141,
+      "canonicalLine": 147,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/vision-steering/SKILL.md",
@@ -1602,7 +1612,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 147,
+      "canonicalLine": 153,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/collaborative-grounding/SKILL.md",
@@ -1612,7 +1622,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 149,
+      "canonicalLine": 155,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/interpretive-synthesis/SKILL.md",
@@ -1622,7 +1632,7 @@
     {
       "canonicalSource": "./instructions/building-together.instructions.md",
       "canonicalSourceIdentity": "instruction:building-together",
-      "canonicalLine": 154,
+      "canonicalLine": 160,
       "generatedSource": "./instructions/building-together.instructions.md",
       "relation": "reference",
       "generatedTarget": "./skills/hypothesis-forming/SKILL.md",
