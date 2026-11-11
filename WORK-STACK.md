@@ -16,10 +16,12 @@ description names when the workflow may be useful.
 
 The local candidate is installed as `wycats@wycats`, replacing the older
 `wycats-ai-plugin` installation. Codex discovers the revised skill descriptions
-and startup hook. The hook is untrusted and requires the user's review through
-`/hooks` before it can deliver the introduction. Next: qualify delivery in a
-fresh session after that review, then judge the guidance in ordinary work.
-The candidate has not been published or evaluated in use.
+and startup hook. After the user trusted the hook, a fresh native Codex request
+delivered the complete 14,422-character introduction as developer context,
+including the revised example. The request also contained the new discovery
+description. A local capture endpoint verified delivery without calling a model.
+Next: judge the guidance in ordinary work. The candidate has not been published
+or evaluated for its effect on behavior.
 
 The local marketplace is generated under `out/codex-marketplace/` in
 `/Users/wycats/Code/vscode-ai-plugin.worktrees/stance-discovery`; preserve that
@@ -78,6 +80,10 @@ the user's approval after checks and review.
 Each of these was deliberately left open. Where a tracked record explains what
 is established, it is linked.
 
+- **Hook approval clarity.** The user saw only “hook 1” when granting trust.
+  Check whether the host's review UI can show “Load Building together guidance”
+  and the plugin name. A running-status message alone may not name the item in
+  the approval UI. Preserve the trusted hook definition until that is understood.
 - **Expertise and shared vocabulary.** Investigate how naming relevant expertise
   and expressing confidence helps the current agent contribute possibilities
   and judgment within the user's uncertainty. Consider short, shared names for
