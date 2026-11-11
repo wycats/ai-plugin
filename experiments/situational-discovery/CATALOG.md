@@ -2,7 +2,7 @@
 
 Generated from canonical descriptions by `node experiments/situational-discovery/catalog.ts`.
 
-- [architectural-distillation](../../skills/workflows/architectural-distillation/SKILL.md): Restructure mature code so it directly expresses what the system has learned through use and evolution, preserving meaningful constraints and distinctions while removing historical residue and accidental complexity.
+- [architectural-distillation](../../skills/workflows/architectural-distillation/SKILL.md): Use when a new approach has taken over, or accumulated changes make it hard to tell why the code is structured as it is. Recover the requirements and distinctions revealed by that history, then restructure the code around them.
 
 - [authorial-continuity](../../skills/stances/authorial-continuity/SKILL.md): Use when developing language that will be attributed to someone, preserving how their judgment takes shape in words and in their relationship with the people who will read them.
 

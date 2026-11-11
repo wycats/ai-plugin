@@ -1,8 +1,8 @@
 ---
 name: architectural-distillation
-description: Restructure mature code so it directly expresses what the system
-  has learned through use and evolution, preserving meaningful constraints and
-  distinctions while removing historical residue and accidental complexity.
+description: Use when a new approach has taken over, or accumulated changes make
+  it hard to tell why the code is structured as it is. Recover the requirements
+  and distinctions revealed by that history, then restructure the code around them.
 metadata:
   wycats.kind: workflow
   wycats.user-invocable: "true"

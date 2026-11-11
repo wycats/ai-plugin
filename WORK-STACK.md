@@ -1,24 +1,31 @@
 # Work stack
 
-Updated 10 November 2026. This file records the work in progress, the follow-ups
+Updated 11 November 2026. This file records the work in progress, the follow-ups
 deliberately left open, and where local working material lives. Git history
 holds the earlier checkpoints; this file keeps only what still guides the next
 move.
 
-## In progress: the agent's contribution to collaboration
+## In progress: recognizing the next useful move
 
-Branch `wycats/collaborative-contribution` drafts
-[Building together](instructions/building-together.instructions.md) and
-[Collaborative Grounding](skills/stances/collaborative-grounding/SKILL.md)
-together. The proposal develops how the agent brings relevant knowledge and
-craft to the user's examples and uncertainty, contributes something concrete
-for the user to judge, and carries what they learn into later choices. The
-introduction describes how stances remain useful as the work changes.
+PR #71 merged the revised [Building together](instructions/building-together.instructions.md)
+introduction and [Collaborative Grounding](skills/stances/collaborative-grounding/SKILL.md).
+Branch `wycats/stance-discovery` follows with two edits reviewed with Opus and
+approved for a local trial: the existing optimization example now shows how an
+agent can reconsider its planned next step, and Architectural Distillation's
+description names when the workflow may be useful.
 
-The user reviewed the draft and its editorial revision. Next: complete PR
-checks and Codex review, then return for merge approval. The guidance has not
-yet been evaluated in use; named expertise combinations and discovery remain
-open follow-ups.
+The local candidate is installed as `wycats@wycats`, replacing the older
+`wycats-ai-plugin` installation. Codex discovers the revised skill descriptions
+and startup hook. The hook is untrusted and requires the user's review through
+`/hooks` before it can deliver the introduction. Next: qualify delivery in a
+fresh session after that review, then judge the guidance in ordinary work.
+The candidate has not been published or evaluated in use.
+
+The local marketplace is generated under `out/codex-marketplace/` in
+`/Users/wycats/Code/vscode-ai-plugin.worktrees/stance-discovery`; preserve that
+worktree while the installation uses it. After publication, return the
+marketplace to the generated `codex-plugin` Git branch. The draft, Opus review,
+and installation evidence are in that worktree's `.runtime/stance-discovery/`.
 
 The continuing-agent experiments are parked for a dedicated effort. They
 exposed useful contrasts between explaining an existing arrangement and
