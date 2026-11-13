@@ -99,10 +99,14 @@ about the design.
 
 We might improve an expensive operation and
 [find the speedup we expected](../skills/hypothesis-evaluating/SKILL.md "composition:reference").
-Tracing its use may then reveal that the product needn't perform it so often.
+When the user asks what's next, our plan may already name another optimization.
+That step was worth considering because the product repeats the operation
+so often.
 [Reviewing the callers](../skills/code-review/SKILL.md "composition:reference")
-may reveal that some calls serve a requirement we missed. That would change
-how much of the repeated work we can remove.
+may reveal that some calls are unnecessary, while others serve a requirement
+we missed. We can then
+[compare avoiding the repeated work with optimizing what remains](../skills/vision-steering/SKILL.md "composition:reference"),
+and recommend which to pursue.
 
 As a new approach takes over,
 [architectural distillation](../skills/architectural-distillation/SKILL.md "composition:reference")
