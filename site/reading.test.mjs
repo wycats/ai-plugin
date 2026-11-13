@@ -183,6 +183,20 @@ test('an arrival claims only the provenance its address carries, and keeps it ac
   assert.deepEqual(Object.fromEntries(hop.searchParams), { from: 'result-understanding', note: 'result-understanding', question: 'express' });
   // The hop's return is the original story origin, not the intermediate reading.
   assert.equal(returnAction(arrivalFrom(hop.search, context), passages).href, 'index.html?note=result-understanding#result-understanding');
+  // A detour through setup or the style guide keeps the same return and question,
+  // including when the reader follows a reading from that page's Contents.
+  for (const page of ['trying.html', 'style.html']) {
+    const detour = new URL(carry(page, base, chosen));
+    const detourArrival = arrivalFrom(detour.search, context);
+    assert.deepEqual(detourArrival, chosen);
+    assert.deepEqual(returnAction(detourArrival, passages), returnAction(chosen, passages));
+    const onward = new URL(carry('reference-1.html', detour.href, detourArrival));
+    assert.deepEqual(arrivalFrom(onward.search, context), chosen);
+    // Going straight to an edition page does not invent a reading origin.
+    assert.equal(new URL(carry(page, base, direct)).search, '');
+    assert.equal(carry(`https://example.invalid/${page}`, base, chosen), `https://example.invalid/${page}`);
+    assert.equal(carry(`../${page}`, base, chosen), `../${page}`);
+  }
   // A link chosen from another question names that question instead.
   assert.equal(new URL(carry('reference-1.html?question=result', base, chosen)).searchParams.get('question'), 'result');
   // A passage origin without a note clears a stale note.
