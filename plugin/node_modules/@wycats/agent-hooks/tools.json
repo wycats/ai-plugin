@@ -1,0 +1,45 @@
+{
+  "$comment": "Maps platform-specific tool names to canonical names. Used by the hook runtime for cross-platform tool normalization.",
+  "terminal": {
+    "canonical": "terminal",
+    "platforms": {
+      "vscode": ["run_in_terminal"],
+      "claude-code": ["Bash"]
+    }
+  },
+  "edit": {
+    "canonical": "edit",
+    "platforms": {
+      "vscode": ["replace_string_in_file", "multi_replace_string_in_file", "create_file"],
+      "claude-code": ["Edit", "Write", "MultiEdit"]
+    }
+  },
+  "read": {
+    "canonical": "read",
+    "platforms": {
+      "vscode": ["read_file"],
+      "claude-code": ["Read"]
+    }
+  },
+  "search": {
+    "canonical": "search",
+    "platforms": {
+      "vscode": ["grep_search", "semantic_search", "file_search"],
+      "claude-code": ["Grep", "Glob"]
+    }
+  },
+  "web": {
+    "canonical": "web",
+    "platforms": {
+      "vscode": ["fetch_webpage"],
+      "claude-code": ["WebFetch", "WebSearch"]
+    }
+  },
+  "agent": {
+    "canonical": "agent",
+    "platforms": {
+      "vscode": ["runSubagent"],
+      "claude-code": ["Agent"]
+    }
+  }
+}
