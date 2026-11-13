@@ -1,6 +1,6 @@
 # Work stack
 
-Updated 11 November 2026. This file records the work in progress, the follow-ups
+Updated 12 November 2026. This file records the work in progress, the follow-ups
 deliberately left open, and where local working material lives. Git history
 holds the earlier checkpoints; this file keeps only what still guides the next
 move.
@@ -20,8 +20,29 @@ and startup hook. After the user trusted the hook, a fresh native Codex request
 delivered the complete 14,422-character introduction as developer context,
 including the revised example. The request also contained the new discovery
 description. A local capture endpoint verified delivery without calling a model.
-Next: judge the guidance in ordinary work. The candidate has not been published
-or evaluated for its effect on behavior.
+An ordinary-use setup review produced a focused documentation improvement and
+recommended observing a first-time installer before adding more prose. A later
+compatibility trial did not reach its intended decision: the agent shared the
+validation path immediately, leaving no separate-reader choice to reconsider.
+A subsequent publication trial reached a real provisional decision: prepared
+hosting while adapter v1 rejected demand. With v2, the agent revised that
+recommendation; with an added offline requirement, it proposed a separate
+archive output. The hosted-only continuation did not question retaining the
+strategy selection itself. The user judged both recommendations sensible and
+accepted these checks as enough to proceed toward landing the guidance changes.
+Removing the strategy choice was not required for a good recommendation. These
+observations do not establish a causal effect of the guidance; a matched
+old-versus-new comparison remains a follow-up. The candidate remains unpublished,
+and no further runs are queued.
+Records are in `.runtime/compatibility-trial-2026-11-12/` and
+`.runtime/publication-decision-2026-11-12/` in this worktree.
+
+The landing change includes the two guidance edits, the matching generated
+catalog entry, and setup instructions that distinguish installation from hook
+trust. Local validation, Codex packaging, and reading-site checks passed.
+Complete PR checks and Codex review before asking the user to merge; merging
+publishes the plugin and website. Experiment records remain local, with their
+limited findings summarized here.
 
 The local marketplace is generated under `out/codex-marketplace/` in
 `/Users/wycats/Code/vscode-ai-plugin.worktrees/stance-discovery`; preserve that
