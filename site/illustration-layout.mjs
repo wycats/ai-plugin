@@ -1,8 +1,10 @@
 import { parseFragment, serialize } from 'parse5';
 
 /** Place the existing drawings beside their passages, retaining every passage
- * node, link and return address. The source's paragraph boundaries stay intact. */
-export function composeIllustrations(html) {
+ * node, link and return address. The source's paragraph boundaries stay intact.
+ * The edition's note on the text joins the opening spread as an aside, before
+ * the introductory paragraphs and outside all of them. */
+export function composeIllustrations(html, openingNote = '') {
   const root = parseFragment(html);
   const elements = root.childNodes.filter(node => node.tagName);
   const byId = id => elements.find(node => node.attrs?.some(attr => attr.name === 'id' && attr.value === id));
@@ -16,7 +18,8 @@ export function composeIllustrations(html) {
     throw new Error('Illustration layout needs introductory paragraphs before the opening cycle and a reflection before the reprise');
   }
   const openingCopy = group('cycle-copy', introduction);
-  replace([...introduction, opening], group('cycle-spread cycle-opening', [openingCopy, opening]));
+  const note = parseFragment(openingNote).childNodes;
+  replace([...introduction, opening], group('cycle-spread cycle-opening', [...note, openingCopy, opening]));
   replace([reflection, reprise], group('cycle-spread cycle-return', [reprise, reflection]));
   return serialize(root);
 

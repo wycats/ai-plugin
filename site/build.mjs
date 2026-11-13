@@ -9,6 +9,7 @@ import { annotation, marginalNote } from './marginalia.mjs';
 import { resolveGuide, guideMarkup } from './guide.mjs';
 import { questions } from './questions.mjs';
 import { composeIllustrations } from './illustration-layout.mjs';
+import { kinds, editionNote, colophon, questionsIntroduction, addressedReading, footLinks, pageMeta, repositoryUrl } from './edition.mjs';
 
 const site = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(site, '..');
@@ -18,6 +19,13 @@ const out = args.length ? path.resolve(args[1]) : path.join(repo, 'out', 'readin
 if (!out.startsWith(path.join(repo, 'out') + path.sep)) throw new Error('Site output must be inside the repo out directory');
 const source = path.join(repo, 'instructions', 'building-together.instructions.md');
 const styleSource = path.join(site, 'STYLE.md');
+const tryingSource = path.join(site, 'TRYING.md');
+// Pages the edition writes for its readers. They have fixed addresses and stay
+// out of the index of canonical readings.
+const editorial = new Map([
+  [styleSource, { address: 'style.html', kind: 'editorial guide' }],
+  [tryingSource, { address: 'trying.html', kind: 'edition note' }],
+]);
 fs.mkdirSync(out, { recursive: true });
 const pages = new Map([[source, 'index.html']]);
 const queue = [source];
@@ -45,14 +53,28 @@ function renderSource(file) {
       // Editorial documentation links to repository guidance without pulling
       // the contributor documentation graph into the book's reading catalog.
       if (file === styleSource) {
-        token.href = `https://github.com/wycats/ai-plugin/blob/main/${path.relative(repo, target).split(path.sep).map(encodeURIComponent).join('/')}${hash ? '#' + hash : ''}`;
+        token.href = repositoryPage(target, hash);
+        return;
+      }
+      // "Trying the plugin" stays in the book for readings the essay already
+      // reaches, and hands off to the repository's documentation for setup.
+      // Each link remembers its document, so a quotation can be checked
+      // against the one its credit names.
+      if (file === tryingSource) {
+        token.linkedSource = target;
+        if (pages.has(target)) {
+          token.href = pages.get(target) + (hash ? '#' + hash : '');
+          return;
+        }
+        if (hash && !headingIds(target).has(hash)) throw new Error(`Trying the plugin: ${rel} has no section #${hash}`);
+        token.href = repositoryPage(target, hash);
         return;
       }
       if (!pages.has(target)) {
         pages.set(target, `reference-${pages.size}.html`);
         queue.push(target);
       }
-      if (file !== source && target !== file) {
+      if (file !== source && target !== file && !editorial.has(file)) {
         if (!referrers.has(target)) referrers.set(target, new Set());
         referrers.get(target).add(file);
       }
@@ -60,6 +82,10 @@ function renderSource(file) {
       if (token.title?.startsWith('composition:')) token.title = path.basename(path.dirname(target));
     },
     renderer: {
+      blockquote(token) {
+        if (file === tryingSource) checkQuotation(token);
+        return `<blockquote>${this.parser.parse(token.tokens)}</blockquote>`;
+      },
       code(token) {
         if (token.lang === 'mermaid' && file === source) return cycleIllustration('opening-cycle');
         return `<pre><code>${escape(token.text)}</code></pre>`;
@@ -96,13 +122,31 @@ function renderSource(file) {
     return linked;
   }
   const parsed = marked.parse(markdown);
-  const body = file === source ? composeIllustrations(parsed) : parsed;
+  const body = file === source ? composeIllustrations(parsed, editionNote(editorial.get(tryingSource).address)) : parsed;
   rendered.push({ file, title, body, sections, kind: data.metadata?.['wycats.kind'], description: data.description });
+}
+function repositoryPage(target, hash) {
+  return `${repositoryUrl}/blob/main/${path.relative(repo, target).split(path.sep).map(encodeURIComponent).join('/')}${hash ? '#' + hash : ''}`;
+}
+// Section addresses of a repository document, as its headings produce them.
+function headingIds(target) {
+  const { content } = matter(fs.readFileSync(target, 'utf8'));
+  return new Set([...content.matchAll(/^#{1,6} (.+)$/gm)].map(([, heading]) => heading.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/ +/g, '-')));
+}
+// A quotation on an edition page reproduces its source exactly: the words in
+// quotation marks must occur in the document its credit links to.
+function checkQuotation(token) {
+  const flat = tokens => tokens.flatMap(item => [item, ...flat(item.tokens || [])]);
+  const credit = flat(token.tokens).find(item => item.type === 'link' && item.linkedSource);
+  const words = /“([\s\S]+)”/.exec(token.text)?.[1].replace(/\s+/g, ' ');
+  if (!credit || !words) throw new Error('Trying the plugin: a quotation needs quotation marks and a linked credit');
+  const sourceText = fs.readFileSync(credit.linkedSource, 'utf8').replace(/^>\s?/gm, '').replace(/\s+/g, ' ');
+  if (!sourceText.includes(words)) throw new Error(`Trying the plugin: “${words}” is not in ${path.relative(repo, credit.linkedSource)}`);
 }
 // Discover canonical readings first so their existing addresses stay stable.
 for (let i = 0; i < queue.length; i++) renderSource(queue[i]);
-pages.set(styleSource, 'style.html');
-renderSource(styleSource);
+for (const [file, { address }] of editorial) pages.set(file, address);
+for (const file of editorial.keys()) renderSource(file);
 if (annotationCount !== 1) throw new Error(`Expected one annotation passage in ${annotation.section}, found ${annotationCount}`);
 const bySource = new Map(rendered.map(page => [path.relative(repo, page.file).split(path.sep).join('/'), page]));
 // Editorial navigation names canonical sources; each must be a rendered reading.
@@ -155,10 +199,6 @@ function readingLinks(tokens) {
 function passageExcerptText(tokens) {
   return tokens.map(token => token.tokens ? passageExcerptText(token.tokens) : token.text || '').join('');
 }
-const kinds = {
-  stance: { label: 'stance', group: 'stances', about: 'Stances shape the judgment a task needs.' },
-  workflow: { label: 'workflow', group: 'workflows', about: 'Workflows guide tasks such as investigating a codebase or developing an RFC.' },
-};
 const resumeHref = id => `index.html?resume=${id}#${id}`;
 const placeName = id => passages[id].section || 'The opening';
 function gloss(page) {
@@ -204,22 +244,23 @@ function navigation(current) {
     };
     const citation = passage => ({ href: resumeHref(passage), label: `Building together · ${placeName(passage)}` });
     const guide = guideMarkup(question, question.guide, { href: page => pages.get(page.file), link, also, citation, illustration: question.plate ? questionPlate() : '' });
-    return `<details class="question" name="contents-question" id="question-${question.id}" data-passage="${question.passage}"${question === open ? ' open' : ''}><summary><span class="question-text">${escape(question.question)}</span>${fold}</summary>
+    if (!question.situation?.trim() || /[{}]/.test(question.situation)) throw new Error(`Question ${question.id}: its situation must be plain prose`);
+    return `<details class="question" name="contents-question" id="question-${question.id}" data-passage="${question.passage}"${question === open ? ' open' : ''}><summary><span class="question-heading"><span class="question-text">${escape(question.question)}</span><span class="question-situation">${escape(question.situation)}</span></span>${fold}</summary>
 <div class="question-spread">${guide}</div></details>`;
   };
 
   return `<button class="contents-toggle folio-action" aria-label="Contents" aria-controls="contents" aria-expanded="false" aria-haspopup="dialog" hidden>${folio}<span>Contents</span></button>
 <dialog id="contents" aria-labelledby="contents-title"><div class="contents-heading"><h2 id="contents-title">Contents</h2><p class="contents-parts"><a href="#contents-chapters">chapters</a><a href="#contents-questions">questions</a><a href="#contents-index">index</a></p><button class="edge-close" data-close-dialog aria-label="Close contents">${closeMark}</button></div>
 <nav class="contents-body" aria-label="Building together and its readings">${current === story ? '' : `<p class="contents-origin" data-origin hidden>${returnLink('Return to the passage')}</p>`}
-<section id="contents-chapters" class="contents-chapters" aria-label="Chapters" tabindex="-1"><div class="contents-column"><div class="story-link">${link(story)}</div>${outline}</div><div class="contents-colophon"><p>${escape(story.description)}</p></div></section>
-<section id="contents-questions" class="contents-questions" aria-labelledby="questions-title" tabindex="-1"><h3 id="questions-title">Questions to begin from</h3>${entrances.map(entrance).join('')}</section>
-<section id="contents-index" class="contents-index" aria-labelledby="index-title" tabindex="-1"><h3 id="index-title">Index of readings</h3><p class="index-key">Chapter references lead to passages that cite each reading.</p>${readingIndex(current)}</section><p class="contents-edition"><a href="style.html"${current.file === styleSource ? ' aria-current="page"' : ''}>Style of this edition</a></p></nav></dialog>`;
+<section id="contents-chapters" class="contents-chapters" aria-label="Chapters" tabindex="-1"><div class="contents-column"><div class="story-link">${link(story)}</div>${outline}</div>${colophon(story.description, editorial.get(tryingSource).address, current.file === tryingSource)}</section>
+<section id="contents-questions" class="contents-questions" aria-labelledby="questions-title" tabindex="-1"><h3 id="questions-title">Questions to begin from</h3><p class="part-introduction">${questionsIntroduction}</p>${entrances.map(entrance).join('')}</section>
+<section id="contents-index" class="contents-index" aria-labelledby="index-title" tabindex="-1"><h3 id="index-title">Index of readings</h3><p class="index-key">Chapter references lead to passages that cite each reading.</p>${readingIndex(current)}</section><p class="contents-edition">${[[tryingSource, 'Trying the plugin'], [styleSource, 'Style of this edition']].map(([file, label]) => `<a href="${editorial.get(file).address}"${current.file === file ? ' aria-current="page"' : ''}>${label}</a>`).join(' · ')}</p></nav></dialog>`;
 }
 function readingIndex(current, ids = true) {
   const story = rendered[0];
   const entry = page => `<a href="${pages.get(page.file)}"${page === current ? ' aria-current="page"' : ''}><span class="entry-title">${escape(page.title)}</span></a>`;
   return [...Object.entries(kinds), [undefined, { group: 'other readings', about: '' }]].map(([kind, { group, about }]) => {
-    const members = rendered.filter(page => page !== story && page.file !== styleSource && page.kind === kind).sort((a, b) => a.title.localeCompare(b.title, 'en'));
+    const members = rendered.filter(page => page !== story && !editorial.has(page.file) && page.kind === kind).sort((a, b) => a.title.localeCompare(b.title, 'en'));
     if (!members.length) return '';
     const id = `index-${group.replace(/ /g, '-')}`;
     // Each entry is an annotated row: the name on the left edge, chapter
@@ -234,8 +275,11 @@ function readingIndex(current, ids = true) {
 function returnLink(label) {
   return `<a data-return-to-reading href="index.html"><span class="edge-label" data-return-label>${label}</span><span class="edge-cue" data-origin-cue></span></a>`;
 }
-function readingEdge(where) {
-  return `<p class="reading-edge reading-edge-${where}">${returnLink('Building together')}<span class="edge-note" data-edge-note>, the essay this reading accompanies</span></p>`;
+// A direct arrival at the head of a canonical reading also learns whom the
+// text addresses and what kind of reading it is.
+function readingEdge(where, page) {
+  const addressed = where === 'head' && !editorial.has(page.file) ? ` <span class="edge-addressed">${addressedReading(page.kind)}</span>` : '';
+  return `<p class="reading-edge reading-edge-${where}">${returnLink('Building together')}<span class="edge-note" data-edge-note>, the essay this reading accompanies${addressed ? `.${addressed}` : ''}</span></p>`;
 }
 // Resolve and validate the annotation before replacing the previous generated pages.
 for (const page of rendered) page.body = page.body.replace('<!--marginal-note-->', () => marginalNote(annotatedParagraph, url));
@@ -252,7 +296,7 @@ function arrival(page) {
   const opening = /^\s*(<h1\b[^>]*>[\s\S]*?<\/h1>)\s*(<p>[\s\S]*?<\/p>)?/.exec(page.body);
   if (!opening) throw new Error(`${page.title}: a reading must open with its title`);
   const [whole, title, intro = ''] = opening;
-  const kind = page.file === styleSource ? 'editorial guide' : kinds[page.kind]?.label;
+  const kind = editorial.get(page.file)?.kind ?? kinds[page.kind]?.label;
   const memberships = entrancesFor(page).map(question => {
     const { role } = question.readings.find(reading => reading.page === page);
     return besideQuestion(question, `<p class="beside-role">${escape(role)}</p>`);
@@ -265,11 +309,22 @@ function besideQuestion(question, role = '') {
   return `<section class="beside-question" data-question="${question.id}"><p class="beside-text">${escape(question.question)}</p>${role}<button type="button" class="beside-open" data-open-question="question-${question.id}" data-beside hidden>${fold}<span data-open-label>Open this question</span></button></section>`;
 }
 const passageData = escape(JSON.stringify(passages));
+// What a link to the page says about it: the essay in the author's words and
+// the edition's, a reading by its gloss and kind.
+function describe(page) {
+  const essay = rendered[0].description;
+  if (page.file === source) return `${essay} An essay written to a coding agent, in a reading edition with the stances and workflows it links.`;
+  if (editorial.has(page.file)) return page.file === tryingSource
+    ? 'What installing the wycats plugin gives a coding agent, how installation differs from trusting its guidance, and a first investigation to try.'
+    : 'How the reading edition of Building together writes the guides, notes, and navigation it adds around the canonical texts.';
+  const label = kinds[page.kind]?.label;
+  return `${gloss(page) || essay} ${label ? `A ${label}` : 'A reading'} from the wycats plugin, read alongside Building together.`;
+}
 for (const page of rendered) {
   const story = page.file === source;
   fs.writeFileSync(path.join(out, pages.get(page.file)), `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escape(page.title)}${story ? '' : ' · Building together'}</title><meta name="description" content="How shared understanding develops through conversation, implementation, and use."><script src="${asset('theme.js')}"></script><link rel="stylesheet" href="${asset('reading.css')}"><link rel="stylesheet" href="${asset('contents.css')}"><link rel="stylesheet" href="${asset('marginalia.css')}"><script type="module" src="${asset('reading.js')}"></script></head>
-<body class="${story ? 'story-reading' : 'reference-reading'}${page.file === styleSource ? ' editorial-reading' : ''}" data-return-anchor="${annotation.id}" data-passages="${passageData}"><a class="skip-link" href="#reading">Skip to text</a><div class="reading-tools"><button class="paper-choice" hidden>Use dark paper</button>${navigation(page)}</div><main id="reading" tabindex="-1">${story ? '' : readingEdge('head')}<article>${story ? page.body : arrival(page)}</article>${story ? relationshipDialog(url, annotation.id) : ''}<footer>${story ? '<p>Linked references are included for reading alongside the text.</p>' : readingEdge('foot')}<p><a href="https://github.com/wycats/ai-plugin#setup">Install the plugin</a> · <a href="https://github.com/wycats/ai-plugin">Source and documentation</a> · <a href="style.html">Style of this edition</a></p><noscript><section class="plain-index"><h2>Index of readings</h2><p><a href="index.html">Building together</a></p>${readingIndex(page, false)}</section></noscript></footer></main></body></html>`);
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escape(page.title)}${story ? '' : ' · Building together'}</title>${pageMeta({ title: page.title, description: describe(page), file: pages.get(page.file), story })}<script src="${asset('theme.js')}"></script><link rel="stylesheet" href="${asset('reading.css')}"><link rel="stylesheet" href="${asset('contents.css')}"><link rel="stylesheet" href="${asset('marginalia.css')}"><script type="module" src="${asset('reading.js')}"></script></head>
+<body class="${story ? 'story-reading' : 'reference-reading'}${editorial.has(page.file) ? ' editorial-reading' : ''}" data-return-anchor="${annotation.id}" data-passages="${passageData}"><a class="skip-link" href="#reading">Skip to text</a><div class="reading-tools"><button class="paper-choice" hidden>Use dark paper</button>${navigation(page)}</div><main id="reading" tabindex="-1">${story ? '' : readingEdge('head', page)}<article>${story ? page.body : arrival(page)}</article>${story ? relationshipDialog(url, annotation.id) : ''}<footer>${story ? '' : readingEdge('foot', page)}${footLinks({ trying: editorial.get(tryingSource).address, style: editorial.get(styleSource).address, story })}<noscript><section class="plain-index"><h2>Index of readings</h2><p><a href="index.html">Building together</a></p>${readingIndex(page, false)}</section></noscript></footer></main></body></html>`);
 }
 fs.cpSync(path.join(site, 'assets'), path.join(out, 'assets'), { recursive: true, filter: file => path.basename(file) !== 'README.md' });
 for (const name of ['reading.css', 'contents.css', 'marginalia.css', 'theme.js', 'artwork.js', 'reading.js', 'contents.js', 'marginalia.js', 'origin.js', 'guide.js', 'vercel.json']) fs.copyFileSync(path.join(site, name), path.join(out, name));

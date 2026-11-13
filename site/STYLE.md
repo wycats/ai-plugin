@@ -171,3 +171,7 @@ Otherwise move the whole credit to the next line, where it can wrap if needed.
 - Make illustrated controls understandable without the illustration, with
   meaningful labels and visible keyboard focus. Treat purely decorative marks
   as decoration, including for assistive technology.
+- Set what the edition says about itself in small type under a small-caps
+  label, in a page's margin or at its edges. This covers what a page is, whom
+  its text addresses, and where a reader can go next. The reading column holds
+  the source text alone.

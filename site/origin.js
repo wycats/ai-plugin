@@ -45,7 +45,7 @@ export function returnAction(arrival, passages) {
 }
 
 /**
- * A reference link carried through an excursion: it keeps the story origin,
+ * A reading or edition-page link carried through an excursion: it keeps the story origin,
  * and the question the reader chose from unless the link names its own.
  * Other links are returned unchanged.
  */
@@ -53,7 +53,7 @@ export function carry(href, base, arrival) {
   const destination = new URL(href, base);
   const directory = new URL('.', base);
   if (destination.origin !== directory.origin || !destination.pathname.startsWith(directory.pathname)
-    || !/\/reference-\d+\.html$/.test(destination.pathname)) return href;
+    || !/\/(?:reference-\d+|trying|style)\.html$/.test(destination.pathname)) return href;
   if (arrival.passage) {
     destination.searchParams.set('from', arrival.passage);
     if (arrival.note) destination.searchParams.set('note', arrival.passage);

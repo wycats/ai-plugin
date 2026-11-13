@@ -1,7 +1,9 @@
 .contents-toggle{position:fixed;top:11px;left:24px;z-index:4;padding:7px 16px 7px 12px}
 .contents-toggle>span{font:400 24px/1.1 Manuscript,serif;text-transform:lowercase}
 #contents{inset:0;margin:auto;width:min(960px,calc(100vw - 48px));max-width:none;height:fit-content;max-height:calc(100dvh - 48px);padding:0 48px 34px;overflow:auto}
-.contents-heading{position:sticky;top:0;z-index:2;background:var(--paper);margin:0 0 30px;padding:var(--close-clearance,62px) 0 14px;border-bottom:1px solid var(--rule);display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 24px}
+/* The heading's paper reaches a little past its measure, so the overshoot of
+   a letter scrolling beneath never shows at its sides. */
+.contents-heading{position:sticky;top:0;z-index:2;background:var(--paper);box-shadow:-20px 0 0 var(--paper),20px 0 0 var(--paper);margin:0 0 30px;padding:var(--close-clearance,62px) 0 14px;border-bottom:1px solid var(--rule);display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 24px}
 .contents-heading h2{font:400 38px/1.3 Manuscript,serif;margin:0}
 .contents-heading .edge-close{right:-48px}
 .contents-column{min-width:0}.contents-column:first-child{padding-left:24px}
@@ -24,7 +26,11 @@
 .contents-parts{display:flex;gap:4px 22px;margin:0;font:400 16px/1.3 Newsreader,serif;letter-spacing:.06em;font-variant-caps:all-small-caps}
 #contents .contents-parts a{display:inline-block;padding:8px 0;color:var(--muted)}
 #contents .contents-parts a:hover{color:var(--green)}
-.contents-body>section,.question{scroll-margin-top:calc(var(--contents-heading-height,120px) + 12px)}
+/* A question or the index brought to the top tucks its own rule under the
+   heading's, so one rule shows; the other parts keep a little air. */
+.contents-body>section{scroll-margin-top:calc(var(--contents-heading-height,120px) + 12px)}
+.contents-body>.contents-index,.question{scroll-margin-top:calc(var(--contents-heading-height,120px) - 1px)}
+.contents-body>.contents-questions{scroll-margin-top:calc(var(--contents-heading-height,120px) + 26px)}
 .contents-body>section:focus{outline:none}
 .contents-body>section:focus-visible{outline:2px solid var(--link);outline-offset:6px}
 .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
@@ -32,7 +38,11 @@
 /* Chapters: the book's order, with a colophon naming what this edition is. */
 .contents-chapters{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);gap:30px 52px;font-size:18px}
 .contents-colophon{padding:6px 0 0 18px;border-left:1px solid var(--rule);font:400 16px/1.55 Newsreader,serif;color:var(--muted)}
-.contents-colophon p{margin:0 0 12px;max-width:34ch}
+.contents-colophon p{margin:0 0 12px;max-width:36ch}
+.contents-colophon p:first-child{font-style:italic}
+#contents .colophon-links a{display:inline;color:var(--link);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+#contents .colophon-links a:hover{text-decoration-thickness:2px}
+#contents .colophon-links a[aria-current]::before{content:none}
 
 /* Questions: overlapping entrances. Live text explains every relationship. */
 .contents-body h3{font:400 30px/1.3 Manuscript,serif;text-transform:lowercase;color:var(--green);margin:46px 0 6px}
@@ -41,7 +51,12 @@
 .question:last-of-type{border-bottom:1px solid var(--rule)}
 .question>summary{display:grid;grid-template-columns:minmax(0,1fr) 20px;align-items:start;gap:18px;padding:16px 4px 16px 0;min-height:56px}
 .question>summary .folded-tab{justify-self:center;margin-top:9px;width:13px;height:18px;transition:transform .15s}
-.question-text{font:400 28px/1.35 Manuscript,serif;text-transform:lowercase}
+.question-text{display:block;font:400 28px/1.35 Manuscript,serif;text-transform:lowercase}
+/* Folded, a question shows the situation it begins from; unfolded, its lead
+   says the same and more. */
+.question-situation{display:block;margin:3px 0 2px;font:400 17px/1.45 Newsreader,serif;color:var(--muted)}
+.question[open] .question-situation{display:none}
+.contents-questions>.part-introduction{margin-bottom:22px}
 .question[open]>summary .question-text{color:var(--green)}
 /* A question's guide (guide.mjs). The account runs in the main column; each
    reading's note sits in the margin beside the phrase that leads to it, joined
@@ -153,3 +168,4 @@
 /* The edition’s editorial guidance follows the catalog as a quiet colophon link. */
 .contents-edition{margin:32px 0 0;padding-top:16px;border-top:1px solid var(--rule);font:400 16px/1.5 Newsreader,serif}
 #contents .contents-edition a{display:inline;color:var(--muted);text-decoration:underline;text-underline-offset:4px}
+#contents .contents-edition a[aria-current]::before{content:none}

@@ -118,3 +118,48 @@ test('Contents follows history entries, but an explicit close and reload stay cl
     }
   }
 });
+
+// A door in the page opens Contents at the part it names. The reader's place
+// is captured as for the Contents control, and focus lands on that part.
+test('a door in the page opens Contents at its part', () => {
+  class Element extends EventTarget {
+    constructor(id = '') { super(); this.id = id; this.dataset = {}; this.style = { setProperty() {} }; }
+    querySelector() { return null; }
+    querySelectorAll() { return []; }
+    getBoundingClientRect() { return { height: 20, top: 0 }; }
+    setAttribute() {}
+    focus() { document.activeElement = this; }
+    scrollIntoView() { this.scrolled = true; }
+  }
+  const dialog = new Element('contents');
+  const heading = new Element();
+  const toggle = new Element();
+  const part = new Element('contents-questions');
+  const door = new Element();
+  door.dataset.openContents = part.id;
+  heading.querySelector = () => new Element();
+  dialog.querySelector = selector => selector === '.contents-heading' ? heading : selector === `#${part.id}` ? part : null;
+  const globals = {
+    window: new EventTarget(), history: { state: null, replaceState(state) { this.state = state; } }, location: new URL('https://example.test/index.html'),
+    document: { activeElement: null, querySelector: selector => selector === '#contents' ? dialog : toggle, querySelectorAll: selector => selector === '[data-open-contents]' ? [door] : [], fonts: { ready: Promise.resolve() } },
+    performance: { getEntriesByType: () => [] }, ResizeObserver: class { observe() {} },
+    requestAnimationFrame: () => 0, cancelAnimationFrame() {},
+  };
+  const originals = Object.fromEntries(Object.keys(globals).map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  for (const [key, value] of Object.entries(globals)) Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
+  try {
+    let opener, captures = 0;
+    setupContents((element, from) => { element.open = true; opener = from; }, () => { captures++; return 'passage-1'; }, {});
+    door.dispatchEvent(new Event('click'));
+    assert.equal(dialog.open, true);
+    assert.equal(opener, door, 'Closing Contents returns focus to the door');
+    assert.equal(captures, 1);
+    assert.equal(part.scrolled, true);
+    assert.equal(document.activeElement, part);
+  } finally {
+    for (const [key, descriptor] of Object.entries(originals)) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+    }
+  }
+});
