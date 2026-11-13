@@ -1,0 +1,8 @@
+interface:
+  display_name: architectural-distillation
+  short_description: Use when a new approach has taken over, or accumulated
+    changes make it hard to tell why the code is structured as it is. Recover
+    the requirements and distinctions revealed by that history, then restructure
+    the code around them.
+policy:
+  allow_implicit_invocation: true

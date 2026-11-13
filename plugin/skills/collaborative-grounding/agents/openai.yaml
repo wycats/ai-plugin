@@ -1,0 +1,7 @@
+interface:
+  display_name: collaborative-grounding
+  short_description: Use when developing an idea or choosing a direction with the
+    user. Contribute expertise and observations, work from what the user has
+    shared, and make a proposal they can examine and help refine.
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,8 @@
+interface:
+  display_name: observational-grounding
+  short_description: Use when observations seem to disagree, or a conclusion
+    depends on an uncertain relationship between what was observed and what it
+    is taken to show. Relate the evidence to its source and conditions as you
+    investigate.
+policy:
+  allow_implicit_invocation: true

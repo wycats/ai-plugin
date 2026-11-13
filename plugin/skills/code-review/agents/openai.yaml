@@ -1,0 +1,7 @@
+interface:
+  display_name: code-review
+  short_description: "Use when reviewing a patch or pull request: examine how the
+    code fulfills the change's purpose, and revisit earlier judgments when
+    details change your understanding of the design."
+policy:
+  allow_implicit_invocation: true
