@@ -39,7 +39,7 @@ function carryOrigin(container, context) {
     if (carried !== link.href) link.href = carried;
   }
 }
-for (const button of document.querySelectorAll('[data-beside]')) button.hidden = false;
+for (const button of document.querySelectorAll('[data-beside], [data-contents-door]')) button.hidden = false;
 if (!story) {
   carryOrigin(document, arrival);
   showReturn(returnAction(arrival, passages));

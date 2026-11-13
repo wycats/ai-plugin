@@ -4,7 +4,8 @@ import { questionAt } from './origin.js';
  * Contents is one leaf with three parts: the chapters, questions to begin
  * from, and the index of readings. Opening it from the story unfolds the
  * question that arises in the passage being read; opening it from a reading
- * unfolds a question that reading belongs to (set by the build).
+ * unfolds a question that reading belongs to (set by the build). A door in
+ * the page (`data-open-contents`) opens it at the part it names.
  */
 export function setupContents(openDialog, beforeOpen = () => {}, passages = {}, arrive = target => target.focus({ preventScroll: true }), restoreOrigin = () => {}) {
   const dialog = document.querySelector('#contents');
@@ -102,6 +103,17 @@ export function setupContents(openDialog, beforeOpen = () => {}, passages = {}, 
       unfold(question);
       question.scrollIntoView({ block: 'start' });
       question.querySelector('summary').focus({ preventScroll: true });
+    });
+  }
+
+  // Doors in the page open Contents at one of its parts: the edition's note
+  // and each page's foot lead to the questions and the index.
+  for (const door of document.querySelectorAll('[data-open-contents]')) {
+    door.addEventListener('click', () => {
+      const part = dialog.querySelector(`#${door.dataset.openContents}`);
+      show(door);
+      part.scrollIntoView({ block: 'start' });
+      part.focus({ preventScroll: true });
     });
   }
 

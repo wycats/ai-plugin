@@ -45,12 +45,31 @@ figure{margin:28px 0 32px}
 .cycle-spread img{mix-blend-mode:multiply;mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent),linear-gradient(to bottom,transparent,#000 5%,#000 95%,transparent);mask-composite:intersect}
 [data-theme="dark"] .cycle-spread img{mix-blend-mode:screen}
 .cycle-return>p{max-width:680px}
+/* The edition speaking for itself (edition.mjs): small type under a small-caps
+   label. It keeps to the margin where there is one and stands behind a thin
+   rule otherwise, as a reading's related questions do. The canonical text has
+   the reading column to itself. */
+.edition-note{max-width:680px;margin:0 0 8px;padding-left:18px;border-left:1px solid var(--pen);font:400 16px/1.5 Newsreader,serif}
+.edition-note p{margin:0 0 9px}
+.edition-note .edition-label{margin:0 0 4px;font-size:15px;letter-spacing:.06em;font-variant-caps:all-small-caps;color:var(--muted)}
+.edition-note .edition-doors{display:flex;flex-wrap:wrap;align-items:center;gap:2px 22px;margin:12px 0 0}
+.contents-door{display:inline-flex;align-items:center;gap:7px;min-height:32px;padding:2px 0;border:0;background:none;font:400 16px/1.3 Newsreader,serif;color:var(--link);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.contents-door:hover{background:none;text-decoration-thickness:2px}
+.contents-door .folded-tab{width:9px;height:12px}
 @media(min-width:1100px){
- .cycle-opening{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:38px}
+ .cycle-opening{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:auto 1fr;gap:34px 38px}
+ .cycle-opening>.cycle-copy{grid-column:1;grid-row:1/span 2}
+ .cycle-opening>.edition-note{grid-column:2;grid-row:1;align-self:start;max-width:400px;margin:.3em 0 0 14px;padding:0;border:0}
+ .cycle-opening>.manuscript-cycle{grid-column:2;grid-row:2;align-self:start}
  .cycle-return{grid-template-columns:minmax(0,1.35fr) minmax(0,.85fr);gap:44px}
- [data-note-layout="inline"] .cycle-spread{grid-template-columns:1fr}
+ [data-note-layout="inline"] .cycle-spread{grid-template-columns:1fr;grid-template-rows:none}
+ [data-note-layout="inline"] .cycle-opening>:is(.cycle-copy,.edition-note,.manuscript-cycle){grid-column:auto;grid-row:auto}
+ [data-note-layout="inline"] .cycle-opening>.edition-note{max-width:680px;margin:0 0 8px;padding-left:18px;border-left:1px solid var(--pen)}
 }
 footer{font:400 16px/1.5 Newsreader,serif;max-width:680px;margin-top:56px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted)}
+footer p{margin-bottom:10px}
+.foot-doors{display:flex;flex-wrap:wrap;align-items:center;gap:2px 24px}
+.edge-addressed{display:block}
 /* A reference page: the argument occupies the column; orientation keeps to
    its edges; relationships annotate the material they illuminate.
    - The edges (head and foot) hold the way back into the book, in one voice:
@@ -105,6 +124,7 @@ button{font:500 16px/1.3 Newsreader,serif;color:var(--ink);background:var(--pape
 button:hover{background:var(--wash)}
 .paper-choice{position:fixed;top:11px;right:30px;z-index:4;min-height:44px;padding:7px 14px;border:1px solid var(--tab-edge);border-radius:9px 2px 2px 2px;background:var(--paper);color:var(--muted);box-shadow:-2px 2px 0 #0001}
 .reading-tools{position:fixed;inset:0 0 auto;z-index:4;display:flex;flex-wrap:wrap;align-items:start;justify-content:space-between;gap:10px 16px;padding:11px 24px;pointer-events:none}
+.reading-tools::before{content:'';position:absolute;inset:0 0 -18px;z-index:-1;background:linear-gradient(var(--paper) 70%,transparent);pointer-events:none}
 .reading-tools>button{position:static;pointer-events:auto;max-width:100%}
 .reading-tools>.contents-toggle{order:1}.reading-tools>.paper-choice{order:2;margin-left:auto}
 .reading-tools>dialog{pointer-events:auto}
@@ -130,10 +150,14 @@ body.dialog-open{overflow:hidden}
  .manuscript-cycle{margin:30px -10px 38px}.paper-choice{right:18px;font-size:14px;padding-inline:10px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
-@media print{body{font-size:12pt}.paper-choice,.contents-toggle,.skip-link,dialog,footer{display:none!important}main{padding:0}h1{font-size:28pt}h2{font-size:19pt;break-after:avoid}p{orphans:3;widows:3}figure{break-inside:avoid}}
+@media print{body{font-size:12pt}.paper-choice,.contents-toggle,.contents-door,.reading-tools::before,.skip-link,dialog,footer{display:none!important}main{padding:0}h1{font-size:28pt}h2{font-size:19pt;break-after:avoid}p{orphans:3;widows:3}figure{break-inside:avoid}}
 
 .editorial-reading table{display:table;table-layout:fixed;width:100%}
 .editorial-reading th,.editorial-reading td{vertical-align:top;padding:12px}
+/* A credited quotation on an edition page keeps its credit attached. */
+.editorial-reading blockquote p{margin:0}
+.editorial-reading blockquote cite{display:inline-block;max-inline-size:100%;font-style:normal;font-size:17px;color:var(--muted)}
+.editorial-reading blockquote cite a{color:var(--muted)}
 
 /* Rubrics and annotations stay with their passages when the
    available reading measure calls for a single column. */

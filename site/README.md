@@ -11,6 +11,11 @@ repository Markdown pages reachable through its links. Canonical Markdown owns
 the wording and source relationships. The reading edition adds navigation,
 illustrations, and a small set of editorial annotations.
 
+The canonical texts are instructions written to a coding agent. The edition
+says so where a reader arrives, in its own voice and apart from those texts:
+small type under a small-caps label, in a page's margin or at its edges. The
+reading column holds canonical prose and nothing else.
+
 ## Reading implementation
 
 - `build.mjs` renders the canonical Markdown and resolves resource destinations.
@@ -46,6 +51,21 @@ illustrations, and a small set of editorial annotations.
   address establishes about the reader's path (story origin, note, chosen
   question), the links that carry it, the return it leads to, and which
   question unfolds at a passage.
+- `edition.mjs` holds what the edition says about itself: the note beside the
+  essay's opening, the colophon in Contents, the sentence a direct arrival
+  reads at the head of a reading, the foot of each page, and the description a
+  shared link shows. `illustration-layout.mjs` places the note in the opening
+  spread as an `aside`, outside every canonical paragraph. Its doors
+  (`data-open-contents`) open Contents at the questions or the index; they
+  need the script and stay hidden without it.
+- `TRYING.md` is rendered as `trying.html`, “Trying the plugin”. It explains
+  what installing gives an agent, how each application supplies ongoing
+  guidance, and a first investigation. The repository's
+  setup guide owns the commands: the page links to its sections, and the
+  build fails if a linked section is missing or a quotation is not the credited
+  document's exact words. Links to readings the essay already reaches stay in
+  the book. Like `style.html`, it is an edition page with a fixed address and
+  is left out of the index, so reference addresses do not move.
 - `assets/` contains the accepted paired artwork and local fonts, including
   Newsreader's license. See `assets/README.md` for their provenance.
 
@@ -55,8 +75,12 @@ Synthesis → return to the passage**. The marginal note offers the same excursi
 with its focused relationship map.
 
 Contents is one leaf in three parts. **Chapters** keeps the story's order beside
-a short colophon naming what the edition is and whom its guidance addresses.
-**Questions to begin from** offers overlapping entrances: each question's guide
+a short colophon: the essay's own description in italics, a sentence naming
+what the edition is and whom its texts address, and the way to “Trying the
+plugin”. **Questions to begin from** opens with a sentence on what a question
+unfolds to. Folded, each question shows its `situation`: one or two plain
+sentences on the circumstances it begins from, so a reader can recognize them
+before opening it. Unfolded, the lead takes over. Each question's guide
 explains how to work through its situation, quotes the passage where it arises,
 and notes what each of its readings contributes there. A reading that recurs
 names its other questions (“Also in…”), so a second appearance reads as the
@@ -88,7 +112,10 @@ A reference page follows one principle: the argument occupies the column,
 orientation keeps to its edges, and relationships annotate the material they
 illuminate. Its head and foot edges hold the way back into the book in one
 voice. With no known origin they name the book (“Building together, the essay
-this reading accompanies”) and claim no return. When the address names a story
+this reading accompanies”) and claim no return. At the head of a canonical
+reading, that arrival also reads “Both are written to a coding agent” and the
+sentence the index gives its kind, since nothing else on the page says whom
+“you” addresses or what a stance is. When the address names a story
 passage (`from`), both edges and Contents read “Return to the passage”, followed
 by the chapter numeral and the passage's opening words; with `note`, they read
 “Return to the note” and reopen it. The reading arrives first: its Fellowhand
@@ -109,8 +136,15 @@ Returning from a prose link, Contents, or an index locator brings the passage,
 and the chapter heading it opens, into view; returning to a note lands on its
 passage too. A reading mark and rule in the margin identify the passage and
 serve as its focus indicator until focus moves on.
-The footer links to the repository's installation instructions and source
-without changing the authored story.
+Every page's foot offers the questions and the index again, for a reader who
+has finished and is deciding where to go, and links to “Trying the plugin”, the
+repository's installation instructions and source, and the style guide. The
+essay's foot also repeats the colophon's sentence on what the edition is. None
+of this changes the authored story.
+
+The fixed Contents and paper controls stand on a band of paper that fades at
+its lower edge, so prose scrolling beneath them never shows between or behind
+them. Below about 1430px the reading column passes under those controls.
 The prose and reference links remain available without JavaScript, with the note
 in flow and the annotated index at the end of the page.
 
@@ -162,11 +196,16 @@ remain separate. `WORK-STACK.md` records the accepted design and deferred cases.
 
 Tests verify that all story paragraphs survive rendering, that annotation
 phrases have an unambiguous match, and that generated destinations resolve.
+They verify that the edition's note is an aside outside every canonical
+paragraph, that a direct arrival is told whom a reading addresses, and that
+“Trying the plugin” quotes the setup guide exactly and links to sections that
+exist.
 Tests also verify that every page's index lists each reading once, that each
 question's cue and readings resolve, that recurring readings name their other
 questions, and that references state their place for a direct arrival.
 Browser review covers the note, both map views, Contents and its questions,
-theme switching, narrow layout, and focus/position when returning to the reading.
+the doors into Contents, theme switching, narrow layout, the paper band under
+the fixed controls, and focus/position when returning to the reading.
 
 ## Deployment
 

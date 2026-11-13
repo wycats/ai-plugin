@@ -15,6 +15,10 @@
 // unit's reading. The independent cue locates the question in the essay;
 // it does not require the guide to include an excerpt.
 //
+// A `situation` is one or two plain sentences shown under a folded question.
+// It describes the circumstances at the cue in concrete terms, so a reader can
+// recognize them before opening the guide; the lead then takes over.
+//
 // Write in plain, concrete sentences that read in order. Address the reader
 // as "you"; name other people by their part in the work.
 
@@ -27,6 +31,7 @@ export const questions = [
     cue: { section: 'developing-an-approach', text: 'the user says the six independent choices feel wrong.' },
     question: 'The design feels wrong, but it’s hard to say why. Where do we begin?',
     short: 'something feels wrong',
+    situation: 'A settings screen has grown to six independent choices. Each made sense when it was added.',
     lead: 'Treat the user’s reaction as evidence. For a settings screen that feels wrong, work through a setup the user would actually choose, adapt, and share.',
     guide: [
       {
@@ -54,6 +59,7 @@ export const questions = [
     cue: { section: 'working-through-a-change', text: 'We might improve an expensive operation and find the speedup we expected.' },
     question: 'The change worked as predicted. What did it teach us?',
     short: 'a result that worked',
+    situation: 'The benchmark shows the speedup you expected, and the plan already names the next optimization.',
     lead: 'You made an expensive operation faster, and the benchmark shows the speedup you expected. Now investigate how the product uses that operation. It may be doing work it could avoid.',
     guide: [
       {
@@ -82,6 +88,7 @@ export const questions = [
     cue: { section: 'working-through-a-change', text: 'Before removing the old structures, return to the cases and decisions they preserved.' },
     question: 'We have learned something. How should the design express it?',
     short: 'expressing what we learned',
+    situation: 'A new approach has taken over, and the old paths are still in the code.',
     lead: 'Restructure the code so it directly expresses what you’ve learned. Keep the cases that need different behavior separate from each other.',
     reading: [workflow('architectural-distillation'), 'Work out what the existing code and its history can teach you before deciding what to change.'],
     guide: [
@@ -109,6 +116,7 @@ export const questions = [
     cue: { section: 'learning-from-use', text: 'we have to make those choices understandable without recounting every attempt.' },
     question: 'How do we explain the design to people who weren’t there?',
     short: 'explaining the design',
+    situation: 'The design came out of a long conversation. The people who will use it were not there.',
     lead: 'Someone choosing a shared setup needs to know whether it is a starting point they can adapt or will also receive later changes from its author. Explain what each choice would do, and why both forms of sharing can be useful.',
     guide: [
       {

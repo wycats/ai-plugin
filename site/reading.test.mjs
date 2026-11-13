@@ -26,7 +26,11 @@ function hasAncestor(node, predicate) {
   for (let parent = node.parentNode; parent; parent = parent.parentNode) if (predicate(parent)) return true;
   return false;
 }
-const inNote = node => hasAncestor(node, parent => parent.attrs?.some(a => a.name === 'class' && a.value.split(/\s+/).includes('marginal-note')));
+const within = name => node => hasAncestor(node, parent => parent.attrs?.some(a => a.name === 'class' && a.value.split(/\s+/).includes(name)));
+const inNote = within('marginal-note');
+// The edition's own asides in the article: the marginal note and the note on
+// the edition. Every other paragraph there is the essay's.
+const inApparatus = node => inNote(node) || within('edition-note')(node);
 
 test('annotations preserve source whitespace and reject absent or ambiguous phrases', () => {
   const input = 'A result can agree with our\nprediction and still change what is worth doing next.';
@@ -47,8 +51,23 @@ test('canonical build preserves every story paragraph and has self-contained des
     const html = await readFile(path.join(directory, 'index.html'), 'utf8');
     const document = parse(html);
     const article = descendants(document, n => n.tagName === 'article')[0];
-    const actual = descendants(article, n => n.tagName === 'p' && !inNote(n)).map(normalized);
+    const actual = descendants(article, n => n.tagName === 'p' && !inApparatus(n)).map(normalized);
     assert.deepEqual(actual, expected);
+    // The edition says what the essay is in an aside of its own, before the
+    // first paragraph and inside none of them. Its doors lead on: Contents
+    // (which needs the script, so the door starts hidden) and the page on trying.
+    const notes = descendants(article, n => n.tagName === 'aside' && n.attrs.some(a => a.name === 'class' && a.value === 'edition-note'));
+    assert.equal(notes.length, 1);
+    assert.ok(!hasAncestor(notes[0], parent => parent.tagName === 'p'));
+    const editionWords = descendants(notes[0], n => n.tagName === 'p').map(normalized);
+    assert.equal(editionWords[0], 'About this edition');
+    assert.match(editionWords[1], /coding agent/);
+    assert.ok(editionWords.every(words => !expected.includes(words)), 'The edition does not speak in the essay\'s words');
+    const doors = descendants(notes[0], n => n.attrs?.some(a => a.name === 'data-open-contents'));
+    assert.deepEqual(doors.map(n => n.attrs.find(a => a.name === 'data-open-contents').value), ['contents-questions']);
+    assert.ok(doors.every(n => n.attrs.some(a => a.name === 'hidden')));
+    assert.ok(descendants(document, n => n.attrs?.some(a => a.name === 'id' && a.value === 'contents-questions')).length);
+    assert.deepEqual(descendants(notes[0], n => n.tagName === 'a').map(n => n.attrs.find(a => a.name === 'href').value), ['trying.html']);
     const origins = new Set(descendants(article, n => n.attrs?.some(a => a.name === 'id'))
       .map(n => n.attrs.find(a => a.name === 'id').value));
     const body = descendants(document, n => n.tagName === 'body')[0];
@@ -70,7 +89,7 @@ test('canonical build preserves every story paragraph and has self-contained des
       assert.ok(normalized(passage).startsWith(excerpt.replace(/…$/, '')), `Excerpt changed its source text: ${origin}`);
       assert.ok(excerpt.split(/\s+/).length <= 8, `Excerpt is no longer compact: ${origin}`);
     }
-    const proseLinks = descendants(article, n => n.tagName === 'p' && !inNote(n))
+    const proseLinks = descendants(article, n => n.tagName === 'p' && !inApparatus(n))
       .flatMap(p => descendants(p, n => n.tagName === 'a'))
       .map(n => n.attrs.find(a => a.name === 'href')?.value)
       .filter(href => href?.startsWith('reference-'));
@@ -99,7 +118,7 @@ test('canonical build preserves every story paragraph and has self-contained des
       if (!name.endsWith('.html')) continue;
       const page = await readFile(path.join(directory, name), 'utf8');
       assert.doesNotMatch(page, /(?:\.runtime|type-study|\/Users\/)/);
-      assert.match(page, /data-return-to-reading|Linked references/);
+      assert.match(page, /data-return-to-reading|class="edition-note"/);
       const pageDocument = parse(page);
       const reminder = descendants(pageDocument, n => n.attrs?.some(a => a.name === 'data-origin'));
       assert.equal(reminder.length, name === 'index.html' ? 0 : 1);
@@ -113,6 +132,7 @@ test('canonical build preserves every story paragraph and has self-contained des
       const destinations = descendants(footer, n => n.tagName === 'a').map(n => n.attrs.find(a => a.name === 'href').value);
       assert.ok(destinations.includes('https://github.com/wycats/ai-plugin#setup'));
       assert.ok(destinations.includes('https://github.com/wycats/ai-plugin'));
+      assert.ok(destinations.includes('trying.html'), 'Every page leads to the page on trying the plugin');
     }
     for (const name of ['initial-i-light', 'initial-i-dark', 'return-map-light', 'return-map-dark', 'diagram-recomposed-light', 'diagram-recomposed-dark']) {
       assert.ok((await readFile(path.join(directory, 'assets', 'illustrations', name + '.png'))).length > 0);
@@ -193,6 +213,8 @@ test('Contents offers questions, a complete index, and a place for every reading
     const names = (await readdir(directory)).filter(name => name.endsWith('.html'));
     const references = names.filter(name => /^reference-\d+\.html$/.test(name));
     assert.ok(names.includes('style.html'), 'The editorial guide has a stable book address');
+    assert.ok(names.includes('trying.html'), 'The page on trying the plugin has a stable book address');
+    const editionPages = ['style.html', 'trying.html'];
     const story = parse(await readFile(path.join(directory, 'index.html'), 'utf8'));
     const passages = JSON.parse(attr(descendants(story, n => n.tagName === 'body')[0], 'data-passages'));
 
@@ -201,7 +223,11 @@ test('Contents offers questions, a complete index, and a place for every reading
       const dialog = descendants(document, n => attr(n, 'id') === 'contents')[0];
       const hrefs = node => descendants(node, n => n.tagName === 'a').map(n => attr(n, 'href'));
       const editorialLink = descendants(dialog, n => hasClass(n, 'contents-edition'))[0];
-      assert.deepEqual(hrefs(editorialLink), ['style.html'], 'Contents exposes editorial guidance separately from canonical readings');
+      assert.deepEqual(hrefs(editorialLink), ['trying.html', 'style.html'], 'Contents exposes the edition\'s own pages separately from canonical readings');
+      // The colophon says what the edition is and whom its texts address.
+      const colophon = descendants(dialog, n => hasClass(n, 'contents-colophon'))[0];
+      assert.match(normalized(colophon), /written to a coding agent/);
+      assert.deepEqual(hrefs(colophon), ['trying.html']);
 
       // A known title is always findable: each reading appears once in the index.
       const index = descendants(dialog, n => attr(n, 'id') === 'contents-index')[0];
@@ -238,6 +264,13 @@ test('Contents offers questions, a complete index, and a place for every reading
         .map(n => [attr(n, 'id'), normalized(n.tagName === 'p' ? n : descendants(n, p => hasClass(p, 'passage'))[0])]));
       const questions = descendants(dialog, n => n.tagName === 'details' && hasClass(n, 'question'));
       assert.equal(questions.length, 4);
+      // Folded, each question shows the situation it begins from, in its summary.
+      for (const question of questions) {
+        const summary = question.childNodes.find(n => n.tagName === 'summary');
+        const situation = descendants(summary, n => hasClass(n, 'question-situation'));
+        assert.equal(situation.length, 1);
+        assert.ok(normalized(situation[0]).length > 30);
+      }
       const appearances = new Map();
       for (const question of questions) {
         const id = attr(question, 'id').replace(/^question-/, '');
@@ -324,10 +357,22 @@ test('Contents offers questions, a complete index, and a place for every reading
       assert.equal(article.childNodes.find(n => n.tagName), opening, `${name}: the arrival opens the article`);
       assert.equal(descendants(opening, n => n.tagName === 'h1').length, 1);
       // Without a known origin, the edges name the book and claim no return.
+      // At the head of a canonical reading, a direct arrival also learns whom
+      // the text addresses and what kind of reading it is; the script removes
+      // that with the rest of the note when the address names a passage.
       for (const where of ['head', 'foot']) {
         const line = descendants(document, n => hasClass(n, `reading-edge-${where}`))[0];
         assert.ok(line, `${name}: ${where} edge`);
-        assert.match(normalized(line), /^Building together, the essay this reading accompanies$/);
+        const addressed = where === 'head' && !editionPages.includes(name);
+        assert.match(normalized(line), addressed
+          ? /^Building together, the essay this reading accompanies\. Both are written to a coding agent\. (Stances shape|Workflows guide) .+\.$/
+          : /^Building together, the essay this reading accompanies$/);
+        if (addressed) {
+          const kind = normalized(descendants(opening, n => hasClass(n, 'reading-kind'))[0]);
+          assert.match(normalized(line), new RegExp(`${kind}s (shape|guide) `, 'i'), `${name}: the edge explains the kind its title names`);
+          const note = descendants(line, n => attr(n, 'data-edge-note') !== undefined)[0];
+          assert.ok(normalized(note).includes('Both are written to a coding agent'), `${name}: a known origin replaces the whole note`);
+        }
         assert.doesNotMatch(normalized(line), /return/i);
         assert.deepEqual(hrefs(line), ['index.html']);
       }
@@ -348,6 +393,45 @@ test('Contents offers questions, a complete index, and a place for every reading
       const fallback = descendants(document, n => n.tagName === 'noscript')[0];
       for (const reference of references) assert.ok(text(fallback).includes(`href="${reference}"`), `${name}: no-script index`);
     }
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test('the page on trying the plugin quotes the setup guide exactly and hands off to sections that exist', async () => {
+  await mkdir(path.join(repo, 'out'), { recursive: true });
+  const directory = await mkdtemp(path.join(repo, 'out', 'reading-test-'));
+  try {
+    execFileSync(process.execPath, ['site/build.mjs', '--out', directory], { cwd: repo });
+    const attr = (node, name) => node.attrs?.find(a => a.name === name)?.value;
+    const article = descendants(parse(await readFile(path.join(directory, 'trying.html'), 'utf8')), n => n.tagName === 'article')[0];
+    const repository = 'https://github.com/wycats/ai-plugin/blob/main/';
+    const sections = async file => new Set([...matter(await readFile(path.join(repo, file), 'utf8')).content.matchAll(/^#{1,6} (.+)$/gm)]
+      .map(([, heading]) => heading.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/ +/g, '-')));
+    // Setup belongs to the repository's documentation. Each hand-off names a
+    // document, and a section of it, that exists in this checkout.
+    const handoffs = descendants(article, n => n.tagName === 'a').map(n => attr(n, 'href')).filter(href => href.startsWith(repository));
+    assert.ok(handoffs.length >= 5);
+    for (const href of handoffs) {
+      const [file, section] = href.slice(repository.length).split('#');
+      assert.match(file, /^docs\/[a-z-]+\.md$/);
+      if (section) assert.ok((await sections(file)).has(section), `${file} has no section #${section}`);
+    }
+    for (const section of ['install-in-codex', 'claude-code-persistent-guidance', 'vs-code-local-registration', 'try-a-first-investigation']) {
+      assert.ok(handoffs.includes(`${repository}docs/setup.md#${section}`), `Trying the plugin hands off to ${section}`);
+    }
+    // A quotation is the credited document's exact words.
+    const quotes = descendants(article, n => n.tagName === 'blockquote');
+    assert.equal(quotes.length, 1);
+    for (const quote of quotes) {
+      const cite = descendants(quote, n => n.tagName === 'cite')[0];
+      const credit = attr(descendants(cite, n => n.tagName === 'a')[0], 'href');
+      const words = /^“(.+)” —/.exec(normalized(quote))[1];
+      const source = (await readFile(path.join(repo, credit.slice(repository.length).split('#')[0]), 'utf8')).replace(/^>\s?/gm, '').replace(/\s+/g, ' ');
+      assert.ok(source.includes(words), 'The quoted prompt is the setup guide\'s own');
+    }
+    // It stays in the book for the readings and the passage it mentions.
+    const inBook = descendants(article, n => n.tagName === 'a').map(n => attr(n, 'href')).filter(href => !/^https?:/.test(href));
+    assert.ok(inBook.some(href => /^reference-\d+\.html$/.test(href)));
+    assert.ok(inBook.includes('index.html#working-through-a-change'));
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
 
