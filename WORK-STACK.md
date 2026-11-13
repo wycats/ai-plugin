@@ -1,24 +1,54 @@
 # Work stack
 
-Updated 10 November 2026. This file records the work in progress, the follow-ups
+Updated 12 November 2026. This file records the work in progress, the follow-ups
 deliberately left open, and where local working material lives. Git history
 holds the earlier checkpoints; this file keeps only what still guides the next
 move.
 
-## In progress: the agent's contribution to collaboration
+## In progress: recognizing the next useful move
 
-Branch `wycats/collaborative-contribution` drafts
-[Building together](instructions/building-together.instructions.md) and
-[Collaborative Grounding](skills/stances/collaborative-grounding/SKILL.md)
-together. The proposal develops how the agent brings relevant knowledge and
-craft to the user's examples and uncertainty, contributes something concrete
-for the user to judge, and carries what they learn into later choices. The
-introduction describes how stances remain useful as the work changes.
+PR #71 merged the revised [Building together](instructions/building-together.instructions.md)
+introduction and [Collaborative Grounding](skills/stances/collaborative-grounding/SKILL.md).
+Branch `wycats/stance-discovery` follows with two edits reviewed with Opus and
+approved for a local trial: the existing optimization example now shows how an
+agent can reconsider its planned next step, and Architectural Distillation's
+description names when the workflow may be useful.
 
-The user reviewed the draft and its editorial revision. Next: complete PR
-checks and Codex review, then return for merge approval. The guidance has not
-yet been evaluated in use; named expertise combinations and discovery remain
-open follow-ups.
+The local candidate is installed as `wycats@wycats`, replacing the older
+`wycats-ai-plugin` installation. Codex discovers the revised skill descriptions
+and startup hook. After the user trusted the hook, a fresh native Codex request
+delivered the complete 14,422-character introduction as developer context,
+including the revised example. The request also contained the new discovery
+description. A local capture endpoint verified delivery without calling a model.
+An ordinary-use setup review produced a focused documentation improvement and
+recommended observing a first-time installer before adding more prose. A later
+compatibility trial did not reach its intended decision: the agent shared the
+validation path immediately, leaving no separate-reader choice to reconsider.
+A subsequent publication trial reached a real provisional decision: prepared
+hosting while adapter v1 rejected demand. With v2, the agent revised that
+recommendation; with an added offline requirement, it proposed a separate
+archive output. The hosted-only continuation did not question retaining the
+strategy selection itself. The user judged both recommendations sensible and
+accepted these checks as enough to proceed toward landing the guidance changes.
+Removing the strategy choice was not required for a good recommendation. These
+observations do not establish a causal effect of the guidance; a matched
+old-versus-new comparison remains a follow-up. The candidate remains unpublished,
+and no further runs are queued.
+Records are in `.runtime/compatibility-trial-2026-11-12/` and
+`.runtime/publication-decision-2026-11-12/` in this worktree.
+
+The landing change includes the two guidance edits, the matching generated
+catalog entry, and setup instructions that distinguish installation from hook
+trust. Local validation, Codex packaging, and reading-site checks passed.
+Complete PR checks and Codex review before asking the user to merge; merging
+publishes the plugin and website. Experiment records remain local, with their
+limited findings summarized here.
+
+The local marketplace is generated under `out/codex-marketplace/` in
+`/Users/wycats/Code/vscode-ai-plugin.worktrees/stance-discovery`; preserve that
+worktree while the installation uses it. After publication, return the
+marketplace to the generated `codex-plugin` Git branch. The draft, Opus review,
+and installation evidence are in that worktree's `.runtime/stance-discovery/`.
 
 The continuing-agent experiments are parked for a dedicated effort. They
 exposed useful contrasts between explaining an existing arrangement and
@@ -71,6 +101,10 @@ the user's approval after checks and review.
 Each of these was deliberately left open. Where a tracked record explains what
 is established, it is linked.
 
+- **Hook approval clarity.** The user saw only “hook 1” when granting trust.
+  Check whether the host's review UI can show “Load Building together guidance”
+  and the plugin name. A running-status message alone may not name the item in
+  the approval UI. Preserve the trusted hook definition until that is understood.
 - **Expertise and shared vocabulary.** Investigate how naming relevant expertise
   and expressing confidence helps the current agent contribute possibilities
   and judgment within the user's uncertainty. Consider short, shared names for

@@ -14,11 +14,31 @@ codex plugin marketplace add wycats/ai-plugin --ref codex-plugin
 codex plugin add wycats@wycats
 ```
 
-Review and trust the plugin's session-start hook. Use `/hooks` in the Codex CLI
-to inspect its status, then start a fresh chat in a project you want to work on.
+Confirm the installation from the terminal:
+
+```sh
+codex plugin list --marketplace wycats --json
+```
+
+Look for `wycats@wycats` in `installed`, with `installed: true` and
+`enabled: true`. Then set up its session guidance:
+
+1. Open Codex in a project you want to work on: `codex -C /path/to/project`.
+2. Enter `/hooks` in the Codex chat input. Find the `SessionStart` hook from
+   the `wycats` plugin and review its source and command. The command runs
+   `scripts/persistent-context-hook.mjs` through `node`, so Node.js must be
+   available in the environment where Codex runs.
+3. Trust that hook after reviewing it, then start a fresh chat. You can exit
+   the CLI and run `codex -C /path/to/project` again. The fresh session lets the
+   now-trusted startup hook run.
+
 The hook delivers [Building together](../instructions/building-together.instructions.md)
-as guidance for the session. Skills such as Recon are available for particular
-tasks. See [How it works](#how-it-works) for delivery details.
+as guidance for the session. Plugin installation and hook trust are separate:
+the installed/enabled check above confirms the plugin, while `/hooks` shows
+whether its guidance hook still needs review. See Codex's
+[hook review documentation](https://learn.chatgpt.com/docs/hooks#review-and-trust-hooks)
+for details. Skills such as Recon are available for particular tasks; continue
+with [a first investigation](#try-a-first-investigation) below.
 
 If you already have the earlier `wycats-ai-plugin` package, use the
 [rename migration](#renaming-an-existing-installation).
