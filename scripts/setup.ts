@@ -10,6 +10,7 @@ import { execFileSync, type ExecFileSyncOptionsWithBufferEncoding } from "node:c
 import { platform } from "node:os";
 import * as p from "@clack/prompts";
 import {
+  ANTIGRAVITY_TARGET,
   CLAUDE_CODE_TARGET,
   CODEX_TARGET,
   displayOutputDirectoryForTarget,
@@ -21,6 +22,7 @@ const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
 const CONFIG_PATH = join(ROOT, "config.json");
 const VSCODE_EXAMPLE_PATH = join(ROOT, "config.example.json");
 const CC_EXAMPLE_PATH = join(ROOT, "config.claude-code.example.json");
+const ANTIGRAVITY_EXAMPLE_PATH = join(ROOT, "config.antigravity.example.json");
 const CODEX_EXAMPLE_PATH = join(ROOT, "config.codex.example.json");
 
 type VSCodeRegistrationOutcome =
@@ -31,6 +33,7 @@ type VSCodeRegistrationOutcome =
   | { status: "failed"; label: string; command: string };
 
 const PRESETS: Record<string, Record<string, string | null>> = {
+  antigravity: { fast: null, balanced: null, auxiliary: null },
   codex: {
     fast: null,
     balanced: null,
@@ -195,6 +198,7 @@ async function setup() {
   const target = await p.select({
     message: "What platform are you using?",
     options: [
+      { value: "antigravity", label: "Antigravity", hint: "skills, agents, and always-on guidance" },
       { value: "vscode", label: "VS Code", hint: "GitHub Copilot" },
       {
         value: "claude-code",
@@ -216,7 +220,9 @@ async function setup() {
 
   // 2. Model provider (options depend on target)
   const providerOptions =
-    target === CLAUDE_CODE_TARGET
+    target === ANTIGRAVITY_TARGET
+      ? [{ value: "antigravity", label: "Antigravity defaults", hint: "inherit the session model" }, { value: "custom", label: "Custom tiers", hint: "inherit, flash_lite, flash, or pro" }]
+      : target === CLAUDE_CODE_TARGET
       ? [
           {
             value: "claude",
@@ -322,7 +328,9 @@ async function setup() {
 
   // 4. Build config — use the right example for the target
   const examplePath =
-    target === CLAUDE_CODE_TARGET
+    target === ANTIGRAVITY_TARGET
+      ? ANTIGRAVITY_EXAMPLE_PATH
+      : target === CLAUDE_CODE_TARGET
       ? CC_EXAMPLE_PATH
       : target === CODEX_TARGET
         ? CODEX_EXAMPLE_PATH
@@ -477,6 +485,8 @@ async function setup() {
       });
       return;
     }
+  } else if (target === ANTIGRAVITY_TARGET) {
+    p.log.info("Antigravity plugin built. Install with pnpm install:antigravity --config config.json.");
   } else {
     p.log.info(
       [
@@ -496,7 +506,9 @@ async function setup() {
       : undefined;
 
   const nextSteps =
-    target === VSCODE_TARGET
+    target === ANTIGRAVITY_TARGET
+      ? "Install or update with pnpm install:antigravity --config config.json, then start a new conversation."
+      : target === VSCODE_TARGET
       ? (vscodeCompletion?.nextSteps ?? "Reload VS Code to pick up the plugin.")
       : target === CLAUDE_CODE_TARGET
         ? `To launch Claude Code with the plugin:\n  pnpm launch-claude\n\nUse /reload-plugins during a session to pick up rebuilds.`

@@ -677,3 +677,23 @@ an explanation, or recognizes where the user’s judgment is needed. Record
 unnecessary consultation and interference from early context as well. A read
 receipt establishes access to the material. The account and resulting work
 show whether it helped.
+
+
+## Antigravity projection
+
+The `antigravity` target projects canonical sources directly into a native
+plugin. Skills remain under `skills/<name>/SKILL.md`, agents use
+`agents/<name>.md`, and persistent instructions use always-on `rules/<name>.md`
+files. Composition links are resolved against those output addresses before
+writing metadata. Persistent delivery uses native rules, independently of the
+policy hooks omitted from this target.
+
+Explicit-only skills use `disable-model-invocation`. Per-skill hiding from the
+user menu is not qualified, so the build omits the unsupported visibility key
+and records the limitation. Agent visibility maps to `mainAgent`; all projected
+roles remain available as subagents. Models and tool groups use Antigravity
+mappings rather than Copilot identifiers. Agent skills and linked activity
+context remain model-directed reads, with no automatic preload claim.
+
+See [Antigravity setup](antigravity.md) for installation, native documentation,
+and the distinction between package conformance and runtime qualification.

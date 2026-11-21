@@ -4,6 +4,7 @@ import { join } from "node:path";
 export const VSCODE_TARGET = "vscode";
 export const CLAUDE_CODE_TARGET = "claude-code";
 export const CODEX_TARGET = "codex";
+export const ANTIGRAVITY_TARGET = "antigravity";
 export const PI_TARGET = "pi";
 
 export const OUTPUT_DIRECTORY_BY_TARGET = {
@@ -11,6 +12,7 @@ export const OUTPUT_DIRECTORY_BY_TARGET = {
   [CLAUDE_CODE_TARGET]: "claude-code",
   [CODEX_TARGET]: "codex",
   [PI_TARGET]: "pi",
+  [ANTIGRAVITY_TARGET]: "antigravity",
 } as const;
 
 export const LEGACY_VSCODE_OUTPUT_DIRECTORY_NAME = "vscode";

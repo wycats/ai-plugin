@@ -14,7 +14,7 @@ const exec = promisify(execFile);
 void test("editor schema stays current with runtime configuration, including shipped examples", async () => {
   assert.deepEqual(JSON.parse(await readFile(join(ROOT, "config.schema.json"), "utf8")), JSON.parse(buildConfigJsonSchema()),
     "Run pnpm generate:config-schema after editing scripts/build-config.ts");
-  for (const name of ["config.example.json", "config.claude-code.example.json", "config.codex.example.json", "config.pi.example.json"]) {
+  for (const name of ["config.example.json", "config.claude-code.example.json", "config.codex.example.json", "config.pi.example.json", "config.antigravity.example.json"]) {
     parseBuildConfig(JSON.parse(await readFile(join(ROOT, name), "utf8")) as unknown);
   }
 });

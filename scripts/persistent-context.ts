@@ -2,7 +2,7 @@ import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { build } from "esbuild";
 import { fileURLToPath } from "node:url";
 import { dirname, join, relative, resolve } from "node:path";
-import { parseResourceFrontmatter } from "./resource-frontmatter.ts";
+import { parseResourceFrontmatter, serializeResourceFrontmatter } from "./resource-frontmatter.ts";
 import { parseCompositionLinks, projectCompositionLinks, type CanonicalComposition } from "./resource-composition.ts";
 import type { PersistentInstructionDocument } from "./runtime/persistent-context.mjs";
 import type { PersistentInstructionPlan, ProjectedResource, ProjectionPlan } from "./projection-plan.ts";
@@ -14,6 +14,17 @@ export async function writePersistentContext(
 ): Promise<void> {
   const persistent = plan.persistentInstructions;
   if (!persistent) return;
+
+  if (persistent.delivery === "native-rules") {
+    for (const { resource, outputPath } of persistent.resources) {
+      const projected = projectCompositionLinks(await readFile(resource.sourcePath, "utf8"),
+        resource.sourcePath, outputPath, composition, plan.outputBySourcePath);
+      await mkdir(dirname(outputPath), { recursive: true });
+      await writeFile(outputPath, serializeResourceFrontmatter({ trigger: "always_on" },
+        parseResourceFrontmatter(projected).body));
+    }
+    return;
+  }
 
   const documents = await prepareInstructionDocuments(outDir, persistent.resources, composition, plan.outputBySourcePath);
   await writeInstructionPayload(outDir, documents);

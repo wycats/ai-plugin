@@ -1,7 +1,7 @@
 # wycats
 
 Reusable instructions for investigation, implementation, review, and writing in
-VS Code Copilot, Claude Code, Codex, and Pi.
+VS Code Copilot, Claude Code, Codex, Antigravity, and Pi.
 
 ## What this is
 
@@ -302,13 +302,14 @@ use abstract role names for models and tool groups instead of hardcoded
 provider-specific values. A local `config.json` (gitignored) maps those roles
 to concrete values for your environment. The build resolves the names and
 writes runtime projections to `out/wycats/` for VS Code,
-`out/claude-code/` for Claude Code, `out/codex/` for Codex, or `out/pi/` for Pi.
+`out/claude-code/` for Claude Code, `out/codex/` for Codex, `out/pi/` for Pi, or `out/antigravity/` for Antigravity.
 
 | Target      | Active resource projections |
 | ----------- | --------------------------- |
 | VS Code     | Agents, workflow skills, hidden stances, instructions, and hooks |
 | Claude Code | Agents, workflow skills, stances materialized as hidden skills, and hooks |
 | Codex       | Workflow skills and stances, plus the persistent-context hook; agents are packaged as reference material |
+| Antigravity | Workflow skills and stances, native agents, and always-on persistent rules; authored policy hooks omitted |
 | Pi          | Public Recon workflow, private canonical stances, and the `wycats-recon` pi-subagents profile |
 
 The first Pi package is intentionally bounded to Recon. Its delegated profile
@@ -324,6 +325,20 @@ Build with `pnpm build:pi`, then launch without installing this package using
 records the runtime prerequisite, exact supported surface, and prototype
 omissions; browser, memory, Exo, nested fan-out, and dedicated testing tools
 are reported rather than silently substituted.
+
+### Antigravity installation and updates
+
+With Antigravity installed, build and install directly from this checkout:
+
+```sh
+pnpm install:antigravity
+```
+
+Run the same command after pulling source updates. It builds the native package,
+validates it with `agy`, and installs it globally. Start a new conversation to
+use the updated guidance. Use `pnpm build:antigravity` to build without installing.
+See [Antigravity setup and host differences](docs/antigravity.md) for options and
+capability limits.
 
 ### Pi installation and updates
 
@@ -376,6 +391,8 @@ See [docs/setup.md](https://github.com/wycats/ai-plugin/blob/main/docs/setup.md)
 pnpm watch     # Auto-rebuild on source or config changes
 pnpm build     # One-off build
 pnpm build:codex # Build the Codex target from the example config
+pnpm build:antigravity # Build the native Antigravity package
+pnpm install:antigravity # Build, validate, and install/update locally
 pnpm build:pi  # Build the bounded Pi Recon package
 pnpm package-codex # Build an ignored local Codex marketplace
 pnpm validate  # Check discovered resources and plugin metadata

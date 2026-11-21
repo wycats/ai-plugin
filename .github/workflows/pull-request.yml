@@ -57,6 +57,9 @@ jobs:
       - name: Build Codex projection
         run: pnpm build -- --config config.codex.example.json
 
+      - name: Build Antigravity projection
+        run: pnpm build:antigravity
+
       - name: Build Pi projection
         run: pnpm build:pi
 

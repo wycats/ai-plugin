@@ -93,6 +93,7 @@ export function projectPluginHooks(
   const contextHook = persistentDelivery === "session-start";
 
   switch (target) {
+    case "antigravity":
     case "pi":
       return undefined;
     case "vscode":

@@ -1,0 +1,23 @@
+{
+  "$schema": "./config.schema.json",
+  "target": "antigravity",
+  "models": {
+    "fast": null,
+    "balanced": null,
+    "auxiliary": null
+  },
+  "toolGroups": {
+    "core": ["view_file", "grep_search", "find_by_name", "list_dir"],
+    "agent": ["invoke_subagent"],
+    "communication": ["send_message"],
+    "browser": [],
+    "edit": ["write_to_file", "replace_file_content"],
+    "memory": [],
+    "exo": [],
+    "terminal": ["run_command"],
+    "terminal-minimal": ["run_command"],
+    "testing": [],
+    "tasks": [],
+    "github": []
+  }
+}
