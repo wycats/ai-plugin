@@ -328,7 +328,7 @@ These inventories change with the projection plan and are not repeated here.
 ### 4.2 Activation metadata
 
 Adapters must consume normalized canonical `invocation`, remove it from generated frontmatter, retain
-normalized `user-invocable`, and emit the following native invocation value for
+normalized `user-invocable` where the host supports it, and emit the following native invocation value for
 each selected skill or stance. Values are emitted explicitly for both policies.
 All locations in this table are relative to the projected `SKILL.md` directory.
 
@@ -338,8 +338,11 @@ All locations in this table are relative to the projected `SKILL.md` directory.
 | Claude Code | `SKILL.md` frontmatter | `disable-model-invocation` | `false` | `true` |
 | Codex | `agents/openai.yaml` | `policy.allow_implicit_invocation` | `true` | `false` |
 | Pi | `SKILL.md` frontmatter | `disable-model-invocation` | `false` | `true` |
+| Antigravity | `SKILL.md` frontmatter | `disable-model-invocation` | `false` | `true` |
 
-For reconstruction, the frontmatter-based targets receive:
+Antigravity omits `user-invocable` because hidden slash-command visibility is not qualified. Its capability report records this limitation.
+
+For reconstruction, the other frontmatter-based targets receive:
 
 ```yaml
 user-invocable: true

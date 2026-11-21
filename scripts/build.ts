@@ -659,6 +659,7 @@ async function build() {
   const allSkillPaths = [...skillPaths, ...stancePaths];
 
   for (const { resource, outputPath } of plan.resources.filter(({ resource }) => resource.kind === "instruction")) {
+    if (resource.persistentContext && plan.persistentInstructions?.delivery === "native-rules") continue;
     await writeProjectedResource(resource, outputPath, composition, outputBySourcePath);
   }
   await writePersistentContext(outDir, plan, composition);

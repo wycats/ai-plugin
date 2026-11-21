@@ -1,7 +1,7 @@
 /** Build from canonical sources, validate with the receiving host, then install.
  * The same command updates an existing installation through Antigravity's CLI. */
 import { execFileSync } from "node:child_process";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, stat } from "node:fs/promises";
 import { constants } from "node:fs";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
@@ -50,7 +50,11 @@ async function main() {
   let agy = options.agy ?? process.env.ANTIGRAVITY_CLI;
   if (!agy) {
     const bundled = join(homedir(), ".gemini", "bin", process.platform === "win32" ? "agy.exe" : "agy");
-    try { await access(bundled, constants.X_OK); agy = bundled; }
+    try {
+      if (!(await stat(bundled)).isFile()) throw new Error("Bundled CLI is not a file");
+      await access(bundled, constants.X_OK);
+      agy = bundled;
+    }
     catch { agy = "agy"; }
   }
   // Verify the CLI is available before doing build work. No inference is invoked.

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dirname, isAbsolute, join, posix, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, posix, relative, resolve, sep } from "node:path";
 import { codexSkillSidecar } from "./skill-activation.ts";
 import { PI_PROFILE } from "./pi-profile.ts";
 import {
@@ -38,9 +38,15 @@ export interface ProjectionPlan {
 }
 
 function projectedDestination(resource: CanonicalResource, target: BuildTarget): string {
-  if (resource.persistentContext) return target === ANTIGRAVITY_TARGET
-    ? `rules/${resource.name}.md` : resource.pluginPath.slice(2);
-  if (target === ANTIGRAVITY_TARGET && resource.kind === "agent") return `agents/${resource.name}.md`;
+  if (target === ANTIGRAVITY_TARGET && (resource.persistentContext || resource.kind === "agent")) {
+    // Display names remain in frontmatter; canonical filenames own file addresses.
+    const filename = basename(resource.sourcePath).replace(/\.agent\.md$|\.instructions\.md$/, ".md");
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]*\.md$/.test(filename)) {
+      throw new Error(`Antigravity requires a portable resource filename: ${resource.pluginPath}`);
+    }
+    return `${resource.persistentContext ? "rules" : "agents"}/${filename}`;
+  }
+  if (resource.persistentContext) return resource.pluginPath.slice(2);
   if (resource.kind === "workflow" || resource.kind === "stance") {
     if (target === PI_TARGET && resource.kind === "workflow" && resource.identity !== PI_PROFILE.resources[0]) {
       return `references/workflows/${resource.name}/SKILL.md`;

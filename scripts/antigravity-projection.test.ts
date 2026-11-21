@@ -131,3 +131,44 @@ void test("explicit skills retain their selection boundary in the native envelop
     assert.equal(plan.resources[0].exposure, "public");
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+void test("agent and rule display names cannot change their projected file addresses", async () => {
+  const root = await mkdtemp(join(tmpdir(), "antigravity-addresses-"));
+  try {
+    await mkdir(join(root, "agents"));
+    await mkdir(join(root, "instructions"));
+    await writeFile(join(root, "agents", "helper.agent.md"), "---\nname: Team helper\ndescription: Help investigate\n---\nHelp.\n");
+    await writeFile(join(root, "instructions", "guidance.instructions.md"), "---\nname: ../../escaped\ndescription: Persistent guidance\nmetadata:\n  wycats.context: persistent\n---\n[Helper](../agents/helper.agent.md \"composition:reference\")\n");
+    const loaded = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+    assert.ok(loaded.composition);
+    const plan = createProjectionPlan(loaded.composition, "antigravity", join(root, "output"));
+    const helper = plan.resources.find(({ resource }) => resource.kind === "agent");
+    const rule = plan.resources.find(({ resource }) => resource.persistentContext);
+    assert.ok(helper);
+    assert.ok(rule);
+    assert.equal(helper.pluginPath, "./agents/helper.md");
+    assert.equal(rule.pluginPath, "./rules/guidance.md");
+    const content = projectCompositionLinks(await readFile(rule.resource.sourcePath, "utf8"), rule.resource.sourcePath,
+      rule.outputPath, loaded.composition, plan.outputBySourcePath);
+    const links = parseCompositionLinks(content).links;
+    assert.equal(links.length, 1);
+    assert.equal(resolve(dirname(rule.outputPath), links[0].destination), helper.outputPath);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+void test("configured native model tiers reach generated agent definitions", async () => {
+  const root = await mkdtemp(join(tmpdir(), "antigravity-models-"));
+  try {
+    const config = JSON.parse(await readFile(join(ROOT, "config.antigravity.example.json"), "utf8")) as {
+      models: Record<string, string | null>;
+    };
+    config.models = { fast: "pro", balanced: "flash", auxiliary: "flash_lite" };
+    const configPath = join(root, "config.json");
+    await writeFile(configPath, JSON.stringify(config));
+    const output = join(root, "output");
+    await exec(process.execPath, [join(ROOT, "scripts/build.ts"), "--config", configPath, "--output", output], { cwd: ROOT });
+    for (const [name, tier] of [["recon", "pro"], ["recon-worker", "pro"], ["editorial-reader", "flash_lite"]]) {
+      assert.equal(parseResourceFrontmatter(await readFile(join(output, "agents", `${name}.md`), "utf8")).data.model, tier);
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});

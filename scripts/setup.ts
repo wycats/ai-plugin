@@ -3,6 +3,7 @@
  * runs the build, and (for VS Code) registers the plugin.
  */
 
+import { validateAntigravityModels } from "./antigravity-projection.ts";
 import { parseBuildConfig } from "./build-config.ts";
 import { readFile, writeFile, appendFile, access } from "node:fs/promises";
 import { join } from "node:path";
@@ -198,8 +199,8 @@ async function setup() {
   const target = await p.select({
     message: "What platform are you using?",
     options: [
-      { value: "antigravity", label: "Antigravity", hint: "skills, agents, and always-on guidance" },
       { value: "vscode", label: "VS Code", hint: "GitHub Copilot" },
+      { value: "antigravity", label: "Antigravity", hint: "skills, agents, and always-on guidance" },
       {
         value: "claude-code",
         label: "Claude Code",
@@ -284,7 +285,25 @@ async function setup() {
   // 3. Resolve models
   let models: Record<string, string | null>;
 
-  if (provider === "custom") {
+  if (provider === "custom" && target === ANTIGRAVITY_TARGET) {
+    models = {};
+    for (const role of ["fast", "balanced", "auxiliary"]) {
+      const tier = await p.select({
+        message: `Model tier for ${role}:`,
+        options: [
+          { value: "inherit", label: "Inherit the session model" },
+          { value: "flash_lite", label: "Flash Lite" },
+          { value: "flash", label: "Flash" },
+          { value: "pro", label: "Pro" },
+        ],
+      });
+      if (p.isCancel(tier)) {
+        p.cancel("Setup cancelled. Your existing config.json is unchanged.");
+        process.exit(0);
+      }
+      models[role] = tier;
+    }
+  } else if (provider === "custom") {
     p.note(
       "Enter model names for each role, or leave blank for platform default.",
       "Custom models",
@@ -344,6 +363,8 @@ async function setup() {
     toolGroups: example.toolGroups,
     ...(example.hookMatchers ? { hookMatchers: example.hookMatchers } : {}),
   });
+
+  if (target === ANTIGRAVITY_TARGET) validateAntigravityModels(config.models);
 
   await writeFile(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n");
 
