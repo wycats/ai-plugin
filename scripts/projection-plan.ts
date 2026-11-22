@@ -92,8 +92,18 @@ export function createProjectionPlan(
     }
   }
   const resources: ProjectedResource[] = [];
+  const destinationOwners = new Map<string, CanonicalResource>();
   for (const resource of selected) {
     const destination = projectedDestination(resource, target);
+    if (target === ANTIGRAVITY_TARGET) {
+      // Flat native directories must also be unambiguous on case-insensitive hosts.
+      const key = destination.toLowerCase();
+      const previous = destinationOwners.get(key);
+      if (previous) {
+        throw new Error(`Antigravity destination collision at '${destination}': ${previous.pluginPath} and ${resource.pluginPath}. Rename one source file before building.`);
+      }
+      destinationOwners.set(key, resource);
+    }
     const frontmatter = resource.frontmatter;
     let skillMetadata: ProjectedResource["skillMetadata"];
     if (resource.activation) {

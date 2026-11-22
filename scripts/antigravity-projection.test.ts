@@ -172,3 +172,36 @@ void test("configured native model tiers reach generated agent definitions", asy
     }
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+void test("Antigravity rejects colliding nested agents and rules before output cleanup", async () => {
+  for (const section of ["agents", "instructions"]) {
+    for (const secondBasename of ["helper", "Helper"]) {
+      const root = await mkdtemp(join(tmpdir(), "antigravity-collision-"));
+      try {
+        const suffix = section === "agents" ? ".agent.md" : ".instructions.md";
+        for (const [team, name] of [["team-a", "helper"], ["team-b", secondBasename]]) {
+          const folder = join(root, section, team);
+          await mkdir(folder, { recursive: true });
+          await writeFile(join(folder, `${name}${suffix}`), `---\nname: ${team}-helper\ndescription: Help ${team}\n${section === "instructions" ? "metadata:\n  wycats.context: persistent\n" : ""}---\nGuidance for ${team}.\n`);
+        }
+        const loaded = await loadCanonicalComposition(root, await discoverResourceFiles(root));
+        assert.ok(loaded.composition);
+        const composition = loaded.composition;
+        assert.equal(composition.resources.length, 2);
+        const output = join(root, "output");
+        await mkdir(output);
+        const sentinel = join(output, "previous.md");
+        await writeFile(sentinel, "previous build");
+        // Planning is the build's preflight, before prepareProjectionOutput.
+        assert.throws(() => createProjectionPlan(composition, "antigravity", output), (error: unknown) => {
+          assert.ok(error instanceof Error);
+          assert.match(error.message, /Antigravity destination collision/);
+          assert.ok(error.message.includes(`${section}/team-a/helper${suffix}`));
+          assert.ok(error.message.includes(`${section}/team-b/${secondBasename}${suffix}`));
+          return true;
+        });
+        assert.equal(await readFile(sentinel, "utf8"), "previous build");
+      } finally { await rm(root, { recursive: true, force: true }); }
+    }
+  }
+});
