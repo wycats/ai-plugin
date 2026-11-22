@@ -14,14 +14,14 @@ matching and persistent context are different activation mechanisms. Existing
 file-scoped instructions retain their VS Code projection.
 
 Links to canonical resources use `composition:reference`, so validation and
-projection follow the same resource graph as skills and agents. The build keeps
+projection follow the same resource graph as skills and agents. The hook and project-import targets keep
 the instruction file at `instructions/<name>.instructions.md` and generates a
 context payload from its body. It preserves all prose, including the bibliography.
 The payload separates link destinations from text. At execution, the loader
 resolves those destinations against the installed package's location and emits
 absolute Markdown links. Installation paths with spaces remain usable.
 
-The build collects every selected persistent instruction into one payload, in
+Those targets collect every selected persistent instruction into one payload, in
 resource order. A shared renderer resolves its links and returns the complete
 prose. Adding or renaming an instruction requires no document-specific adapter
 change. Building together is currently the collection's only member.
@@ -46,6 +46,12 @@ Installed packages need Node.js but do not require a separate dependency install
 The Claude installer validates its saved installation record with a Zod schema
 before checking that the managed files still match it.
 
+Antigravity instead projects each persistent document to `rules/<name>.md`
+with `trigger: always_on`. It preserves the body and rewrites links relative to
+that rule. Native rules require neither a context payload nor a Node hook.
+Runtime context delivery and compaction behavior still need a receiving-context
+probe; package validation establishes the envelope and paths.
+
 ## Delivery by target
 
 | Target | Package entry | Delivery and limits |
@@ -53,6 +59,7 @@ before checking that the managed files still match it.
 | Codex | `hooks/hooks.json`, discovered by the compatibility plugin manifest | `SessionStart` adds developer context on startup, clear, and after root-session compaction. Resume retains the earlier context. The matcher excludes resume and fork to avoid appending another copy. Plugin hooks require host trust review. |
 | Claude Code | `/wycats:setup-guidance` or `scripts/claude-guidance.mjs install --project <directory>` | Explicit setup adds a project `CLAUDE.md` import of the complete generated story. Native instruction context survives resume and compaction and coexists with output styles. It is user-message context, not system-role text. Refresh the export after plugin updates; remove it separately when uninstalling. No persistent-context hook is registered. |
 | VS Code Local harness | `com.github.copilot/hooks/hooks.json` | `SessionStart` adds conversation context on the first prompt. Restoration after compaction is not established. The persistent document is excluded from native rule discovery to avoid a second activation path. |
+| Antigravity | `rules/<name>.md` | Native `always_on` rules; no generated context hook or authored policy hooks. Package validation and CLI discovery verified; model delivery remains unqualified. |
 | Pi Recon profile | Omitted | The current profile supports a bounded Recon workflow. Its capability report records the omission. Adding the full story needs a deliberate profile expansion and verification of its linked workflows. |
 
 These mappings follow the [Codex plugin contract](https://developers.openai.com/plugins/build/plugins#bundled-mcp-servers-and-lifecycle-hooks),

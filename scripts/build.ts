@@ -23,6 +23,7 @@ import {
   type DiscoveredResource,
 } from "./resource-discovery.ts";
 import {
+  ANTIGRAVITY_TARGET,
   CODEX_TARGET,
   legacyVSCodeOutputPath,
   outputPathForTarget,
@@ -42,6 +43,7 @@ import { parseHookManifest, type HookManifest } from "./hook-manifest.ts";
 import { PI_PROFILE, piAgentContext } from "./pi-profile.ts";
 import { createProjectionPlan, projectionResourceMap, type ProjectionPlan, type ProjectedResource } from "./projection-plan.ts";
 import { contextDeliveryIndex } from "./context-delivery.ts";
+import { antigravityAgentMetadata, writeAntigravityManifest, validateAntigravityModels } from "./antigravity-projection.ts";
 import { writePersistentContext } from "./persistent-context.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -289,8 +291,8 @@ async function buildAgent(
     // VS Code resolves delegation and handoffs by name. Explicit frontmatter
     // replaces its plugin-qualified fallback, so carry the namespace ourselves.
     data.name = `${pluginName}:${canonicalName}`;
-  } else if ((isClaudeCode || isPi) && !data.name) {
-    // Claude Code and pi-subagents require this field.
+  } else if ((isClaudeCode || isPi || config.target === ANTIGRAVITY_TARGET) && !data.name) {
+    // Native agent loaders require the canonical name.
     const name = isPi ? PI_PROFILE.name : canonicalName;
     const original = { ...data };
     for (const k of Object.keys(data)) {
@@ -318,8 +320,8 @@ async function buildAgent(
   // Resolve tools
   if (Array.isArray(data.tools)) {
     const resolved = resolveTools(data.tools, config);
-    // Claude Code and Pi groups may overlap; both hosts want a strict unique list.
-    data.tools = isClaudeCode || isPi ? [...new Set(resolved)] : resolved;
+    // Native tool groups can overlap; emit a unique allowlist.
+    data.tools = isClaudeCode || isPi || config.target === ANTIGRAVITY_TARGET ? [...new Set(resolved)] : resolved;
   }
 
   if (isClaudeCode) {
@@ -328,6 +330,11 @@ async function buildAgent(
 
   if (isPi) {
     Object.assign(data, piAgentContext(profileSkillNames));
+  }
+
+  if (config.target === ANTIGRAVITY_TARGET) {
+    Object.assign(data, antigravityAgentMetadata(data));
+    delete data["user-invocable"];
   }
 
   const frontmatter = serializeFrontmatter(data, isPi ? "block" : "flow");
@@ -556,6 +563,7 @@ async function writePiCapabilityReport(
 
 async function build() {
   const config = await loadConfig();
+  if (config.target === ANTIGRAVITY_TARGET) validateAntigravityModels(config.models);
   const defaultOutDir = outputPathForTarget(ROOT, config.target);
   const outDir = BUILD_OPTIONS.outputPath ?? defaultOutDir;
   if (BUILD_OPTIONS.outputPath) {
@@ -651,6 +659,7 @@ async function build() {
   const allSkillPaths = [...skillPaths, ...stancePaths];
 
   for (const { resource, outputPath } of plan.resources.filter(({ resource }) => resource.kind === "instruction")) {
+    if (resource.persistentContext && plan.persistentInstructions?.delivery === "native-rules") continue;
     await writeProjectedResource(resource, outputPath, composition, outputBySourcePath);
   }
   await writePersistentContext(outDir, plan, composition);
@@ -679,7 +688,12 @@ async function build() {
     JSON.stringify(packageJson, null, 2) + "\n",
   );
 
-  if (isPi) {
+  if (config.target === ANTIGRAVITY_TARGET) {
+    await writeAntigravityManifest(outDir, pluginMeta);
+    console.log(`Built to ${relative(ROOT, outDir)}/`);
+    console.log(`  agents: ${String(agentPaths.length)}, skills: ${String(allSkillPaths.length)}`);
+    console.log("  persistent guidance: native always-on rules");
+  } else if (isPi) {
     await writePiCapabilityReport(outDir, plan);
     console.log(`Built to ${relative(ROOT, outDir)}/`);
     console.log(`  agents:       ${String(agentPaths.length)} pi-subagents profile`);

@@ -31,7 +31,7 @@ const toolGroupsSchema = z.object({
 
 export const buildConfigSchema = z.strictObject({
   $schema: z.string().optional().describe("Path to this schema file. Enables editor validation and autocomplete."),
-  target: buildTargetSchema.describe("Build target platform. VS Code builds to out/wycats/; Claude Code builds to out/claude-code/; Codex builds to out/codex/; Pi builds to out/pi/."),
+  target: buildTargetSchema.describe("Build target platform. VS Code builds to out/wycats/; Claude Code builds to out/claude-code/; Codex builds to out/codex/; Pi builds to out/pi/; Antigravity builds to out/antigravity/."),
   models: modelsSchema,
   thinkingLevels: z.record(z.string(), modelMapping).optional().describe("Optional target-specific thinking levels keyed by abstract model role. Pi projects these into pi-subagents agent profiles."),
   toolGroups: toolGroupsSchema,

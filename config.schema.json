@@ -12,9 +12,10 @@
         "vscode",
         "claude-code",
         "codex",
-        "pi"
+        "pi",
+        "antigravity"
       ],
-      "description": "Build target platform. VS Code builds to out/wycats/; Claude Code builds to out/claude-code/; Codex builds to out/codex/; Pi builds to out/pi/."
+      "description": "Build target platform. VS Code builds to out/wycats/; Claude Code builds to out/claude-code/; Codex builds to out/codex/; Pi builds to out/pi/; Antigravity builds to out/antigravity/."
     },
     "models": {
       "type": "object",

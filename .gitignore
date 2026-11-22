@@ -13,4 +13,5 @@ dist/*
 !dist/wycats/**
 out/
 config.json
+config.*.local.json
 hooks-debug.log

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dirname, isAbsolute, join, posix, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, posix, relative, resolve, sep } from "node:path";
 import { codexSkillSidecar } from "./skill-activation.ts";
 import { PI_PROFILE } from "./pi-profile.ts";
 import {
@@ -8,7 +8,7 @@ import {
   type CanonicalComposition,
   type CanonicalResource,
 } from "./resource-composition.ts";
-import { CODEX_TARGET, PI_TARGET, VSCODE_TARGET, buildTargetSchema, isBuildTarget, type BuildTarget } from "./target-output.ts";
+import { ANTIGRAVITY_TARGET, CODEX_TARGET, PI_TARGET, VSCODE_TARGET, buildTargetSchema, isBuildTarget, type BuildTarget } from "./target-output.ts";
 
 const resourceExposureSchema = z.enum(["public", "private", "reference"]);
 
@@ -23,7 +23,7 @@ export interface ProjectedResource {
 
 export interface PersistentInstructionPlan {
   resources: ProjectedResource[];
-  delivery: "session-start" | "claude-project-import";
+  delivery: "session-start" | "claude-project-import" | "native-rules";
 }
 
 export interface ProjectionPlan {
@@ -38,6 +38,14 @@ export interface ProjectionPlan {
 }
 
 function projectedDestination(resource: CanonicalResource, target: BuildTarget): string {
+  if (target === ANTIGRAVITY_TARGET && (resource.persistentContext || resource.kind === "agent")) {
+    // Display names remain in frontmatter; canonical filenames own file addresses.
+    const filename = basename(resource.sourcePath).replace(/\.agent\.md$|\.instructions\.md$/, ".md");
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]*\.md$/.test(filename)) {
+      throw new Error(`Antigravity requires a portable resource filename: ${resource.pluginPath}`);
+    }
+    return `${resource.persistentContext ? "rules" : "agents"}/${filename}`;
+  }
   if (resource.persistentContext) return resource.pluginPath.slice(2);
   if (resource.kind === "workflow" || resource.kind === "stance") {
     if (target === PI_TARGET && resource.kind === "workflow" && resource.identity !== PI_PROFILE.resources[0]) {
@@ -84,14 +92,25 @@ export function createProjectionPlan(
     }
   }
   const resources: ProjectedResource[] = [];
+  const destinationOwners = new Map<string, CanonicalResource>();
   for (const resource of selected) {
     const destination = projectedDestination(resource, target);
+    if (target === ANTIGRAVITY_TARGET) {
+      // Flat native directories must also be unambiguous on case-insensitive hosts.
+      const key = destination.toLowerCase();
+      const previous = destinationOwners.get(key);
+      if (previous) {
+        throw new Error(`Antigravity destination collision at '${destination}': ${previous.pluginPath} and ${resource.pluginPath}. Rename one source file before building.`);
+      }
+      destinationOwners.set(key, resource);
+    }
     const frontmatter = resource.frontmatter;
     let skillMetadata: ProjectedResource["skillMetadata"];
     if (resource.activation) {
       try {
         const projected: Record<string, unknown> = { ...frontmatter, "user-invocable": resource.activation.userInvocable };
         delete projected.invocation;
+        if (target === ANTIGRAVITY_TARGET) delete projected["user-invocable"];
         if (target === CODEX_TARGET) {
           if (!/^skills\/[^/]+\/SKILL\.md$/.test(destination)) {
             throw new Error("Codex requires skill directories immediately under skills/");
@@ -159,7 +178,7 @@ export function createProjectionPlan(
     includesSourceHooks: target === VSCODE_TARGET || target === "claude-code",
     ...(persistentResources.length ? { persistentInstructions: {
       resources: persistentResources,
-      delivery: target === "claude-code" ? "claude-project-import" as const : "session-start" as const,
+      delivery: target === ANTIGRAVITY_TARGET ? "native-rules" as const : target === "claude-code" ? "claude-project-import" as const : "session-start" as const,
     } } : {}) };
 }
 

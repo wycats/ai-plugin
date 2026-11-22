@@ -328,7 +328,7 @@ These inventories change with the projection plan and are not repeated here.
 ### 4.2 Activation metadata
 
 Adapters must consume normalized canonical `invocation`, remove it from generated frontmatter, retain
-normalized `user-invocable`, and emit the following native invocation value for
+normalized `user-invocable` where the host supports it, and emit the following native invocation value for
 each selected skill or stance. Values are emitted explicitly for both policies.
 All locations in this table are relative to the projected `SKILL.md` directory.
 
@@ -338,8 +338,11 @@ All locations in this table are relative to the projected `SKILL.md` directory.
 | Claude Code | `SKILL.md` frontmatter | `disable-model-invocation` | `false` | `true` |
 | Codex | `agents/openai.yaml` | `policy.allow_implicit_invocation` | `true` | `false` |
 | Pi | `SKILL.md` frontmatter | `disable-model-invocation` | `false` | `true` |
+| Antigravity | `SKILL.md` frontmatter | `disable-model-invocation` | `false` | `true` |
 
-For reconstruction, the frontmatter-based targets receive:
+Antigravity omits `user-invocable` because hidden slash-command visibility is not qualified. Its capability report records this limitation.
+
+For reconstruction, the other frontmatter-based targets receive:
 
 ```yaml
 user-invocable: true
@@ -677,3 +680,23 @@ an explanation, or recognizes where the user’s judgment is needed. Record
 unnecessary consultation and interference from early context as well. A read
 receipt establishes access to the material. The account and resulting work
 show whether it helped.
+
+
+## Antigravity projection
+
+The `antigravity` target projects canonical sources directly into a native
+plugin. Skills remain under `skills/<name>/SKILL.md`, agents use
+`agents/<name>.md`, and persistent instructions use always-on `rules/<name>.md`
+files. Composition links are resolved against those output addresses before
+writing metadata. Persistent delivery uses native rules, independently of the
+policy hooks omitted from this target.
+
+Explicit-only skills use `disable-model-invocation`. Per-skill hiding from the
+user menu is not qualified, so the build omits the unsupported visibility key
+and records the limitation. Agent visibility maps to `mainAgent`; all projected
+roles remain available as subagents. Models and tool groups use Antigravity
+mappings rather than Copilot identifiers. Agent skills and linked activity
+context remain model-directed reads, with no automatic preload claim.
+
+See [Antigravity setup](antigravity.md) for installation, native documentation,
+and the distinction between package conformance and runtime qualification.
