@@ -42,14 +42,21 @@ for (const target of ["codex", "claude-code", "vscode"]) {
       await rm(built, { recursive: true });
       const hooksPath = target === "vscode" ? "com.github.copilot/hooks/hooks.json" : "hooks/hooks.json";
       const hooks = JSON.parse(await readFile(join(installed, hooksPath), "utf8")) as {
-        hooks: Record<string, Array<{ command?: string; matcher?: string; hooks?: Array<{ command: string; additionalContextLimit?: number }> }> | undefined>;
+        hooks: Record<string, Array<{
+          command?: string;
+          matcher?: string;
+          hooks?: Array<{ command: string; statusMessage?: string; additionalContextLimit?: number }>;
+        }> | undefined>;
       };
       const entry = (hooks.hooks.SessionStart ?? []).find(entry => (entry.command ?? entry.hooks?.[0]?.command)?.includes("persistent-context-hook.mjs"));
       if (target === "claude-code") assert.equal(entry, undefined);
       else assert.ok(entry);
       if (target === "codex") {
         assert.ok(entry);
-        assert.equal(entry.hooks?.[0].additionalContextLimit, 16000);
+        const handler = entry.hooks?.[0];
+        assert.ok(handler);
+        assert.equal(handler.statusMessage, "Load Building together guidance");
+        assert.equal(handler.additionalContextLimit, 16000);
         const lifecycle = new RegExp(entry.matcher ?? ".*");
         for (const source of ["startup", "clear", "compact"]) assert.ok(lifecycle.test(source));
         for (const source of ["resume", "fork"]) assert.equal(lifecycle.test(source), false);
