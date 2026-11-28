@@ -1,0 +1,7 @@
+interface:
+  display_name: relational-continuity
+  short_description: Use when wording needs to carry the work forward in
+    conversation, a summary, or a handoff. Preserve the concerns and
+    relationships that make the next contribution meaningful.
+policy:
+  allow_implicit_invocation: true

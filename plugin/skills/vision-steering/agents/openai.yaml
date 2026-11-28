@@ -1,0 +1,8 @@
+interface:
+  display_name: vision-steering
+  short_description: Use when deciding what to pursue by considering what the work
+    should make possible for people. Keep that purpose active through local
+    choices, and let experience clarify or challenge the direction with the
+    user.
+policy:
+  allow_implicit_invocation: true

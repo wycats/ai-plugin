@@ -1,0 +1,8 @@
+interface:
+  display_name: rfc-writing
+  short_description: Use when developing or revising an RFC or design proposal,
+    assessing its readiness for a decision, or reconciling it with
+    implementation and experience. Carry the design's reasoning and commitments
+    through the work.
+policy:
+  allow_implicit_invocation: true

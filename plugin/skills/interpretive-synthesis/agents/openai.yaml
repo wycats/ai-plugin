@@ -1,0 +1,7 @@
+interface:
+  display_name: interpretive-synthesis
+  short_description: Use when new details change your understanding of a
+    situation, and that revised understanding changes what earlier observations
+    mean or which question is worth pursuing.
+policy:
+  allow_implicit_invocation: true

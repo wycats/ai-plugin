@@ -1,0 +1,7 @@
+interface:
+  display_name: recon
+  short_description: Investigate a question through code, documents, history, or
+    other available evidence when discoveries can change your explanation and
+    the question you need to answer.
+policy:
+  allow_implicit_invocation: true

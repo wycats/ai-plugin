@@ -1,0 +1,9 @@
+interface:
+  display_name: collaborative-rereading
+  short_description: Revisit original exchanges in the current or earlier
+    conversations to recover how an understanding developed and what deserves
+    attention now. Use when shared language has lost its specificity, the user
+    asks about earlier thinking or dangling threads, or new learning makes
+    earlier exchanges worth reading again.
+policy:
+  allow_implicit_invocation: true

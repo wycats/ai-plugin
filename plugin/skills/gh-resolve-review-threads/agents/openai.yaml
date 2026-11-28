@@ -1,0 +1,9 @@
+interface:
+  display_name: gh-resolve-review-threads
+  short_description: Use when asked to address PR review or diff comments,
+    including comments supplied through a review UI. Investigate the concern,
+    establish what the published PR supports, and resolve threads when the
+    evidence and project conventions support closure. Read-only review leaves
+    threads open.
+policy:
+  allow_implicit_invocation: true

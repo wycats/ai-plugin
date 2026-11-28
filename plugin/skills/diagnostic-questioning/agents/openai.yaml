@@ -1,0 +1,7 @@
+interface:
+  display_name: diagnostic-questioning
+  short_description: Use when a conversation can resolve uncertainty about another
+    person's intent, priorities, or experience. Let each answer revise your
+    understanding and guide the next question.
+policy:
+  allow_implicit_invocation: true

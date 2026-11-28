@@ -1,0 +1,9 @@
+interface:
+  display_name: thread-coordinator
+  short_description: "Use when separate Codex chats need to work together:
+    ownership or dependencies are unclear, a result needs to reach another
+    effort, work has stalled between handoffs, or the user wants ongoing
+    coordination. Keep each effort connected to the shared purpose and make the
+    next action clear."
+policy:
+  allow_implicit_invocation: true

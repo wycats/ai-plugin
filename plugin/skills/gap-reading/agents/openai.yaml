@@ -1,0 +1,8 @@
+interface:
+  display_name: gap-reading
+  short_description: Use when an explanation or direction of work has left
+    details, possibilities, or unfinished threads out of view. Return to the
+    underlying material to recover what may change your understanding or remain
+    worth keeping before you can explain how it fits.
+policy:
+  allow_implicit_invocation: true

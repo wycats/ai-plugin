@@ -1,0 +1,7 @@
+interface:
+  display_name: authorial-continuity
+  short_description: Use when developing language that will be attributed to
+    someone, preserving how their judgment takes shape in words and in their
+    relationship with the people who will read them.
+policy:
+  allow_implicit_invocation: true

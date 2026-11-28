@@ -1,0 +1,8 @@
+interface:
+  display_name: implementation-quality
+  short_description: Improve how existing code, types, names, file organization,
+    and local documentation express the system's concepts. Use for
+    implementation quality passes or holistic review of confusing details, from
+    a single operation to a systematic codebase pass.
+policy:
+  allow_implicit_invocation: true

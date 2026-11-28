@@ -1,0 +1,8 @@
+interface:
+  display_name: colleague-review
+  short_description: Develop an artifact through a colleague's reading, questions,
+    and attempts to apply it. Use when an explanation, interface, design, or
+    guide needs to be examined from another participant's starting point and
+    revised through discussion.
+policy:
+  allow_implicit_invocation: true

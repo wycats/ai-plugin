@@ -1,0 +1,7 @@
+interface:
+  display_name: reader-orientation
+  short_description: Use when shaping code, explanations, interfaces, or
+    instructions around what someone can know where they encounter them, so they
+    can reason locally and investigate deeper without losing the larger idea.
+policy:
+  allow_implicit_invocation: true

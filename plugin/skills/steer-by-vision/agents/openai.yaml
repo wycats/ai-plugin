@@ -1,0 +1,9 @@
+interface:
+  display_name: steer-by-vision
+  short_description: "Use when a project needs a deliberate choice of direction:
+    several worthwhile moves compete, a milestone leaves the next move unclear,
+    or useful local work has lost its connection to what the user wants to
+    accomplish. Recover that connection and recommend work that can advance or
+    test it."
+policy:
+  allow_implicit_invocation: true
