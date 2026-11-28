@@ -6,6 +6,7 @@ import { VSCODE_PLUGIN_HOOK_PATH } from "./vscode-plugin.ts";
 interface HookCommand {
   type: "command";
   command: string;
+  statusMessage?: string;
   timeout?: number;
   /** Codex's inline context budget; other hosts omit this field. */
   additionalContextLimit?: number;
@@ -116,6 +117,7 @@ function hookManifest(pluginPath: string, hooks: ProjectedHooks["hooks"]): Proje
 function projectCodexContextHook(): Partial<Record<string, HookGroup[]>> {
   const handler: HookCommand = {
     type: "command",
+    statusMessage: "Load Building together guidance",
     command: `node -e "import(require('node:url').pathToFileURL(require('node:path').join(process.env.PLUGIN_ROOT, 'scripts/persistent-context-hook.mjs')).href)"`,
     timeout: 10,
     additionalContextLimit: 16000,

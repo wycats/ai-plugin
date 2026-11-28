@@ -32,6 +32,13 @@ Look for `wycats@wycats` in `installed`, with `installed: true` and
    the CLI and run `codex -C /path/to/project` again. The fresh session lets the
    now-trusted startup hook run.
 
+In Codex Desktop, open a local project folder, then go to **Settings → Hooks**
+and select the `wycats` plugin. With no local projects, this page can show
+“No hooks found” even when the plugin is installed. Look for **Load Building
+together guidance** under `SessionStart`. If you trusted it when it was called
+“Hook 1,” Codex asks you to review it again after the label changes. Review
+and trust the hook, then start a fresh chat.
+
 The hook delivers [Building together](../instructions/building-together.instructions.md)
 as guidance for the session. Plugin installation and hook trust are separate:
 the installed/enabled check above confirms the plugin, while `/hooks` shows
